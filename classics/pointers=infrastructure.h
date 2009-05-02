@@ -86,6 +86,7 @@ struct handle_structure_nt {  //non-template base
    CLASSICS_EXPORT void zap_unowned() const;  //called when baro count hits zero
    void inc_unowned_reference() const { get_Lifetime()->inc_unowned_count(); }
    void dec_unowned_reference() const { if (get_Lifetime()->dec_unowned_count()) zap_unowned(); }
+   static void dec_unowned_reference (const handle_structure_nt& self) { self.dec_unowned_reference(); }
    lifetime* get_Lifetime() const
     {
     lifetime* retval= Lifetime;

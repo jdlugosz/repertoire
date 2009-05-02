@@ -8,6 +8,7 @@
 #endif
 
 #include "ratwin\message=struct.h"
+#include "ratwin\window=struct.h"
 #include "classics\closure.h"
 #include "tomahawk\HWND_vpapa.h"
 
@@ -25,16 +26,16 @@ protected:
    unsigned short LastMessage;  // unhook when I see this.
 public:
    void sane_check() const;
-   TOMAHAWK_EXPORT ratwin::window::WNDPROC_2 get_WndProc();
    TOMAHAWK_EXPORT message_tap();
    TOMAHAWK_EXPORT virtual ~message_tap();
+   TOMAHAWK_EXPORT ratwin::window::WNDPROC_2 get_WndProc();
    TOMAHAWK_EXPORT void hook (ratwin::types::HWND);
    TOMAHAWK_EXPORT bool unhook (bool force=true);
    void unhook_when_possible() { UnhookASAP= true;  }
-//   TOMAHAWK_EXPORT virtual long handle_message (ratwin::message::sMSG& msg) =0;
    TOMAHAWK_EXPORT virtual int pre_translate_message (const ratwin::message::MSG& msg); // 0:no clue, 1:done&ate it, 2:done&proceed
    TOMAHAWK_EXPORT virtual void on_attach();  // called when hooked.
    TOMAHAWK_EXPORT long call_old_wndproc (ratwin::message::sMSG& msg);
+   ratwin::window::WNDPROC_sig get_old_wndproc() const { return OldWndProc; }
    TOMAHAWK_EXPORT void set_window_handle (ratwin::types::HWND);
    };
 

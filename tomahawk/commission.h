@@ -32,7 +32,8 @@ public:
    TOMAHAWK_EXPORT ~commission();
    TOMAHAWK_EXPORT commission (const commission&);
    TOMAHAWK_EXPORT commission& operator= (const commission&);
-
+   TOMAHAWK_EXPORT static int compare (const commission&, const commission&);
+   TOMAHAWK_EXPORT static int comparekey (const commission&, const classics::schedule_t&);
    };
 
 }

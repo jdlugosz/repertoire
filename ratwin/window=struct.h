@@ -1,6 +1,6 @@
 // The Repertoire Project copyright 2006 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: ratwin\window=struct.h
-// Revision: public build 9, shipped on 18-Oct-2006
+// Revision: post-public build 9
 
 #pragma once
 #include "ratwin\message=struct.h"
@@ -180,6 +180,8 @@ struct WNDPROC_sig {
    Dlugosz::ratwin::arg::arg32 x;
    WNDPROC_sig (WNDPROC x) : x(reinterpret_cast<Dlugosz::ratwin::arg::arg32>(x)) {}
    WNDPROC_sig (WNDPROC_2 x) : x(reinterpret_cast<Dlugosz::ratwin::arg::arg32>(x)) {}
+   operator bool() const { return x; }
+   bool operator! () const { return ! operator bool(); }
    };
 
 template <typename CharT>

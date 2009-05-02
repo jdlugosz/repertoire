@@ -15,8 +15,9 @@ public:
    baro (const baro<T>& other) : Base(other) {}
    baro (const handle<T>& other) : Base(other) {}
    baro& operator= (const baro& other)   { Base::operator=(other); return *this; }
+   baro& operator= (T* p) { Base::operator=(p); return *this; }
    };
-   
+
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 } // end of classics
 
