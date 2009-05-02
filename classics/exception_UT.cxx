@@ -1,16 +1,18 @@
 // The Repertoire Project copyright 1999 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: classics\exception_UT.cxx
-// Revision: public build 5, shipped on 8-April-1999
+// Revision: public build 6, shipped on 28-Nov-1999
 
 // This tests the exception class
 
 #include "classics\exception.h"
 #include "classics\string_ios.h"
 #include <iostream>
+#include <time.h>
 
 using std::cout;
 using std::endl;
 using classics::wFmt;
+using classics::ustring;
 
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
@@ -67,10 +69,36 @@ void test2()
     
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
+void (*old_setup_hook) (classics::exception* self, const ustring& module, const ustring& name, const ustring& fname, int line);
+
+void my_setup (classics::exception* self, const ustring& module, const ustring& name, const ustring& fname, int line)
+ {
+ old_setup_hook (self, module, name, fname, line);
+ // then add my own stuff
+ tm *newtime;
+ time_t aclock;
+ time (&aclock);
+ newtime= localtime (&aclock);
+ self->add_key ("Time", asctime(newtime));
+ }
+
+/* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
+
+void test3()
+ {
+ cout << "testing setup_hook" << endl;
+ old_setup_hook= classics::exception::setup_hook;
+ classics::exception::setup_hook= my_setup;
+ test1();
+ }
+ 
+/* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
+
 int main()
  {
  test1();
  test2();
+ test3();
  cout << "* note: results not automatically validated." << endl;
  return 0;
  }

@@ -1,6 +1,6 @@
 // The Repertoire Project copyright 1999 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: ratwin\COM\HRESULT.h
-// Revision: public build 5, shipped on 8-April-1999
+// Revision: public build 6, shipped on 28-Nov-1999
 
 #pragma once
 
@@ -58,8 +58,8 @@ static const HRESULT E_UNEXPECTED= reinterpret_cast<HRESULT>(0x8000FFFF);
 static const HRESULT CLASS_E_NOAGGREGATION= reinterpret_cast<HRESULT> (0x80040110);
 static const HRESULT E_OUTOFMEMORY= reinterpret_cast<HRESULT>(0x8007000E);
 static const HRESULT CLASS_E_CLASSNOTAVAILABLE= reinterpret_cast<HRESULT>(0x80040111);
+static const HRESULT E_NOTIMPL= reinterpret_cast<HRESULT>(0x80004001L);
 #if 0
-#define E_NOTIMPL                        _HRESULT_TYPEDEF_(0x80004001L)
 #define E_INVALIDARG                     _HRESULT_TYPEDEF_(0x80070057L)
 #define E_POINTER                        _HRESULT_TYPEDEF_(0x80004003L)
 #define E_HANDLE                         _HRESULT_TYPEDEF_(0x80070006L)

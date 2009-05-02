@@ -1,6 +1,6 @@
 // The Repertoire Project copyright 1999 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: classics\string.h
-// Revision: public build 5, shipped on 8-April-1999
+// Revision: public build 6, shipped on 28-Nov-1999
 
 #pragma once
 #if !defined CLASSICS_STRING_INCLUDED
@@ -29,6 +29,7 @@ public:
    CLASSICS_EXPORT int compare (const generic_string&, bool case_sensitive=true) const;
    CLASSICS_EXPORT generic_string& operator= (const T*);
    CLASSICS_EXPORT generic_string& operator+= (const generic_string& other);
+   CLASSICS_EXPORT generic_string& operator+= (const T* other);
    };
 
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */

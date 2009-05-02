@@ -75,6 +75,9 @@ Package=<5>
 
 Package=<4>
 {{{
+    Begin Project Dependency
+    Project_Dep_Name ratwin_static
+    End Project Dependency
 }}}
 
 ###############################################################################
@@ -184,6 +187,21 @@ Package=<4>
 
 ###############################################################################
 
+Project: "memory_pool_benchmark"=.\Classics\memory_pool_benchmark.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name classics
+    End Project Dependency
+}}}
+
+###############################################################################
+
 Project: "ratwin"=.\ratwin\ratwin.dsp - Package Owner=<4>
 
 Package=<5>
@@ -199,6 +217,45 @@ Package=<4>
     Begin Project Dependency
     Project_Dep_Name classics
     End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "ratwin_static"=.\ratwin\ratwin_static.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "registry_UT"=.\Classics\registry_UT.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name classics
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "shellrun"=.\ratwin\shellrun.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
 }}}
 
 ###############################################################################
@@ -249,6 +306,21 @@ Package=<4>
 ###############################################################################
 
 Project: "vararray_UT"=.\classics\vararray_UT.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name classics
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "virtual_key_UT"=.\Classics\virtual_key_UT.dsp - Package Owner=<4>
 
 Package=<5>
 {{{

@@ -1,13 +1,12 @@
 // The Repertoire Project copyright 1999 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: ratwin\window.h
-// Revision: public build 5, shipped on 8-April-1999
+// Revision: public build 6, shipped on 28-Nov-1999
 
 #pragma once
-#if !defined RATWIN_WINDOW_INCLUDED
-#define RATWIN_WINDOW_INCLUDED
+#if !defined Ieea3fff0_2fe3_11d3_aacf_0020af6bccd6
+#define Ieea3fff0_2fe3_11d3_aacf_0020af6bccd6
 
-#include "ratwin\base.h"
-//#include "classics\string.h"
+#include "ratwin\window=struct.h"
 
 // DLL imports "cloaked" for overloading
 extern "C" {
@@ -347,7 +346,7 @@ RATWIN_EXPORT
 types::HWND CreateWindowEx (ulong, const char*, const char*, ulong dwStyle);
 
 inline
-bool ShowWindow (types::HWND hWnd, int nCmdShow)
+bool ShowWindow (types::HWND hWnd, SW_window nCmdShow)
 { return ::ShowWindow (reinterpret_cast<arg::arg32>(hWnd), nCmdShow); }
 
 inline

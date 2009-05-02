@@ -1,6 +1,6 @@
 // The Repertoire Project copyright 1999 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: classics\ustring.h
-// Revision: public build 5, shipped on 8-April-1999
+// Revision: public build 6, shipped on 28-Nov-1999
 
 #pragma once
 
@@ -60,6 +60,8 @@ public:
    #endif
    };
 
+CLASSICS_EXPORT const ustring::awareness_t* get_string_awareness (const char**);
+CLASSICS_EXPORT const ustring::awareness_t* get_string_awareness (const wchar_t**);
 CLASSICS_EXPORT const ustring::awareness_t* get_string_awareness (const string*);
 CLASSICS_EXPORT const ustring::awareness_t* get_string_awareness (const wstring*);
 CLASSICS_EXPORT const ustring::awareness_t* get_string_awareness (const std::string*);

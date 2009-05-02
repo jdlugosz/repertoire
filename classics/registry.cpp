@@ -1,6 +1,6 @@
 // The Repertoire Project copyright 1999 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: classics\registry.cpp
-// Revision: public build 5, shipped on 8-April-1999
+// Revision: public build 6, shipped on 28-Nov-1999
 
 #define CLASSICS_EXPORT __declspec(dllexport)
 #include "classics\registry.h"
@@ -113,6 +113,7 @@ registry_key_init registry_key::create (const ustring& subkey)
     }
  if (result) {
     win_exception X ("Classics", FNAME, __LINE__, result);
+    X.add_key ("name", subkey);
     X += "Error creating a registry key";
     throw X;
     }
@@ -199,6 +200,42 @@ bool registry_key::key_exists (const ustring& keyname) const
     }
  }
 
+/* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
+
+bool registry_key::value_exists (const ustring& valname) const
+ {
+ long result;
+ ratwin::registry::value_type type;
+ switch (uses_Unicode) {
+    case Yes: {
+       wstring s= valname;  //16-bit string
+       result= ratwin::registry::RegQueryValue (key, s.c_str(), type, 0, 0);
+       } break;
+    case Maybe: {
+       //work-around for improper implementation of Unicode stub in Win95
+       ratwin::util::SetLastError (0);
+       wstring s= valname;  //16-bit string
+       result= ratwin::registry::RegQueryValue (key, s.c_str(), type, 0, 0);
+       if (result==win_exception::call_not_implemented_error || (result==0 && ratwin::util::GetLastError()==win_exception::call_not_implemented_error)) {
+          // detected lack of Unicode support
+          uses_Unicode= No;
+          // drop through to "No" case.
+          }
+       else {
+          //satisfied that any result or problem is not "call not implemented".
+          uses_Unicode= Yes;
+          break;
+          }
+       } // no break here!
+    case No: {
+       string s= valname;  //8-bit string
+       result= ratwin::registry::RegQueryValue (key, s.c_str(), type, 0, 0);
+       } break;
+    }
+ return result==0;  //false if I didn't successfully read it.
+ }
+
+/* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
 template <typename T>
@@ -406,6 +443,92 @@ void registry_key::remove_value (const ustring& valname)
     }
  
  }
+
+/* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
+
+void registry_key::get_value (const ustring& valname, ratwin::registry::value_type& type, void* data, int& datasize) const
+ {
+ long retval;
+ switch (uses_Unicode) {
+    case Maybe: {
+       ratwin::util::SetLastError(0);
+       wstring name= valname;
+       retval= ratwin::registry::RegQueryValue (key, name.c_str(), type, data, &datasize);
+       if (retval==win_exception::call_not_implemented_error || (retval==0 && ratwin::util::GetLastError()==win_exception::call_not_implemented_error)) {
+          uses_Unicode= No;
+          // fall through to No case
+          }
+       else {
+          uses_Unicode= Yes;
+          break;
+          }
+       }
+    case No: {
+       const string name= valname;
+       retval= ratwin::registry::RegQueryValue (key, name.c_str(), type, data, &datasize);
+       } break;
+    case Yes: {
+       const wstring name= valname;
+       retval= ratwin::registry::RegQueryValue (key, name.c_str(), type, data, &datasize);
+       } break;
+    }
+ if (retval) {
+    win_exception X ("Classics", FNAME, __LINE__, retval);
+    X.add_key ("name", valname);
+    X += "Error accessing registry value";
+    throw X;
+    }
+ }
+ 
+/* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
+
+int registry_key::get_value_int (const ustring& valname) const
+ {
+ ratwin::registry::value_type type;
+ int value;
+ int size= sizeof value;
+ get_value (valname, type, &value, size);
+ if (type != ratwin::registry::REG_DWORD || size != sizeof value) {
+    classics::exception X ("Classics", "Error reading int from registry", FNAME, __LINE__);
+    X.add_key ("name", valname);
+    X += "Not a REG_DWORD or incorrect length.";
+    throw X;
+    }
+ return value;
+ }
+ 
+/* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
+
+ustring registry_key::get_value_string (const ustring& valname, ratwin::registry::value_type& type) const
+ {
+ int size;
+ get_value (valname, type, 0, size);
+ if (type != ratwin::registry::REG_SZ && type != ratwin::registry::REG_EXPAND_SZ && type != ratwin::registry::REG_MULTI_SZ) {
+    classics::exception X ("Classics", "Bad value type in registry", FNAME, __LINE__);
+    X.add_key ("name", valname);
+    X += "Not a string type";
+    throw X;
+    }
+ if (uses_Unicode == Yes) {
+    wstring s (size/2);  //size is in bytes, parameter is in characters
+    wchar_t* buf= s.get_buffer();
+    get_value (valname, type, buf, size);
+    size/=2;  //now working in chars.
+    while (size>0 && buf[size-1]==L'\0')  --size;  //strip off any trailing nul's.
+    s.truncate (size);
+    return s;
+    }
+ else { // must be ANSI
+    string s (size);
+    char* buf= s.get_buffer();
+    get_value (valname, type, buf, size);
+    while (size>0 && buf[size-1]=='\0')  --size;  //strip off any trailing nul's.
+    s.truncate (size);
+    return s;
+    }
+ }
+ 
+/* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
 }  //end of namespace
 ENDWRAP

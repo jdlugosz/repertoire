@@ -1,6 +1,6 @@
 // The Repertoire Project copyright 1999 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: ratwin\charset.h
-// Revision: public build 5, shipped on 8-April-1999
+// Revision: public build 6, shipped on 28-Nov-1999
 
 #pragma once
 #if !defined RATWIN_CHARSET_INCLUDED
@@ -73,6 +73,12 @@ inline
 int WideCharToMultiByte (const wchar_t* src, int srclen, char* dest, int destlen)
  {
  return ::WideCharToMultiByte (/*CP_THREAD_ACP*/CP_ACP, WC_COMPOSITECHECK, reinterpret_cast<arg::carg32>(src), srclen, dest, destlen, 0,0);
+ }
+ 
+inline
+int WideCharToMultiByte (CodePage_t cp, unsigned flags, const wchar_t* src, int srclen, char* dest, int destlen)
+ {
+ return ::WideCharToMultiByte (cp, flags, reinterpret_cast<arg::carg32>(src), srclen, dest, destlen, 0,0);
  }
  
 enum string_info_t {

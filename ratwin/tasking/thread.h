@@ -1,10 +1,10 @@
 // The Repertoire Project copyright 1999 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: ratwin\tasking\thread.h
-// Revision: public build 5, shipped on 8-April-1999
+// Revision: public build 6, shipped on 28-Nov-1999
 
 #pragma once
-#if !defined RATWIN_TASKING_THREAD_INCLUDED
-#define RATWIN_TASKING_THREAD_INCLUDED
+#if !defined I_4d2ad6e8_4511_11d3_aadb_0020af6bccd6
+#define I_4d2ad6e8_4511_11d3_aadb_0020af6bccd6
 
 #include "ratwin\tasking\basic.h"
 
@@ -22,6 +22,7 @@ __declspec(dllimport) int __stdcall TerminateThread (Dlugosz::ratwin::arg::arg32
 __declspec(dllimport) unsigned long __stdcall QueueUserAPC (Dlugosz::ratwin::arg::arg32, Dlugosz::ratwin::arg::arg32, void*);
 __declspec(dllimport) int __stdcall GetThreadTimes (Dlugosz::ratwin::arg::arg32, __int64*, __int64*, __int64*, __int64*);
 __declspec(dllimport) Dlugosz::ratwin::arg::arg32 __stdcall GetCurrentThread();  //obtain the pseudohandle constant.
+__declspec(dllimport) void __stdcall ExitThread (Dlugosz::ratwin::arg::arg32);
 }
 
 ///////////////////////////////////////////////////
@@ -61,8 +62,11 @@ inline
 types::HANDLE GetCurrentThread()
  {  return reinterpret_cast<types::HANDLE>( ::GetCurrentThread() ); }
 
+inline
+void ExitThread (int exitcode)
+ {  ::ExitThread (reinterpret_cast<arg::arg32>(exitcode));  }
+ 
 } //end tasking
-
 }
 ENDWRAP
 #endif

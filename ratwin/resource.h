@@ -1,6 +1,6 @@
 // The Repertoire Project copyright 1999 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: ratwin\resource.h
-// Revision: public build 5, shipped on 8-April-1999
+// Revision: public build 6, shipped on 28-Nov-1999
 
 #pragma once
 #if !defined RATWIN_RESOURCE_INCLUDED
@@ -20,6 +20,8 @@ __declspec(dllimport) Dlugosz::ratwin::arg::arg32 __stdcall
   LoadResource (Dlugosz::ratwin::arg::arg32, Dlugosz::ratwin::arg::arg32);
 __declspec(dllimport) Dlugosz::ratwin::arg::arg32 __stdcall
   FindResourceA (Dlugosz::ratwin::arg::arg32, const char*, const char*);
+__declspec(dllimport) Dlugosz::ratwin::arg::arg32 __stdcall
+  FindResourceW (Dlugosz::ratwin::arg::arg32, const wchar_t*, const wchar_t*);
 __declspec(dllimport) int __stdcall DestroyCursor (Dlugosz::ratwin::arg::arg32);
 __declspec(dllimport) Dlugosz::ratwin::arg::arg32 __stdcall SetCursor (Dlugosz::ratwin::arg::arg32);
 }
@@ -76,6 +78,12 @@ inline const void* LoadResource (types::HINSTANCE hInstance, types::HRSRC resour
 
 inline types::HRSRC FindResource (types::HINSTANCE hInstance, const char* name, int type)
 {return reinterpret_cast<types::HRSRC>(::FindResourceA(reinterpret_cast<arg::arg32>(hInstance), name, reinterpret_cast<const char*>(type))); }
+
+inline types::HRSRC FindResource (types::HINSTANCE hInstance, const wchar_t* name, int type)
+{return reinterpret_cast<types::HRSRC>(::FindResourceW(reinterpret_cast<arg::arg32>(hInstance), name, reinterpret_cast<const wchar_t*>(type))); }
+
+inline types::HRSRC FindResource (types::HINSTANCE hInstance, const wchar_t* name, const wchar_t* type)
+{return reinterpret_cast<types::HRSRC>(::FindResourceW(reinterpret_cast<arg::arg32>(hInstance), name, type)); }
 
 }  //end resource
 

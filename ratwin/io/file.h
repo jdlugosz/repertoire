@@ -1,12 +1,14 @@
 // The Repertoire Project copyright 1999 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: ratwin\io\file.h
-// Revision: public build 5, shipped on 8-April-1999
+// Revision: public build 6, shipped on 28-Nov-1999
 
 #pragma once
-#if !defined RATWIN_IO_FILE_INCLUDED
-#define RATWIN_IO_FILE_INCLUDED
+#if !defined Iaac0f2b0_2fec_11d3_aacf_0020af6bccd6
+#define Iaac0f2b0_2fec_11d3_aacf_0020af6bccd6
+
 
 #include "ratwin\io\general.h"
+#include "classics\flagword.h"
 
 extern "C" {
 __declspec(dllimport) Dlugosz::ratwin::arg::arg32 __stdcall CreateFileA (
@@ -19,9 +21,12 @@ __declspec(dllimport) int __stdcall CopyFileA (Dlugosz::ratwin::arg::carg32, Dlu
 __declspec(dllimport) int __stdcall CopyFileW (Dlugosz::ratwin::arg::carg32, Dlugosz::ratwin::arg::carg32, int);
 __declspec(dllimport) int __stdcall CreateDirectoryExA (Dlugosz::ratwin::arg::carg32, Dlugosz::ratwin::arg::carg32, int);
 __declspec(dllimport) int __stdcall CreateDirectoryExW (Dlugosz::ratwin::arg::carg32, Dlugosz::ratwin::arg::carg32, int);
+__declspec(dllimport) int __stdcall SetCurrentDirectoryA (Dlugosz::ratwin::arg::carg32);
+__declspec(dllimport) int __stdcall SetCurrentDirectoryW (Dlugosz::ratwin::arg::carg32);
 __declspec(dllimport) unsigned long __stdcall GetFileAttributesA (Dlugosz::ratwin::arg::carg32);
 __declspec(dllimport) unsigned long __stdcall GetFileAttributesW (Dlugosz::ratwin::arg::carg32);
 __declspec(dllimport) unsigned long __stdcall GetFileSize (Dlugosz::ratwin::arg::carg32, unsigned long*);
+__declspec(dllimport) int __stdcall GetFileTime (Dlugosz::ratwin::arg::arg32, __int64*, __int64*, __int64*);
 __declspec(dllimport) int __stdcall CreateDirectoryA (Dlugosz::ratwin::arg::carg32, void*);
 __declspec(dllimport) int __stdcall CreateDirectoryW (Dlugosz::ratwin::arg::carg32, void*);
 __declspec(dllimport) int __stdcall RemoveDirectoryA (Dlugosz::ratwin::arg::carg32);
@@ -39,6 +44,8 @@ __declspec(dllimport) unsigned long __stdcall GetTempFileNameW (Dlugosz::ratwin:
 __declspec(dllimport) unsigned long __stdcall GetTempFileNameA (Dlugosz::ratwin::arg::carg32, Dlugosz::ratwin::arg::carg32, unsigned long, Dlugosz::ratwin::arg::arg32);
 __declspec(dllimport) unsigned int __stdcall MoveFileW (Dlugosz::ratwin::arg::carg32, Dlugosz::ratwin::arg::carg32);
 __declspec(dllimport) unsigned int __stdcall MoveFileA (Dlugosz::ratwin::arg::carg32, Dlugosz::ratwin::arg::carg32);
+__declspec(dllimport) unsigned int __stdcall MoveFileExW (Dlugosz::ratwin::arg::carg32, Dlugosz::ratwin::arg::carg32, unsigned);
+__declspec(dllimport) unsigned int __stdcall MoveFileExA (Dlugosz::ratwin::arg::carg32, Dlugosz::ratwin::arg::carg32, unsigned);
 }
 
 
@@ -51,6 +58,7 @@ static const int MAX_PATH= 260;
 enum access_t {
    ACCESS_ONLY = 0, 
    FILE_LIST_DIRECTORY = 1,
+   FILE_READ_ATTRIBUTES= 0x80,
    GENERIC_READ = 0x80000000, 
    GENERIC_WRITE = 0x40000000, 
    GENERIC_READWRITE= GENERIC_READ|GENERIC_WRITE
@@ -89,6 +97,16 @@ enum attribute_flags {
    FILE_FLAG_DELETE_ON_CLOSE=       0x04000000,
    FILE_FLAG_BACKUP_SEMANTICS=      0x02000000,
    FILE_FLAG_POSIX_SEMANTICS=       0x01000000
+   };
+
+enum move_flags {
+   MOVEFILE_REPLACE_EXISTING= 0x00000001,
+   MOVEFILE_COPY_ALLOWED= 0x00000002,
+   MOVEFILE_DELAY_UNTIL_REBOOT= 0x00000004,
+   MOVEFILE_WRITE_THROUGH= 0x00000008,
+   // following are new for Windows 2000
+   MOVEFILE_CREATE_HARDLINK= 0x00000010,
+   MOVEFILE_FAIL_IF_NOT_TRACKABLE= 0x00000020
    };
 
 const types::HANDLE INVALID_FILE= reinterpret_cast<types::HANDLE> (0xffffffff);
@@ -167,6 +185,12 @@ __int64 GetFileSize (types::HANDLE h)
  }
 
 inline
+bool GetFileTime (types::HANDLE h, __int64* create_time, __int64* access_time, __int64* write_time)
+ {
+ return ::GetFileTime (reinterpret_cast<arg::arg32>(h), create_time, access_time, write_time);
+ }
+
+inline
 bool CreateDirectory (const char* name)
  {
  return ::CreateDirectoryA (reinterpret_cast<arg::carg32>(name), 0);
@@ -178,6 +202,21 @@ bool CreateDirectory (const wchar_t* name)
  {
  return ::CreateDirectoryW (reinterpret_cast<arg::carg32>(name), 0);
  }
+
+
+inline
+bool SetCurrentDirectory (const wchar_t* name)
+ {
+ return ::SetCurrentDirectoryW (reinterpret_cast<arg::carg32>(name));
+ }
+
+
+inline
+bool SetCurrentDirectory (const char* name)
+ {
+ return ::SetCurrentDirectoryA (reinterpret_cast<arg::carg32>(name));
+ }
+
 
 inline
 ulong GetShortPathName (const char* input, char* output, ulong buflen)
@@ -293,6 +332,22 @@ int MoveFile(const wchar_t* lpExistingFileName, const wchar_t* lpNewFileName)
                     reinterpret_cast<arg::carg32>(lpNewFileName));
  }
  
+inline
+int MoveFile(const char* lpExistingFileName, const char* lpNewFileName, classics::flagword<move_flags> flags)
+ {
+ return ::MoveFileExA(reinterpret_cast<arg::carg32>(lpExistingFileName),
+                    reinterpret_cast<arg::carg32>(lpNewFileName),
+                    flags.validdata());
+ }
+
+inline
+int MoveFile(const wchar_t* lpExistingFileName, const wchar_t* lpNewFileName, classics::flagword<move_flags> flags)
+ {
+ return ::MoveFileExW(reinterpret_cast<arg::carg32>(lpExistingFileName),
+                    reinterpret_cast<arg::carg32>(lpNewFileName),
+                    flags.validdata());
+ }
+
 } //end io
 }
 ENDWRAP

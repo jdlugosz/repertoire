@@ -1,6 +1,6 @@
 // The Repertoire Project copyright 1999 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: ratwin\registry.h
-// Revision: public build 5, shipped on 8-April-1999
+// Revision: public build 6, shipped on 28-Nov-1999
 
 #pragma once
 
@@ -25,6 +25,8 @@ __declspec(dllimport) long __stdcall RegSetValueExA (Dlugosz::ratwin::arg::arg32
 __declspec(dllimport) long __stdcall RegSetValueExW (Dlugosz::ratwin::arg::arg32, const wchar_t*, int, unsigned long, const void*, unsigned long);
 __declspec(dllimport) long __stdcall RegQueryInfoKeyA (Dlugosz::ratwin::arg::arg32 hKey, char* lpClass, unsigned long*, unsigned long*, unsigned long*, unsigned long*, unsigned long*, unsigned long*, unsigned long*, unsigned long*, unsigned long*, __int64*);
 __declspec(dllimport) long __stdcall RegQueryInfoKeyW (Dlugosz::ratwin::arg::arg32 hKey, wchar_t* lpClass, unsigned long*, unsigned long*, unsigned long*, unsigned long*, unsigned long*, unsigned long*, unsigned long*, unsigned long*, unsigned long*, __int64*);
+__declspec(dllimport) long __stdcall RegQueryValueExA (Dlugosz::ratwin::arg::arg32 hKey, const char*, void*, int*, void*, int*);
+__declspec(dllimport) long __stdcall RegQueryValueExW (Dlugosz::ratwin::arg::arg32 hKey, const wchar_t*, void*, int*, void*, int*);
 }
 
 
@@ -141,7 +143,7 @@ inline long RegCreateKey (types::HKEY parent, const wchar_t* subkey, types::HKEY
     0, //security absent
     reinterpret_cast<arg::arg32>(&result),
     &disposition);
- if (created)  *created= 1==disposition;  //1:created, 2:opened existing
+ if (created)  *created= 1==disposition;  // 1:created, 2:opened existing
  return retval;
  }
 
@@ -202,6 +204,35 @@ inline long RegQueryInfoKey (
    __int64* lpftLastWriteTime=0)
  {
  return ::RegQueryInfoKeyW (reinterpret_cast<arg::arg32>(hKey), lpClass, lpcbClass, 0/*reserved*/,lpcSubKeys,lpcbMaxSubKeyLen,lpcbMaxClassLen,lpcValues,lpcbMaxValueNameLen,lpcbMaxValueLen,lpcbSecurityDescriptor,lpftLastWriteTime);
+ }
+
+inline
+long RegQueryValue (
+   types::HKEY hKey,
+   const char* name,
+   value_type& type,
+   void* buffer,
+   int* bufsize)
+ {
+ int valtype;
+ long retval= ::RegQueryValueExA (reinterpret_cast<arg::arg32>(hKey), name, 0, &valtype, buffer, bufsize);
+ type= value_type(valtype);
+ return retval;
+ }
+
+
+inline
+long RegQueryValue (
+   types::HKEY hKey,
+   const wchar_t* name,
+   value_type& type,
+   void* buffer,
+   int* bufsize)
+ {
+ int valtype;
+ long retval= ::RegQueryValueExW (reinterpret_cast<arg::arg32>(hKey), name, 0, &valtype, buffer, bufsize);
+ type= value_type(valtype);
+ return retval;
  }
 
 }} // end namespace

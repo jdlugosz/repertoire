@@ -1,6 +1,6 @@
 // The Repertoire Project copyright 1999 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: classics\ustring.cpp
-// Revision: public build 5, shipped on 8-April-1999
+// Revision: public build 6, shipped on 28-Nov-1999
 
 #define CLASSICS_EXPORT __declspec(dllexport)
 
@@ -168,6 +168,74 @@ std_string_support<wchar_t>::std_string_support()
  {}
 
 // ==========================================
+
+
+template <typename T>
+struct literal_string_support : public ustring::awareness_t {
+
+   literal_string_support();  //constructor different for each case
+   int length (const void* st) const;  //different for each case
+
+   void* clone (const void* st) const
+    {
+    exception X ("Classics", "ustring conversion problem", FNAME, __LINE__);
+    wFmt(X) << L"Can't \"clone\" a string literal";
+    throw X;
+    return 0;  //stupid compiler
+    }
+ 
+   void destroy (void* st) const
+    {
+    // no action!
+    }
+ 
+   const void* read_data (const void* st, int start, int& len) const
+    {
+    const T* s= static_cast<const T*>(st);
+    return start + s;
+    }
+ 
+   void write_data (void* st, int start, int len, const void* rawdata) const
+    {
+    exception X ("Classics", "ustring conversion problem", FNAME, __LINE__);
+    wFmt(X) << L"Can't modify a string literal";
+    throw X;    
+    }
+
+   void* create (int capacity, void* object) const
+    {
+    exception X ("Classics", "ustring conversion problem", FNAME, __LINE__);
+    wFmt(X) << L"Can't \"create\" a string literal";
+    throw X;
+    return 0;  //stupid compiler
+    }
+
+ }; //end of struct
+
+template<>
+literal_string_support<char>::literal_string_support()
+ : awareness_t (ANSI,"const char*")
+ {}
+
+template<>
+literal_string_support<wchar_t>::literal_string_support()
+ : awareness_t (Unicode, "const wchar_t*")
+ {}
+
+template<>
+int literal_string_support<char>::length (const void* st) const
+ {
+ const T* s= static_cast<const T*>(st);
+ return strlen(s);
+ }
+
+template<>
+literal_string_support<wchar_t>::length (const void* st) const
+ {
+ const T* s= static_cast<const T*>(st);
+ return wcslen(s);
+ }
+
 // ==========================================
 
 // ==========================================
@@ -233,6 +301,22 @@ const ustring::awareness_t* get_string_awareness (const std::wstring*)
  }
 
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
+ 
+const ustring::awareness_t* get_string_awareness (const char**)
+ {
+ static const literal_string_support<char> info;
+ return &info;
+ }
+
+/* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
+ 
+const ustring::awareness_t* get_string_awareness (const wchar_t**)
+ {
+ static const literal_string_support<wchar_t> info;
+ return &info;
+ }
+
+/* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
 ustring::~ustring()
@@ -244,16 +328,16 @@ ustring::~ustring()
 
 ustring::ustring (const char* s)
  {
- awareness= get_string_awareness ((string*)0);
- p= new string (s);
+ awareness= get_string_awareness (&s);
+ p= (void*)s;  //note:  not copied!
  }
 
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
  
 ustring::ustring (const wchar_t* s)
  {
- awareness= get_string_awareness ((wstring*)0);
- p= new wstring (s);
+ awareness= get_string_awareness (&s);
+ p= (void*)s;  //note:  not copied!
  }
 
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */

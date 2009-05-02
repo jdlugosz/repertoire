@@ -1,6 +1,6 @@
 // The Repertoire Project copyright 1999 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: classics\COM\factory.cpp
-// Revision: public build 5, shipped on 8-April-1999
+// Revision: public build 6, shipped on 28-Nov-1999
 
 #define CLASSICS_EXPORT __declspec(dllexport)
 #include "classics\COM\factory.h"
@@ -13,6 +13,8 @@ static const char FNAME[]= __FILE__;
 STARTWRAP
 namespace classics {
 namespace COM {
+
+
 
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
@@ -38,7 +40,7 @@ HRESULT __stdcall factory_ntbase::LockServer (int bLock)
 
 HRESULT __stdcall factory_ntbase::QueryInterface (const ratwin::IID& iid, void** ppv)
  {    
- if ( (iid == __uuidof(ratwin::IUnknown)) || (iid == __uuidof(ratwin::IClassFactory)) ) {
+ if ( inline_eq(iid, __uuidof(ratwin::IUnknown)) || inline_eq(iid, __uuidof(ratwin::IClassFactory)) ) {
     ratwin::IClassFactory* p= this;
     p->AddRef();
     *ppv= p;

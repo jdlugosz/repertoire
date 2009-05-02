@@ -1,6 +1,6 @@
 // The Repertoire Project copyright 1999 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: classics\filename_t.h
-// Revision: public build 5, shipped on 8-April-1999
+// Revision: public build 6, shipped on 28-Nov-1999
 
 #pragma once
 #if !defined CLASSICS_EXPORT
@@ -41,6 +41,7 @@ public:
    CLASSICS_EXPORT filename_t_base (cow<filesystem_t>);
    CLASSICS_EXPORT filename_t_base (const ustring&, cow<filesystem_t>);
    CLASSICS_EXPORT filename_t_base (const filename_t_base& other);
+   CLASSICS_EXPORT filename_t_base();
    CLASSICS_EXPORT ~filename_t_base();
    CLASSICS_EXPORT filename_t_base& operator= (const filename_t_base& other);
    cow<filesystem_t> get_filesystem() const  { return FileSystem; }
@@ -75,6 +76,7 @@ public:
    filename_t (const ustring& s)  :  filename_t_base (s) {}
    filename_t (cow<filesystem_t> x)  :  filename_t_base(x) {}
    filename_t (const ustring& s, cow<filesystem_t> x)  :  filename_t_base(s,x) {}
+   filename_t() : filename_t_base() {}
    // filename_t_base (const filename_t_base& other); supplied by compiler
    filename_t& operator= (const ustring& text) { filename_t_base::operator=(text); return *this; }
    // copy assignment operator supplied by compiler
@@ -94,6 +96,7 @@ public:
    inline void fully_qualify_this();
    inline filename_t fully_qualify() const;
    inline void assure_path_exists() const;
+   inline __int64 timestamp() const;
    };
 
 //=============
@@ -169,6 +172,7 @@ public:
    CLASSICS_EXPORT virtual bool stringmatch (const ustring& left, const ustring& right) const;
    CLASSICS_EXPORT virtual filename_t temp_directory() const;
    virtual void remove (const filename_t&, bool strict=false) const =0;
+   virtual __int64 timestamp (const filename_t&) const =0;
    };
    
 //=============
@@ -208,9 +212,12 @@ public:
    CLASSICS_EXPORT int stringcompare (const ustring& left, const ustring& right) const;
    CLASSICS_EXPORT filename_t temp_directory() const;
    CLASSICS_EXPORT void remove (const filename_t&, bool strict) const;
+   CLASSICS_EXPORT __int64 timestamp (const filename_t&) const;
    // features unique to this derived class
    CLASSICS_EXPORT virtual ustring fold_case (const ustring&) const;
    CLASSICS_EXPORT static void move_file (const filename_t& dest, const filename_t& src);   // new: add to docs.
+   CLASSICS_EXPORT static void move_file_delayed (const filename_t& dest, const filename_t& src);   // new: add to docs.
+   CLASSICS_EXPORT static ustring get_short_name (const filename_t&);  // new: add to docs.
    };
 
 //=============
@@ -234,7 +241,7 @@ int filename_t_base::name_count() const
 inline
 bool filename_t::exists() const
  {
- return FileSystem->exists(*this);
+ return FileSystem.const_object()->exists(*this);
  }
 
 //=============
@@ -242,7 +249,7 @@ bool filename_t::exists() const
 inline
 void filename_t::fully_qualify_this()
  {
- (*this) = FileSystem->fully_qualify (*this);
+ (*this) = FileSystem.const_object()->fully_qualify (*this);
  }
 
 //=============
@@ -250,7 +257,7 @@ void filename_t::fully_qualify_this()
 inline
 filename_t filename_t::fully_qualify() const
  {
- return FileSystem->fully_qualify (*this);
+ return FileSystem.const_object()->fully_qualify (*this);
  }
 
 //=============
@@ -258,7 +265,7 @@ filename_t filename_t::fully_qualify() const
 inline
 void filename_t::assure_path_exists() const
  {
- FileSystem->assure_path_exists (*this);
+ FileSystem.const_object()->assure_path_exists (*this);
  }
  
 //=============
@@ -266,7 +273,15 @@ void filename_t::assure_path_exists() const
 inline
 bool filename_t::same_prefix (const filename_t& other) const
  {
- return FileSystem->stringmatch (prefix(), other.prefix());
+ return FileSystem.const_object()->stringmatch (prefix(), other.prefix());
+ }
+
+//=============
+
+inline 
+__int64 filename_t::timestamp() const
+ {
+ return FileSystem.const_object()->timestamp (*this);
  }
 
 //=============

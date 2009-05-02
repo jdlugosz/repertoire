@@ -1,6 +1,6 @@
 // The Repertoire Project copyright 1999 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: classics\filename_t_UT.cxx
-// Revision: public build 5, shipped on 8-April-1999
+// Revision: public build 6, shipped on 28-Nov-1999
 #include <iostream>
 #include "classics\filename_t.h"
 #include "classics\string_ios.h"
@@ -445,6 +445,20 @@ void M (ustring name)
  
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
+void S (ustring name)
+ {
+ filename_t f (name);
+ try {
+    string s= classics::PC_filesystem_t::get_short_name (f);
+    cout << s << endl;
+    }
+ catch (classics::exception& X) {
+    X.show();
+    }
+ }
+    
+/* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
+
 int main (int argc, const char* argv[])
  {
  if (argc == 1)  return main_test();
@@ -455,6 +469,9 @@ int main (int argc, const char* argv[])
           break;
        case 'M':  //for "make directory"
           M (argv[2]);
+          break;
+       case 'S':  //for "short name"
+          S (argv[2]);
           break;
        default:
           cout << "error: invalid argument" << endl;

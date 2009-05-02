@@ -1,6 +1,6 @@
 // The Repertoire Project copyright 1999 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: classics\registry_UT.cxx
-// Revision: public build 5, shipped on 8-April-1999
+// Revision: public build 6, shipped on 28-Nov-1999
 #include <iostream>
 #include "classics\registry.h"
 #include "classics\exception.h"
@@ -62,7 +62,7 @@ void try_key (registry_key& Key, const ustring& subkey_name, const char* caption
 
 void test2()
  {
- cout << "test 2 -- capabilities test" << endl;
+ cout << "test 2 -- subkey capabilities test" << endl;
  // >> delete old contents here
  registry_key K1= classics::HKEY_CURRENT_USER.create ("testing");
  try_key (K1, "1foobar", "normal key (control)");
@@ -81,12 +81,37 @@ void test2()
  
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
+void test3()
+ {
+ cout << "test 3 -- value test" << endl;
+ registry_key K1= classics::HKEY_CURRENT_USER.create ("testing");
+ const int x= 42;
+ K1.set_value ("val1", ratwin::registry::REG_DWORD, &x, sizeof x);  //write the value
+ ratwin::registry::value_type type;
+ int y;
+ int sizeread= sizeof y;  // on input: size of buffer.  on output: actual size
+ K1.get_value ("val1", type, &y, sizeread);
+ if (type != ratwin::registry::REG_DWORD || x!=y)
+    cout << "Error verifying value val1" << endl;
+ wstring string_value= L"This is a test string.";
+ K1.set_value ("val2", string_value);
+ wstring sout= K1.get_value_string ("val2", type);
+ if (type != ratwin::registry::REG_SZ || string_value != sout) {
+    cout << "Error verifying value val2:" << endl;
+    cout << "\ttype is " << type << ", expected " << ratwin::registry::REG_SZ << endl;
+    cout << "\tcontent is \"" << sout << "\", expected \"" << string_value << "\"." << endl;
+    }
+ }
+ 
+/* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
+
 int main()
  {
  cout << "registry Unit Test" << endl;
  try {
     test1();
     test2();
+    test3();
     }
  catch (classics::exception& X) {
     cout << "caught an exception in main()" << endl;

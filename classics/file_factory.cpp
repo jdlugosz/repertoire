@@ -1,6 +1,6 @@
 // The Repertoire Project copyright 1999 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: classics\file_factory.cpp
-// Revision: public build 5, shipped on 8-April-1999
+// Revision: public build 6, shipped on 28-Nov-1999
 
 #define CLASSICS_EXPORT __declspec(dllexport)
 #include "classics\file_factory.h"
@@ -15,39 +15,61 @@ namespace classics {
 
 static const char FNAME[]= __FILE__;
 static const char MODULE[]= "Classics";
+using std::endl;
 
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
 ratwin::types::HANDLE file_factory::Create (const filename_t& name) const
  {
- static bool Unicode= true;
+ static enum { Yes, No, Maybe } Unicode= Maybe;
  unsigned long errorcode;
  ratwin::types::HANDLE handle;
- if (Unicode) {
-    wstring s= name.text();
-    handle= ratwin::io::CreateFile (s.c_str(), access, share, how, even_more_flags);
-    if (handle == ratwin::INVALID_HANDLE_VALUE) {
+ switch (Unicode) {
+    case Yes: {
+       wstring s= name.text();
+       handle= ratwin::io::CreateFile (s.c_str(), access, share, how, even_more_flags);
+       if (handle != ratwin::INVALID_HANDLE_VALUE)
+          return handle;
+       } break;
+
+    default:
+    case Maybe: {
+       wstring s= name.text();
+       ratwin::util::SetLastError(0);
+       handle= ratwin::io::CreateFile (s.c_str(), access, share, how, even_more_flags);
        errorcode= ratwin::util::GetLastError();
-       if (errorcode == win_exception::call_not_implemented_error)
-          Unicode= false;
-          // and fall through to ANSI case
-       else goto error;
+       if (handle == (ratwin::types::HANDLE)0 && errorcode == win_exception::call_not_implemented_error) {
+          Unicode= No;
+          // fall through to ANSI case
+          }
+       else if (handle == ratwin::INVALID_HANDLE_VALUE) {
+          if (errorcode == win_exception::call_not_implemented_error)
+             Unicode= No;
+             // and fall through to ANSI case
+          else break;
+          }
+       else {
+          Unicode= Yes;
+          return handle;
+          }
        }
-    return handle;
+
+    case No: {
+       string s= name.text();
+       handle= ratwin::io::CreateFile (s.c_str(), access, share, how, even_more_flags);
+       if (handle != ratwin::INVALID_HANDLE_VALUE)
+          return handle;
+       } break;
     }
- // must be ANSI
-    {
-    string s= name.text();
-    handle= ratwin::io::CreateFile (s.c_str(), access, share, how, even_more_flags);
-    if (handle != ratwin::INVALID_HANDLE_VALUE)
-       return handle;
-    }
- error:
+
+// error:
     if (CanFail)  return handle;
     win_exception X (MODULE, FNAME, __LINE__);
-    wFmt(X) << L"Error opening \"" << wstring(name.text()) << L"\".";
-    // ... can add more informatioin regarding options
+    X.add_key ("filename", name.text());
+    X += "Error opening file.\n";
+    wFmt(X) << L"access: " << access << L", share:" << share <<  L", flags:" << even_more_flags << endl;
     throw X;
+
  return handle;  //stupid compiler!
  }
 

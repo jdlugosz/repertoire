@@ -1,6 +1,6 @@
 // The Repertoire Project copyright 1999 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: classics\exception.h
-// Revision: public build 5, shipped on 8-April-1999
+// Revision: public build 6, shipped on 28-Nov-1999
 
 #pragma once
 #if !defined DLUGOSZ_CLASSICS_ERROR_DEFINED
@@ -22,20 +22,22 @@ namespace classics {
 class exception : public std::exception {
 protected:
    wstring S;
-   void setup (const char* module, const char* name, const char* fname, int line);
+   void setup (const ustring& module, const ustring& name, const ustring& fname, int line);
 public:
-   CLASSICS_EXPORT exception (const char* module, const char* name, const char* fname, int line);
+   CLASSICS_EXPORT exception (const ustring& module, const ustring& name, const ustring& fname, int line);
    virtual ~exception() {}
    ustring value() const  { return S; }
    wstring& get_internal_data() { return S; }
    const wstring get_internal_data() const { return S; }
    CLASSICS_EXPORT virtual void show() const;
-   CLASSICS_EXPORT void add_key (const wchar_t* key, const ustring& value);
-   CLASSICS_EXPORT void add_key (const wchar_t* key, int value);
+   CLASSICS_EXPORT void add_key (const ustring& key, const ustring& value);
+   CLASSICS_EXPORT void add_key (const ustring& key, int value);
    void operator+= (const ustring& val)  { S += wstring(val); }
-   CLASSICS_EXPORT void operator() (const char* module, const char* name, const char* fname, int line);
-   static void (*show_function)(const exception&);
+   CLASSICS_EXPORT void operator() (const ustring& module, const ustring& name, const ustring& fname, int line);
+   CLASSICS_EXPORT static void (*show_function)(const exception&);
    CLASSICS_EXPORT static void default_show_function (const exception&);
+   CLASSICS_EXPORT static void normal_setup (exception* self, const ustring& module, const ustring& name, const ustring& fname, int line);
+   CLASSICS_EXPORT static void (*setup_hook) (exception* self, const ustring& module, const ustring& name, const ustring& fname, int line);
    class iterator;
    };
 
@@ -49,7 +51,7 @@ public:
       : errorcode(errorcode), exception (module, "Win32 Error", fname, line)
       { translate_errorcode(); }
    CLASSICS_EXPORT win_exception (const char* module, const char* fname, int line);  //calls GetLastError itself
-   static const int call_not_implemented_error;
+   CLASSICS_EXPORT static const int call_not_implemented_error;
    };
    
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */

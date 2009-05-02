@@ -1,6 +1,6 @@
 // The Repertoire Project copyright 1999 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: ratwin\utilities.h
-// Revision: public build 5, shipped on 8-April-1999
+// Revision: public build 6, shipped on 28-Nov-1999
 
 #pragma once
 #if !defined RATWIN_utilities_INCLUDED
@@ -21,6 +21,8 @@ __declspec(dllimport) unsigned long __stdcall FormatMessageA (unsigned long, con
 __declspec(dllimport) unsigned long __stdcall FormatMessageW (unsigned long, const void* lpSource, unsigned long, unsigned long, wchar_t*, unsigned long, Dlugosz::ratwin::arg::arg32);
 __declspec(dllimport) int __stdcall DebugActiveProcess (unsigned long dwProcessId);
 __declspec(dllimport) unsigned long __stdcall GetTickCount();   //not cloaked!
+__declspec(dllimport) int __stdcall MessageBeep (Dlugosz::ratwin::arg::arg32);
+
 
 // put these in with system info, later
 __declspec(dllimport) void __stdcall  GetSystemInfo (Dlugosz::ratwin::arg::arg32);
@@ -104,6 +106,10 @@ inline
 int MessageBox (const wchar_t* text, const wchar_t* caption, unsigned options=0)
  { return ::MessageBoxW (0, text, caption, options); }
 
+inline
+bool MessageBeep (unsigned options=0)
+ { return ::MessageBeep (reinterpret_cast<arg::arg32>(options)); }
+ 
 inline 
 types::HINSTANCE GetModuleHandle (const char* module_name= 0)
  { return reinterpret_cast<types::HINSTANCE>(::GetModuleHandleA(reinterpret_cast<arg::carg32>(module_name))); }

@@ -1,6 +1,6 @@
 // The Repertoire Project copyright 1999 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: classics\string.hpp
-// Revision: public build 5, shipped on 8-April-1999
+// Revision: public build 6, shipped on 28-Nov-1999
 
 /* These are the template bodies for the string class.  Since the instansiations of
    the normal cases are already in the DLL, you don't need to include this.  This
@@ -73,6 +73,20 @@ template <class T>
 generic_string<T>& generic_string<T>::operator+= (const generic_string<T>& other)
  {
  append (other, 0, other.elcount());
+ return *this;
+ }
+
+/* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
+
+template <class T>
+generic_string<T>& generic_string<T>::operator+= (const T* other)
+ {
+ const int olen= len_ (other);
+ const int mylen= elcount();
+ const int padsize= (mylen+31)&~31;  //next higher multiple of 32
+ reserve (padsize);
+ resize (mylen+olen);
+ put (other, olen, mylen);
  return *this;
  }
 

@@ -1,6 +1,6 @@
 // The Repertoire Project copyright 1999 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: ratwin\WM_constants.h
-// Revision: public build 5, shipped on 8-April-1999
+// Revision: public build 6, shipped on 28-Nov-1999
 
 // I'll make a complete list using an automated utility, AFTER I decide
 // exactly how I'll package this.  One long list is contrary to RATWIN's

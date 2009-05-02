@@ -1,14 +1,11 @@
 // The Repertoire Project copyright 1999 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: ratwin\COM\GUID.h
-// Revision: public build 5, shipped on 8-April-1999
+// Revision: public build 6, shipped on 28-Nov-1999
 
 #pragma once
 #include "ratwin\base.h"
 
-extern "C" {
-__declspec(dllimport) int __stdcall StringFromGUID2 (Dlugosz::ratwin::arg::carg32, wchar_t*, int);
-__declspec(dllimport) unsigned __stdcall CoCreateGuid (Dlugosz::ratwin::arg::arg32);
-}
+
 
 // GLOBAL because the compiler has built-in awareness.
 // specifically, the intrinsic __guid operator returns a ::_GUID value.
@@ -27,10 +24,19 @@ struct _GUID {
    inline void generate();
    };
 
+STARTWRAP
+namespace ratwin {
+namespace Win32API {
+int __stdcall StringFromGUID2 (const _GUID*, wchar_t*, int);
+unsigned __stdcall CoCreateGuid (_GUID*);
+}}  //end of namespaces
+ENDWRAP
+
+
 inline
 void _GUID::generate()
  {
- CoCreateGuid (reinterpret_cast<Dlugosz::ratwin::arg::arg32>(this));
+ ratwin::Win32API::CoCreateGuid (this);
  }
 
 inline bool inline_eq (const _GUID& left, const _GUID& right)
@@ -52,7 +58,7 @@ inline bool operator!= (const _GUID& left, const _GUID& right)
 inline int _GUID::to_string (wchar_t* dest, int destsize) const
 // needs 32 chars for digits, 6 for punctuation, and 1 for terminating NUL.  39 Total.
  {
- return ::StringFromGUID2 (reinterpret_cast<Dlugosz::ratwin::arg::carg32>(this), dest, destsize);
+ return ratwin::Win32API::StringFromGUID2 (this, dest, destsize);
  }
 
 #endif /* GUID_DEFINED */

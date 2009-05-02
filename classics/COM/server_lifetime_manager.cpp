@@ -1,6 +1,6 @@
 // The Repertoire Project copyright 1999 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: classics\COM\server_lifetime_manager.cpp
-// Revision: public build 5, shipped on 8-April-1999
+// Revision: public build 6, shipped on 28-Nov-1999
 
 #define CLASSICS_EXPORT __declspec(dllexport)
 #include "classics\new.h"
@@ -32,10 +32,10 @@ event_flag& server_lifetime_manager_t::unload_flag() const
 
 void server_lifetime_manager_t::idlewait (int time)
  {
- // Not very good because it puts a minimum time down.  Needs to interact with the "inc" functions.
- inc_server_lock();
- ratwin::util::Sleep(time);
- dec_server_lock();  //triggers unload if no connections/locks made yet.
+ if (unload_flag().wait (time) != 0) {
+    inc_server_lock();
+    dec_server_lock();  //triggers unload if no connections/locks made yet.
+    }
  }
 
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */

@@ -54,7 +54,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /machine:I386
-# ADD LINK32 kernel32.lib user32.lib advapi32.lib ole32.lib /nologo /subsystem:windows /dll /debug /machine:I386 /out:"..\Release/Dlugosz Repertoire Classics.vc6{pb5}.dll"
+# ADD LINK32 kernel32.lib user32.lib advapi32.lib ole32.lib /nologo /subsystem:windows /dll /debug /machine:I386 /out:"..\Release/Dlugosz Repertoire Classics.vc6{pb6}.dll"
 
 !ELSEIF  "$(CFG)" == "classics - Win32 Debug"
 
@@ -80,7 +80,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /debug /machine:I386
-# ADD LINK32 kernel32.lib user32.lib advapi32.lib ole32.lib /nologo /subsystem:windows /dll /incremental:no /debug /machine:I386 /out:"..\Debug/Dlugosz Repertoire Classics.vc6.debug{pb5}.dll"
+# ADD LINK32 kernel32.lib user32.lib advapi32.lib ole32.lib /nologo /subsystem:windows /dll /incremental:no /debug /machine:I386 /out:"..\Debug/Dlugosz Repertoire Classics.vc6.debug{pb6}.dll"
 
 !ENDIF 
 
@@ -169,6 +169,10 @@ SOURCE=..\..\classics\exception.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\classics\COM\factory.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\classics\file_factory.cpp
 # End Source File
 # Begin Source File
@@ -204,6 +208,10 @@ SOURCE=..\..\classics\misc_API.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\classics\mutex.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\classics\new.cpp
 # End Source File
 # Begin Source File
@@ -227,7 +235,15 @@ SOURCE=..\..\classics\profile_timer.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\classics\COM\prothonotary.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\classics\registry.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\classics\COM\server_lifetime_manager.cpp
 # End Source File
 # Begin Source File
 
@@ -269,6 +285,10 @@ SOURCE=..\..\classics\ustring.cpp
 # End Source File
 # Begin Source File
 
+SOURCE="..\..\classics\UTF-8.cpp"
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\classics\vararray.cpp
 
 !IF  "$(CFG)" == "classics - Win32 Release"
@@ -281,6 +301,10 @@ SOURCE=..\..\classics\vararray.cpp
 
 !ENDIF 
 
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\classics\virtual_key.cpp
 # End Source File
 # Begin Source File
 

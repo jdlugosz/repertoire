@@ -1,6 +1,6 @@
 // The Repertoire Project copyright 1999 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: classics\exception.cpp
-// Revision: public build 5, shipped on 8-April-1999
+// Revision: public build 6, shipped on 28-Nov-1999
 
 #define CLASSICS_EXPORT __declspec(dllexport)
 #include "classics\exception.h"
@@ -17,17 +17,31 @@ namespace classics {
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
 void (*exception::show_function)(const exception&) =0;
+void (*exception::setup_hook) (exception* self, const ustring& module, const ustring& name, const ustring& fname, int line) = &normal_setup;
 
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
-exception::exception (const char* module, const char* name, const char* fname, int line)
+void exception::setup (const ustring& module, const ustring& name, const ustring& fname, int line)
+ {
+ __try {
+    setup_hook (this, module, name, fname, line);
+    }
+ __except (1) {
+    normal_setup (this, module, name, fname, line);
+    }
+ // >> process callbacks here
+ }
+
+/* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
+
+exception::exception (const ustring& module, const ustring& name, const ustring& fname, int line)
  {
  setup (module, name, fname, line);
  }
 
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
-void exception::operator() (const char* module, const char* name, const char* fname, int line)
+void exception::operator() (const ustring& module, const ustring& name, const ustring& fname, int line)
  {
  static const wchar_t sep[2]= {string_marker::Split3, 0};
  S += sep;
@@ -39,13 +53,20 @@ void exception::operator() (const char* module, const char* name, const char* fn
 namespace {
 
 template <typename T>
-wstring format_key (const wchar_t* key, const T& value)
+wstring format_key (const ustring& key, const T& value)
  {
  static const wchar_t open[2]= { string_marker::Open1, 0 };
  static const wchar_t close[2]= { string_marker::Close1, 0 };
  static const wchar_t sep[2]= { string_marker::Split1, 0 };
  wstring data;
- wFmt(data) << open << key << sep << value << close;
+ static const ustring::awareness_t* special= get_string_awareness ((const wchar_t**)0);
+ if (special == key.get_awareness()) {
+    // efficiency aid until next generation ustring is available
+    wFmt(data) << open << (const wchar_t*)key.get_p() << sep << value << close;
+    }
+ else {
+    wFmt(data) << open << get_as<wstring>(&key) << sep << value << close;
+    }
  return data;
  }
 
@@ -53,26 +74,26 @@ wstring format_key (const wchar_t* key, const T& value)
 
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
-void exception::add_key (const wchar_t* key, const ustring& value)
+void exception::add_key (const ustring& key, const ustring& value)
  {
  S += format_key (key,wstring(value));
  }
 
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
-void exception::add_key (const wchar_t* key, int value)
+void exception::add_key (const ustring& key, int value)
  {
  S += format_key (key,value);
  }
 
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
-void exception::setup (const char* module, const char* name, const char* fname, int line)
+void exception::normal_setup (exception* self, const ustring& module, const ustring& name, const ustring& fname, int line)
  {
- add_key (L"module", module);
- add_key (L"name", name);
- add_key (L"file", fname);
- add_key (L"line", line);
+ self->add_key (L"module", module);
+ self->add_key (L"name", name);
+ self->add_key (L"file", fname);
+ self->add_key (L"line", line);
  }
 
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */

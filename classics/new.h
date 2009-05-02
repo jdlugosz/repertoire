@@ -1,6 +1,6 @@
 // The Repertoire Project copyright 1999 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: classics\new.h
-// Revision: public build 5, shipped on 8-April-1999
+// Revision: public build 6, shipped on 28-Nov-1999
 
 /*  This file is provided as a replacement for the Standard <NEW.H> and related
    operator new() issues to overcome problems in the Microsoft 5.x run-time library.

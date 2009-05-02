@@ -2,23 +2,23 @@ SCC = This is a Source Code Control file
 
 [atomic_counter_UT.dsp]
 SCC_Aux_Path = "G:\VSS Version Control"
-SCC_Project_Name = "$/repertoire pb4/compile.vc5/Classics", OLAAAAAA
+SCC_Project_Name = "$/repertoire pb5/compile.vc5/Classics", NLAAAAAA
 
 [atomic_read_test.dsp]
 SCC_Aux_Path = "G:\VSS Version Control"
-SCC_Project_Name = "$/repertoire pb4/compile.vc5/Classics", OLAAAAAA
+SCC_Project_Name = "$/repertoire pb5/compile.vc5/Classics", NLAAAAAA
 
 [classics.dsp]
 SCC_Aux_Path = "G:\VSS Version Control"
-SCC_Project_Name = "$/repertoire pb4/compile.vc5/Classics", OLAAAAAA
+SCC_Project_Name = "$/repertoire pb5/compile.vc5/Classics", NLAAAAAA
 
 [handle_UT.dsp]
 SCC_Aux_Path = "G:\VSS Version Control"
-SCC_Project_Name = "$/repertoire pb4/compile.vc5/Classics", OLAAAAAA
+SCC_Project_Name = "$/repertoire pb5/compile.vc5/Classics", NLAAAAAA
 
 [vararray_UT.dsp]
 SCC_Aux_Path = "G:\VSS Version Control"
-SCC_Project_Name = "$/repertoire pb4/compile.vc5/Classics", OLAAAAAA
+SCC_Project_Name = "$/repertoire pb5/compile.vc5/Classics", NLAAAAAA
 
 [filename_t_UT.dsp]
 SCC_Aux_Path = "G:\VSS Version Control"
@@ -55,3 +55,15 @@ SCC_Project_Name = "$/repertoire pb4/compile.vc5/Classics", OLAAAAAA
 [exception_UT.dsp]
 SCC_Aux_Path = "G:\VSS Version Control"
 SCC_Project_Name = "$/repertoire pb4/compile.vc5/Classics", OLAAAAAA
+
+[atomic_counter_benchmark.dsp]
+SCC_Aux_Path = "G:\VSS Version Control"
+SCC_Project_Name = "$/repertoire pb5/compile.vc5/Classics", NLAAAAAA
+
+[crc32_UT.dsp]
+SCC_Aux_Path = "G:\VSS Version Control"
+SCC_Project_Name = "$/repertoire pb5/compile.vc5/Classics", NLAAAAAA
+
+[memory_pool_benchmark.dsp]
+SCC_Aux_Path = "G:\VSS Version Control"
+SCC_Project_Name = "$/repertoire pb5/compile.vc5/Classics", NLAAAAAA

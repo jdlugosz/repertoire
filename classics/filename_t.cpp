@@ -1,6 +1,6 @@
 // The Repertoire Project copyright 1999 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: classics\filename_t.cpp
-// Revision: public build 5, shipped on 8-April-1999
+// Revision: public build 6, shipped on 28-Nov-1999
 
 #define CLASSICS_EXPORT __declspec(dllexport)
 
@@ -11,7 +11,12 @@
 #include "ratwin\handle.h"
 #include "ratwin\charset.h"
 #include "ratwin\utilities.h"
+#include "ratwin\INI_file.h"
+#include "classics\file_factory.h"
 using std::endl;
+
+// for debugging
+using std::cout;
 
 STARTWRAP
 namespace classics {
@@ -30,6 +35,12 @@ filename_t_base::filename_t_base (const ustring& s)
  {
  Index= FileSystem->parse(Text);
  }
+ 
+/* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
+
+filename_t_base::filename_t_base()
+ : FileSystem(default_filesystem), Index(0)
+ {}
  
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
@@ -790,6 +801,116 @@ void PC_filesystem_t::move_file (const filename_t& dest, const filename_t& src)
     wFmt (X) << L"Error renaming \"" << wstring(src.text()) << "\" to \""
        << wstring (dest.text()) << "\".";
     throw X;
+ }
+
+/* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
+
+void PC_filesystem_t::move_file_delayed (const filename_t& dest, const filename_t& src)
+ {
+ static bool Unicode= true;
+ int errorcode;
+ if (Unicode) {
+    wstring Dest= dest.text();
+    wstring Src= src.text();
+    const bool b= ratwin::io::MoveFile (Src.c_str(),Dest.c_str(),ratwin::io::MOVEFILE_DELAY_UNTIL_REBOOT);
+    if (!b) {
+       errorcode= ratwin::util::GetLastError();
+       if (errorcode == win_exception::call_not_implemented_error)  Unicode= false;
+       else goto error;
+       }
+    else return;  //OK.
+    }
+ // Windows 95/98 does it a different way.
+    {
+    string Dest= PC_filesystem_t::get_short_name(dest);
+    string Src= PC_filesystem_t::get_short_name(src);
+    const bool b= ratwin::WritePrivateProfileString ("Rename", Dest.c_str(), Src.c_str(), "wininit.ini");
+    if (!b) {
+       errorcode= ratwin::util::GetLastError();
+       goto error;
+       }
+    else return;  //OK.
+    }
+ error:
+    win_exception X ("Classics", FNAME, __LINE__, errorcode);
+    wFmt (X) << L"Error renaming \"" << wstring(src.text()) << "\" to \""
+       << wstring (dest.text()) << "\".";
+    throw X;
+ }
+
+/* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
+
+ustring PC_filesystem_t::get_short_name (const filename_t& fname)
+ {
+ static bool Unicode= true;
+ int errorcode;
+ if (Unicode) {
+    wstring name= fname.text();
+    const int buflen= ratwin::io::GetShortPathName (name.c_str(), 0, 0);
+    if (buflen==0) {
+       errorcode= ratwin::util::GetLastError();
+       if (errorcode == win_exception::call_not_implemented_error)  Unicode= false;
+       else goto error;
+       }
+    else {
+       wstring x (buflen);
+       int actual_len= ratwin::io::GetShortPathName (name.c_str(), const_cast<wchar_t*>(x.get_buffer()), buflen);
+       if (actual_len == 0)  goto error;
+       if (actual_len > buflen) {
+          exception X ("Classics", "internal error in get_short_name", FNAME, __LINE__);
+          wFmt(X) << L"return value is " << actual_len << L", expected " << buflen;
+          throw X;
+          }
+       x.truncate (buflen-1);    // remove trailing nul
+       return x;
+       }
+    }
+ {
+    // Must be ANSI
+    string name= fname.text();
+    const int buflen= ratwin::io::GetShortPathName (name.c_str(), 0, 0);
+    string x (buflen);
+    int actual_len= ratwin::io::GetShortPathName (name.c_str(), const_cast<char*>(x.get_buffer()), buflen);
+    if (actual_len == 0)  {
+       errorcode= ratwin::util::GetLastError();
+       goto error;
+       }
+    if (actual_len > buflen) {
+       exception X ("Classics", "internal error in get_short_name", FNAME, __LINE__);
+       wFmt(X) << L"return value is " << actual_len << L", expected " << buflen;
+       throw X;
+       }
+    x.truncate (buflen-1);    // remove trailing nul
+    return x;
+    }
+ 
+ 
+ error:
+    throw win_exception ("Classics", FNAME, __LINE__, errorcode);
+ }
+
+/* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
+
+__int64 PC_filesystem_t::timestamp (const filename_t& name) const
+ {
+ static file_factory factory (file_factory::Read);
+ // >> need to experiment more with attributes on NT and 9x.
+// factory.set (ratwin::io::FILE_READ_ATTRIBUTES);
+ factory.set (ratwin::io::ACCESS_ONLY);
+ factory.set (ratwin::io::FILE_SHARE_READWRITE);
+ ratwin::types::HANDLE h= factory.Create (name);
+ __int64 write_time;
+ bool retval= ratwin::io::GetFileTime (h, 0,0, &write_time);
+ int errorcode= ratwin::util::GetLastError();
+ ratwin::CloseHandle (h);
+ if (!retval) {
+    win_exception X ("Classics", FNAME, __LINE__, errorcode);
+    X += "Cannot read timestamp";
+    X.add_key ("filename", name.text());
+    X.add_key ("Handle", int(h));
+    throw X;
+    }
+ return write_time;
  }
 
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
