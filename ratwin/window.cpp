@@ -1,10 +1,6 @@
-// Kodak Foundation Components ©2000 Kodak Health Imaging (Dallas)
-// Information:  intranet website not yet established.  Contact Lance VanNostrand for info.
-// Documentation:  reference manual is part number 2E0104.
-// File: Dependant_Libs\Repertoire\ratwin\window.cpp
-// Version: Iteration 2, Revision 1, Patch 2, released 11-Oct-2000
-// The Repertoire Project copyright 1999 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
-// Revision: public build 5, shipped on 8-April-1999
+// The Repertoire Project copyright 2001 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
+// File: ratwin\window.cpp
+// Revision: 
 
 #define RATWIN_EXPORT __declspec(dllexport)
 
@@ -21,7 +17,8 @@ namespace window {
 static  // compiler (VC6) couldn't find it in unnamed namespace!
 long __stdcall really_minimal_window_proc (types::HWND wnd, unsigned mess, unsigned p1, ulong p2)
  {
- if (mess == WM_constants::WM_DESTROY) {
+ if (mess == WM_constants::WM_NCDESTROY) {
+ 	// November 2001: changed DESTROY to NCDESTROY to ensure that more cleanup is done.
     PostQuitMessage(0);
     return 0;
     }

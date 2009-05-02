@@ -67,6 +67,7 @@ namespace internal {
 
    // other handle-like things that don't map directly to Windows.H
    struct TLS_key_struct : public HANDLE_struct {/*empty*/};
+   struct PROPSHEETPAGE_struct : public HANDLE_struct {/*empty*/};
    } //end of internal
 
 typedef internal::HANDLE_struct* HANDLE;
@@ -89,6 +90,8 @@ typedef internal::HRSRC_struct* HRSRC;
 typedef internal::Thread_HANDLE_struct* Thread_HANDLE;
 typedef internal::TLS_key_struct* TLS_key;
 typedef internal::HKEY_struct* HKEY;
+typedef internal::PROPSHEETPAGE_struct* HPROPSHEETPAGE;
+
 
 // hsoft<Hwhatever> allows me to define an "in" parameter that accepts
 // a strictly-typed Handle subtype, or a plain HANDLE, but not the =wrong=
