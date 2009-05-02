@@ -1,6 +1,6 @@
 // The Repertoire Project copyright 2006 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: classics\fixed_memory_pool.cpp
-// Revision: public build 8, shipped on 11-July-2006
+// Revision: public build 9, shipped on 18-Oct-2006
 
 #define CLASSICS_EXPORT __declspec(dllexport)
 
@@ -55,8 +55,9 @@ void inline nt_base_fixed_memory_pool::wait()
 
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
-nt_base_fixed_memory_pool::~nt_base_fixed_memory_pool()
+void nt_base_fixed_memory_pool::purge()
  {
+ if (use_count > 0)  return;  // can't do it (yet).
  //abandon the nodelist, and free the items in the chunklist.
  chunk* p= chunklist;
  while (p) {
@@ -65,6 +66,7 @@ nt_base_fixed_memory_pool::~nt_base_fixed_memory_pool()
     delete[] top;
     p= q;
     }
+ // keep shutdown_commanded set, so it will re-purge later.
  }
 
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
@@ -267,6 +269,7 @@ void* general_static_fixed_memory_pool<FAST_HEAP_CHECK>::alloc (int size)
  retry:
  node* retval= Xexchange (&nodelist, &Busy);
  if (!retval)  {
+    ++use_count;
     nodelist= 0;
     retval= newchunk();  //repopulate the free list
     }
@@ -275,10 +278,10 @@ void* general_static_fixed_memory_pool<FAST_HEAP_CHECK>::alloc (int size)
        wait();
        goto retry;
        }
+    ++use_count;
     nodelist= retval->next;  //pop off a record
     }
  note_alloc (retval);
- ++use_count;
  if (callback)  callback (1, retval);
  return retval;
  }
@@ -288,7 +291,6 @@ void* general_static_fixed_memory_pool<FAST_HEAP_CHECK>::alloc (int size)
 template<bool FAST_HEAP_CHECK>
 void general_static_fixed_memory_pool<FAST_HEAP_CHECK>::free (void* p_raw)
  {
- --use_count;
  if (callback)  callback (2, p_raw);
  node* p= static_cast<node*>(p_raw);
  note_free (p);
@@ -300,7 +302,9 @@ void general_static_fixed_memory_pool<FAST_HEAP_CHECK>::free (void* p_raw)
     goto retry;
     }
  p->next= orig;
+ --use_count;
  nodelist= p;
+ if (use_count == 0 && shutdown_commanded)  purge();
  }
 
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */

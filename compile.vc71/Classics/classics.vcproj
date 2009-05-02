@@ -41,13 +41,13 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/MACHINE:I386"
-				OutputFile="..\Debug/Dlugosz Repertoire Classics.vc71.debug{pb8}.dll"
+				OutputFile="..\Debug/Dlugosz Repertoire Classics.vc71.debug{pb9}.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"
 				GenerateDebugInformation="TRUE"
-				ProgramDatabaseFile=".\..\Debug/Dlugosz Repertoire Classics.vc71.debug{pb8}.pdb"
+				ProgramDatabaseFile=".\..\Debug/Dlugosz Repertoire Classics.vc71.debug{pb9}.pdb"
 				SubSystem="2"
-				ImportLibrary=".\..\Debug/Dlugosz Repertoire Classics.vc71.debug{pb8}.lib"/>
+				ImportLibrary=".\..\Debug/Dlugosz Repertoire Classics.vc71.debug{pb9}.lib"/>
 			<Tool
 				Name="VCMIDLTool"
 				PreprocessorDefinitions="_DEBUG"
@@ -111,13 +111,13 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/MACHINE:I386"
-				OutputFile="..\Release/Dlugosz Repertoire Classics.vc71{pb8}.dll"
+				OutputFile="..\Release/Dlugosz Repertoire Classics.vc71{pb9}.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"
 				GenerateDebugInformation="TRUE"
-				ProgramDatabaseFile=".\..\Release/Dlugosz Repertoire Classics.vc71{pb8}.pdb"
+				ProgramDatabaseFile=".\..\Release/Dlugosz Repertoire Classics.vc71{pb9}.pdb"
 				SubSystem="0"
-				ImportLibrary=".\..\Release/Dlugosz Repertoire Classics.vc71{pb8}.lib"/>
+				ImportLibrary=".\..\Release/Dlugosz Repertoire Classics.vc71{pb9}.lib"/>
 			<Tool
 				Name="VCMIDLTool"
 				PreprocessorDefinitions="NDEBUG"
@@ -134,7 +134,8 @@
 			<Tool
 				Name="VCResourceCompilerTool"
 				PreprocessorDefinitions="NDEBUG"
-				Culture="1033"/>
+				Culture="1033"
+				ResourceOutputFileName="$(IntDir)/all.res"/>
 			<Tool
 				Name="VCWebServiceProxyGeneratorTool"/>
 			<Tool
@@ -179,13 +180,13 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/MACHINE:I386"
-				OutputFile="..\Release/Dlugosz Repertoire Classics.vc71{pb8}.dll"
+				OutputFile="..\Release/Dlugosz Repertoire Classics.vc71{pb9}.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"
 				GenerateDebugInformation="TRUE"
-				ProgramDatabaseFile=".\..\Release/Dlugosz Repertoire Classics.vc71{pb8}.pdb"
+				ProgramDatabaseFile=".\..\Release/Dlugosz Repertoire Classics.vc71{pb9}.pdb"
 				SubSystem="2"
-				ImportLibrary=".\..\Release/Dlugosz Repertoire Classics.vc71{pb8}.lib"/>
+				ImportLibrary=".\..\Release/Dlugosz Repertoire Classics.vc71{pb9}.lib"/>
 			<Tool
 				Name="VCMIDLTool"
 				PreprocessorDefinitions="NDEBUG"
@@ -221,6 +222,9 @@
 		<Filter
 			Name="Source Files"
 			Filter="cpp;c;cxx;rc;def;r;odl;hpj;bat;for;f90">
+			<File
+				RelativePath="..\..\classics\all.rc">
+			</File>
 			<File
 				RelativePath="..\..\classics\APC_server.cpp">
 			</File>
@@ -456,6 +460,9 @@
 			</File>
 			<File
 				RelativePath="..\..\classics\pointers.h">
+			</File>
+			<File
+				RelativePath=".\resource.h">
 			</File>
 			<File
 				RelativePath="..\..\classics\string.h">

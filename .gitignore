@@ -1,3 +1,5 @@
 vssver2.scc
 compile.vc*/mssccprj.scc
 compile.vc*/*/mssccprj.scc
+compile.vc*/debug/
+compile.vc*/release/

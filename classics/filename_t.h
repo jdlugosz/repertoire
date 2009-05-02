@@ -1,6 +1,6 @@
 // The Repertoire Project copyright 2006 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: classics\filename_t.h
-// Revision: public build 8, shipped on 11-July-2006
+// Revision: public build 9, shipped on 18-Oct-2006
 
 #pragma once
 #if !defined CLASSICS_EXPORT

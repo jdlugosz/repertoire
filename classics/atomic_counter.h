@@ -1,6 +1,6 @@
 // The Repertoire Project copyright 2006 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: classics\atomic_counter.h
-// Revision: public build 8, shipped on 11-July-2006
+// Revision: public build 9, shipped on 18-Oct-2006
 
 #pragma once
 #pragma warning (disable: 4146)
@@ -106,14 +106,18 @@ namespace internal {
    inline bool Dec (volatile byte* p)      { return Dec ((volatile char*)p); }
 
    // the nf_ functions are the same, but without __fastcall.
+   CLASSICS_EXPORT __int64 nf_Xexchange (volatile __int64*,__int64);  // 8 bytes
    CLASSICS_EXPORT int nf_Xexchange (volatile int*,int);  // 4 bytes
    CLASSICS_EXPORT short nf_Xexchange (volatile short*,int);  // 2 bytes
    CLASSICS_EXPORT char nf_Xexchange (volatile char*,int);  // 1 byte
 #ifndef _MANAGED
+   CLASSICS_EXPORT __int64 __fastcall Xexchange (volatile __int64*,__int64);  // 8 bytes
    CLASSICS_EXPORT int __fastcall Xexchange (volatile int*,int);  // 4 bytes
    CLASSICS_EXPORT short __fastcall Xexchange (volatile short*,int);  // 2 bytes
    CLASSICS_EXPORT char __fastcall Xexchange (volatile char*,int);  // 1 byte
 #else
+   inline __int64 Xexchange (volatile __int64* p, __int64 newvalue)
+      { return nf_Xexchange (p, newvalue); }
    inline int Xexchange (volatile int* p, int newvalue)
       { return nf_Xexchange (p, newvalue); }
    inline short Xexchange (volatile short* p, short newvalue)
@@ -133,18 +137,17 @@ namespace internal {
       { return Xexchange ((volatile char*)p, newvalue); }
 
    // the nf_ functions are the same, but without __fastcall.
-   CLASSICS_EXPORT bool nf_CompareAndSwap (volatile __int64* dest, int source, int comparend);  // 8 bytes
-      // Note: 64-bit form is not implemented.
+   CLASSICS_EXPORT bool nf_CompareAndSwap (volatile __int64* dest, __int64 source, __int64 comparend);  // 8 bytes
    CLASSICS_EXPORT bool nf_CompareAndSwap (volatile int* dest, int source, int comparend);  // 4 bytes
    CLASSICS_EXPORT bool nf_CompareAndSwap (volatile short* dest, int source, int comparend);  // 2 bytes
    CLASSICS_EXPORT bool nf_CompareAndSwap (volatile char* dest, int source, int comparend);  // 1 byte
 #ifndef _MANAGED
-   CLASSICS_EXPORT bool __fastcall CompareAndSwap (volatile __int64* dest, int source, int comparend);  // 8 bytes
+   CLASSICS_EXPORT bool __fastcall CompareAndSwap (volatile __int64* dest, __int64 source, __int64 comparend);  // 8 bytes
    CLASSICS_EXPORT bool __fastcall CompareAndSwap (volatile int* dest, int source, int comparend);  // 4 bytes
    CLASSICS_EXPORT bool __fastcall CompareAndSwap (volatile short* dest, int source, int comparend);  // 2 bytes
    CLASSICS_EXPORT bool __fastcall CompareAndSwap (volatile char* dest, int source, int comparend);  // 1 byte
 #else
-   inline bool CompareAndSwap (volatile __int64* dest, int source, int comparend)
+   inline bool CompareAndSwap (volatile __int64* dest, __int64 source, __int64 comparend)
       { return nf_CompareAndSwap (dest, source, comparend); }
    inline bool CompareAndSwap (volatile int* dest, int source, int comparend)
       { return nf_CompareAndSwap (dest, source, comparend); }

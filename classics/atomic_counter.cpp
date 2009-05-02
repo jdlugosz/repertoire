@@ -1,6 +1,6 @@
 // The Repertoire Project copyright 2006 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: classics\atomic_counter.cpp
-// Revision: public build 8, shipped on 11-July-2006
+// Revision: public build 9, shipped on 18-Oct-2006
 
 #define CLASSICS_EXPORT __declspec(dllexport)
 #include "classics\atomic_counter.h"
@@ -31,7 +31,7 @@ __declspec(naked) int __fastcall Xadd (volatile int*, int)
     ret
     }
  }
- 
+
 int nf_Xadd (volatile int* p, int delta)
  { return Xadd (p, delta); }
 
@@ -45,10 +45,10 @@ __declspec(naked) short __fastcall Xadd (volatile short*, int)
     ret
     }
  }
- 
+
 short nf_Xadd (volatile short* p, int delta)
  { return Xadd (p, delta); }
- 
+
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
 __declspec(naked) char __fastcall Xadd (volatile char*, int)
@@ -59,10 +59,10 @@ __declspec(naked) char __fastcall Xadd (volatile char*, int)
     ret
     }
  }
- 
+
 char nf_Xadd (volatile char* p, int delta)
  { return Xadd (p, delta); }
- 
+
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
 __declspec(naked) void __fastcall Inc (volatile int*)
@@ -79,7 +79,7 @@ __declspec(naked) void __fastcall Inc (volatile int*)
 
 void nf_Inc (volatile int* p)
  { Inc (p); }
- 
+
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
 __declspec(naked) void __fastcall Inc (volatile short*)
@@ -96,7 +96,7 @@ __declspec(naked) void __fastcall Inc (volatile short*)
 
 void nf_Inc (volatile short* p)
  { Inc (p); }
- 
+
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
 __declspec(naked) void __fastcall Inc (volatile char*)
@@ -113,7 +113,7 @@ __declspec(naked) void __fastcall Inc (volatile char*)
 
 void nf_Inc (volatile char* p)
  { Inc (p); }
- 
+
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
@@ -133,7 +133,7 @@ __declspec(naked) bool __fastcall Dec (volatile int*)
 
 bool nf_Dec (volatile int* p)
  { return Dec (p); }
- 
+
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
 __declspec(naked) bool __fastcall Dec (volatile short*)
@@ -152,7 +152,7 @@ __declspec(naked) bool __fastcall Dec (volatile short*)
 
 bool nf_Dec (volatile short* p)
  { return Dec (p); }
- 
+
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
 __declspec(naked) bool __fastcall Dec (volatile char*)
@@ -171,8 +171,43 @@ __declspec(naked) bool __fastcall Dec (volatile char*)
 
 bool nf_Dec (volatile char* p)
  { return Dec (p); }
- 
+
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
+/* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
+
+__declspec(naked) __int64 __fastcall Xexchange (volatile __int64* dest, __int64 source)
+ {
+ /* Caller is generating code to:
+    push source-high
+    push source-low
+    load ECX with dest (the pointer)
+    Then, CALL pushes return address
+    Caller expects result in EDX:EAX
+ */
+ __asm {
+    // I need comparend in EDX:EAX, source in ECX:EBX
+    push EBX  // must preserve register for caller
+    push EDI  // preserve
+    mov EDI, ECX  // free up ECX.  dest is now [EDI]
+    mov EBX, [ESP+12]
+    mov ECX, [ESP+16]
+    // use original value as comparand, without locking
+    mov EAX, [EDI]
+    mov EDX, [EDI+4]
+    }
+ retry:
+ __asm {
+    lock cmpxchg8b [EDI]
+    jnz retry
+    pop EDI  // restore
+    pop EBX  // restore
+    ret 8
+    }
+ }
+
+__int64 nf_Xexchange (volatile __int64* p, __int64 newvalue)
+ { return Xexchange (p, newvalue); }
+
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
 __declspec(naked) int __fastcall Xexchange (volatile int*, int)
@@ -183,7 +218,7 @@ __declspec(naked) int __fastcall Xexchange (volatile int*, int)
     ret
     }
  }
- 
+
 int nf_Xexchange (volatile int* p, int newvalue)
  { return Xexchange (p, newvalue); }
 
@@ -197,10 +232,10 @@ __declspec(naked) short __fastcall Xexchange (volatile short*, int)
     ret
     }
  }
- 
+
 short nf_Xexchange (volatile short* p, int newvalue)
  { return Xexchange (p, newvalue); }
- 
+
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
 __declspec(naked) char __fastcall Xexchange (volatile char*, int)
@@ -211,13 +246,41 @@ __declspec(naked) char __fastcall Xexchange (volatile char*, int)
     ret
     }
  }
- 
+
 char nf_Xexchange (volatile char* p, int newvalue)
  { return Xexchange (p, newvalue); }
- 
+
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
-// >> add a cmpxchg8 (64-bit) form, too.
+__declspec(naked) bool __fastcall CompareAndSwap (volatile __int64* dest, __int64 source, __int64 comparend)
+ {
+ // I need comparend in EDX:EAX, source in ECX:EBX
+ /* Caller is generating code to:
+    push comparend-high
+    push comparent-low
+    push source-high
+    push source-low
+    load ECX with dest (the pointer)
+    Then, CALL pushes return address
+ */
+ __asm {
+    push EBX  // must preserve for caller
+    push EDI  // preserve
+    mov EDI, ECX  // free up ECX, now dest is [EDI]
+    mov EBX, [ESP+12]
+    mov ECX, [ESP+16]
+    mov EAX, [ESP+20]
+    mov EDX, [ESP+24]
+    lock cmpxchg8b [EDI]
+    setZ AL
+    pop EDI  // restore
+    pop EBX  // restore
+    ret 16
+    }
+ }
+
+bool nf_CompareAndSwap (volatile __int64* dest, __int64 source, __int64 comparend)
+ { return CompareAndSwap (dest, source, comparend); }
 
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 

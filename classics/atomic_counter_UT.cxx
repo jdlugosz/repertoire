@@ -1,6 +1,6 @@
 // The Repertoire Project copyright 2006 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: classics\atomic_counter_UT.cxx
-// Revision: public build 8, shipped on 11-July-2006
+// Revision: public build 9, shipped on 18-Oct-2006
 
 // This tests the atomic_counter template class
 
@@ -18,7 +18,7 @@ using classics::byte;
 
 int passed_count= 0;
 int inconclusive_count= 0;
-const int total_count= 18;
+const int total_count= 19;
 
 int XADD_collisions= 0;
 
@@ -94,7 +94,7 @@ void tester<T>::show_results(int count) const
  cout << "compare_and_swap showed " << collisions << " collisions detected." << endl;
  XADD_collisions += collisions;
  }
- 
+
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
 template <typename T>
@@ -122,7 +122,7 @@ void incdec (T* =0)
     }
  ++passed_count;
  }
- 
+
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
 template <typename T>
@@ -140,7 +140,7 @@ void testit (T* =0)
  ratwin::tasking::WaitForMultipleObjects (hcount, handles, true);
  x.show_results (hcount);
  }
- 
+
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
 class mismatch {
@@ -188,7 +188,7 @@ void mismatch::show_results(int count) const
     }
  else cout << " ** FAILED **" << endl;
  }
- 
+
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
 void nomatch()
@@ -206,11 +206,40 @@ void nomatch()
  ratwin::tasking::WaitForMultipleObjects (hcount, handles, true);
  x.show_results (hcount);
  }
- 
+
+/* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
+
+
+void swap_64()
+ {
+ __int64 dest= 0xeeeeeeeeffffffff;
+ __int64 source= 0x1111111122222222;
+ __int64 comparent= 0x3333333344444444;
+#ifndef _MANAGED
+ volatile bool result= classics::internal::CompareAndSwap (&dest, source, comparent);
+ if (result==true) {
+    cout << " ** FAILED **" << endl;
+    return;
+    }
+ volatile __int64 original= classics::internal::Xexchange (&dest, source);
+ result= classics::internal::CompareAndSwap (&dest, source, dest);
+ if (result == false) {
+    cout << " ** FAILED **" << endl;
+    return;
+    }
+#else
+ cout << "skipping swap_64 because it is not working yet in CLR caller" << endl;
+#endif
+ ++passed_count;
+ }
+
+
+
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
 int main()
  {
+ swap_64();
  cout << "atomic counter Unit Test" << endl;
  testit<long>();
  testit<ulong>();
@@ -230,7 +259,7 @@ int main()
  else  {
  	cout << "some tests inconclusive or failed -- read log carefully." << endl;
  	cout << "Meaning of inconclusive: not using the atomic counter (the control case) didn't mess up,\n"
- 		"so we can't prove that using the atomic counter fixed anything.\n" 
+ 		"so we can't prove that using the atomic counter fixed anything.\n"
        "This happens on a single-CPU machine.  Test on a multi-CPU machine."<< endl;
     cout << passed_count << " passed, " << inconclusive_count << " inconclusive, " << (total_count-(passed_count+inconclusive_count)) << " failed.\n";
     if (passed_count + inconclusive_count == total_count)  return 0;

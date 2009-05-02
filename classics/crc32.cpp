@@ -1,6 +1,6 @@
 // The Repertoire Project copyright 2006 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: classics\crc32.cpp
-// Revision: public build 8, shipped on 11-July-2006
+// Revision: public build 9, shipped on 18-Oct-2006
 // Credit: Based on public domain code by Paul Kienitz and Christian Spieler, as found in InfoZip.
 #define CLASSICS_EXPORT __declspec(dllexport)
 #include "classics\crc32.h"

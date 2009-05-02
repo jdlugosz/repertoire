@@ -1,6 +1,6 @@
 // The Repertoire Project copyright 2006 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: classics\COM\prothonotary.h
-// Revision: public build 8, shipped on 11-July-2006
+// Revision: public build 9, shipped on 18-Oct-2006
 
 #pragma once
 
@@ -41,8 +41,8 @@ public:
    CLASSICS_EXPORT wstring app_name();
    CLASSICS_EXPORT ratwin::HRESULT register_server();
    CLASSICS_EXPORT ratwin::HRESULT unregister_server();
-   CLASSICS_EXPORT wstring server_name();
-   inline void set_server_name (const ustring& name);
+   CLASSICS_EXPORT wstring server_name (bool includepath);
+   void set_server_name (const ustring& name) {  ServerName= name; }
    CLASSICS_EXPORT server_type_t server_type();
    inline void set_server_type (server_type_t);
    inline void set_threading_model (threading_model_t);
@@ -60,7 +60,6 @@ inline COM::prothonotary::prothonotary ()
 inline void COM::prothonotary::set_progID (const ustring& progid_, const ustring& version_independant_progid_)
       { progid= progid_;  version_independant_progid= version_independant_progid_; }
 
-inline void COM::prothonotary::set_server_name (const ustring& name)  { ServerName= name; }
 
 inline void COM::prothonotary::set_server_type (server_type_t t)  { ServerType=t; }
 

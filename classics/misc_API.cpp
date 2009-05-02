@@ -1,6 +1,6 @@
 // The Repertoire Project copyright 2006 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: classics\misc_API.cpp
-// Revision: public build 8, shipped on 11-July-2006
+// Revision: public build 9, shipped on 18-Oct-2006
 
 #define CLASSICS_EXPORT __declspec(dllexport)
 #include "classics\misc_API.h"
@@ -56,7 +56,16 @@ ustring GetModuleFileName (ratwin::types::HINSTANCE hModule)
        }
     result.truncate(len);
     return result;
-    } 
+    }
+ }
+
+/* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
+
+__declspec (noreturn) void internal_error (const char* fname, int line)
+ {
+ classics::exception X ("Classics", "Unexpected internal error", fname, line);
+ X += "This cannot happen.";
+ throw X;
  }
 
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
@@ -66,7 +75,10 @@ ustring as_string (const ratwin::GUID& guid)
  const int size_needed =40;
  wstring result (size_needed);
  int size= guid.to_string (result.get_buffer(), size_needed);
- // >> could do error checking on 'size' result.
+ if (size != 39) {
+    internal_error (FNAME, __LINE__);
+    }
+ result.truncate (size-1);
  return result;
  }
 

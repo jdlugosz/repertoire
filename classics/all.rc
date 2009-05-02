@@ -1,0 +1,4 @@
+#include "version.rc"
+About  HTML    "about.html"
+Classics_Icon  ICON "icon.ico"
+

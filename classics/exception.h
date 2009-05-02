@@ -1,6 +1,6 @@
 // The Repertoire Project copyright 2006 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: classics\exception.h
-// Revision: public build 8, shipped on 11-July-2006
+// Revision: public build 9, shipped on 18-Oct-2006
 
 #pragma once
 #if !defined DLUGOSZ_CLASSICS_ERROR_DEFINED
@@ -26,7 +26,9 @@ protected:
    void setup (const ustring& module, const ustring& name, const ustring& fname, int line);
 public:
    CLASSICS_EXPORT exception (const ustring& module, const ustring& name, const ustring& fname, int line);
+   exception (const exception& other) : std::exception(other), S(other.S), what_cache(0) {}
    virtual ~exception() { delete[] what_cache; }
+   exception& operator= (const exception& other) { std::exception::operator=(other); S=other.S; what_cache=0; return *this;}
    CLASSICS_EXPORT const char* what() const throw();  // std::exception standard (most primitive)
    ustring What() const  // actually does the formatting work; produces a classics::wstring
       { return report_function ? report_function(*this) : default_report_function(*this); }
@@ -52,14 +54,14 @@ public:
 class win_exception : public exception {
    CLASSICS_EXPORT void translate_errorcode();
 public:
-   const int errorcode;
+   int errorcode;  // making this const prevented operator= from working.
    win_exception (const char* module, const char* fname, int line, int errorcode)
       : errorcode(errorcode), exception (module, "Win32 Error", fname, line)
       { translate_errorcode(); }
    CLASSICS_EXPORT win_exception (const char* module, const char* fname, int line);  //calls GetLastError itself
    CLASSICS_EXPORT static const int call_not_implemented_error;
    };
-   
+
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
 class exception::iterator {
@@ -81,7 +83,7 @@ public:
    CLASSICS_EXPORT ustring get_value (const ustring& key) const;  //get a named attribute
    vararray_g<pair> get_all_values() const  { parse();  return Values; }
    };
-   
+
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
 }

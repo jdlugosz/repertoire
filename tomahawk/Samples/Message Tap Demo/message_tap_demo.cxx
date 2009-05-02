@@ -1,6 +1,6 @@
 // The Repertoire Project copyright 2006 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: tomahawk\Samples\Message Tap Demo\message_tap_demo.cxx
-// Revision: public build 8, shipped on 11-July-2006
+// Revision: public build 9, shipped on 18-Oct-2006
 
 #include "tomahawk\message_tap.h"
 #include "tomahawk\Dialog_message_tap.h"

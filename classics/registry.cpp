@@ -1,6 +1,6 @@
 // The Repertoire Project copyright 2006 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: classics\registry.cpp
-// Revision: public build 8, shipped on 11-July-2006
+// Revision: public build 9, shipped on 18-Oct-2006
 
 #define CLASSICS_EXPORT __declspec(dllexport)
 #include "classics\registry.h"
@@ -41,7 +41,7 @@ void registry_key::close()
     }
  own= false;
  }
- 
+
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
 bool registry_key::is_Unicode()
@@ -175,7 +175,7 @@ bool registry_key::key_exists (const ustring& keyname) const
        //work-around for improper implementation of Unicode stub in Win95
        ratwin::util::SetLastError (0);
        wstring s= keyname;  //16-bit string
-       result= ratwin::registry::RegOpenKey (out, s.c_str(), out, ratwin::registry::KEY_QUERY_VALUE);
+       result= ratwin::registry::RegOpenKey (key, s.c_str(), out, ratwin::registry::KEY_QUERY_VALUE);
        if (result==win_exception::call_not_implemented_error || (result==0 && ratwin::util::GetLastError()==win_exception::call_not_implemented_error)) {
           // detected lack of Unicode support
           uses_Unicode= No;
@@ -260,7 +260,7 @@ generic_string<T> subkey_helper (ratwin::types::HKEY key, int index)
  result.truncate(destsize);
  return result;
  }
- 
+
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
 ustring registry_key::subkey (int index)
@@ -275,7 +275,7 @@ ustring registry_key::subkey (int index)
        int destsize=512;
        wstring result (destsize);
        wchar_t* dest= result.get_buffer();
-       ratwin::util::SetLastError (0);       
+       ratwin::util::SetLastError (0);
        long retval= ratwin::registry::RegEnumKey (key, index, dest, destsize);
        if (retval==win_exception::call_not_implemented_error || (retval==0 && ratwin::util::GetLastError()==win_exception::call_not_implemented_error)) {
           uses_Unicode= No;
@@ -285,7 +285,7 @@ ustring registry_key::subkey (int index)
        if (retval != 0)  return subkey_helper<wchar_t>(key, index);
        result.truncate(destsize);
        return result;
-       }       
+       }
     }
  }
 
@@ -320,6 +320,8 @@ void registry_key::set_value (const ustring& valname_u, ratwin::registry::value_
  if (retval) {
     win_exception X ("Classics", FNAME, __LINE__, retval);
     X += "Error setting value with RegSetValue";
+    X.add_key ("value name", valname_u);
+    // but I don't remember the key's name!
     throw X;
     }
  }
@@ -334,7 +336,7 @@ void registry_key::set_value (const ustring& valname_u, const ustring& data_u, r
        ratwin::util::SetLastError(0);
        wstring valname= valname_u;
        const wstring data= data_u;
-       retval= ratwin::registry::RegSetValue (key, valname.c_str(), type, data.get_buffer(), 2*data.elcount());
+       retval= ratwin::registry::RegSetValue (key, valname.c_str(), type, data.get_buffer(), 2*(1+data.elcount()));
        if (retval==win_exception::call_not_implemented_error || (retval==0 && ratwin::util::GetLastError()==win_exception::call_not_implemented_error)) {
           uses_Unicode= No;
           // fall through to No case
@@ -347,18 +349,20 @@ void registry_key::set_value (const ustring& valname_u, const ustring& data_u, r
     case No: {
        string valname= valname_u;
        const string data= data_u;
-       retval= ratwin::registry::RegSetValue (key, valname.c_str(), type, data.c_str(), data.elcount());
+       retval= ratwin::registry::RegSetValue (key, valname.c_str(), type, data.c_str(), 1+data.elcount());
        // note:  Win95 appears to delimit the string by a terminating '\0' and ignores the length argument.
        } break;
     case Yes: {
        wstring valname= valname_u;
        const wstring data= data_u;
-       retval= ratwin::registry::RegSetValue (key, valname.c_str(), type, data.get_buffer(), 2*data.elcount());
+       retval= ratwin::registry::RegSetValue (key, valname.c_str(), type, data.get_buffer(), 2*(1+data.elcount()));
        } break;
     }
  if (retval) {
     win_exception X ("Classics", FNAME, __LINE__, retval);
     X += "Error setting value with RegSetValue";
+    X.add_key ("value name", valname_u);
+    // but I don't remember the key's name!
     throw X;
     }
  }
@@ -369,7 +373,7 @@ void registry_key::set_value (const ustring& value_u)
  {
  set_value ("", value_u);
  }
- 
+
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
 registry_key_init registry_key::set_subkey_and_value (const ustring& subkey, const ustring& value, ratwin::registry::value_type type)
@@ -378,7 +382,7 @@ registry_key_init registry_key::set_subkey_and_value (const ustring& subkey, con
  K2.set_value ("", value, type);
  return K2.pass_off();
  }
- 
+
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
 template <typename T>
@@ -386,18 +390,28 @@ int remove_key_helper (registry_key& key, const ustring& subkey_u)
  {
  int errorcount= 0;
  generic_string<T> subkey= subkey_u;
+ win_exception possible ("Classics", FNAME, __LINE__, 0);
  // first delete subkeys, recursively
- {  //contain scope of K2
- registry_key K2= key.open (subkey);
- for (int child= K2.subkey_count()-1;  child >= 0;  --child) {
-    errorcount += remove_key_helper<T> (K2, K2.subkey(child));
+ try {
+    registry_key K2= key.open (subkey);
+    for (int child= K2.subkey_count()-1;  child >= 0;  --child) {
+       errorcount += remove_key_helper<T> (K2, K2.subkey(child));
+       }
     }
- }
+ catch (win_exception& X) {
+    possible= X;
+    }
  long retval= ratwin::registry::RegDeleteKey (key.get_HKEY(), subkey.c_str());
+ if (retval != 0 && retval != 2) {
+    if (possible.errorcode != 0) throw possible;
+    win_exception X ("Classics", FNAME, __LINE__, retval);
+    X.add_key ("subkey", subkey_u);
+    throw X;
+    }
  if (retval)  ++errorcount;
  return errorcount;
  }
- 
+
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
 int registry_key::remove (const ustring& subkey)
@@ -435,12 +449,12 @@ void registry_key::remove_value (const ustring& valname)
        retval= ratwin::registry::RegDeleteValue (key, name.c_str());
        } break;
     }
- if (retval) {
+ if (retval && retval != 2/* not present already is not considered an error*/) {
     win_exception X ("Classics", FNAME, __LINE__, retval);
     X += "Error removing registry value";
     throw X;
     }
- 
+
  }
 
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
@@ -478,7 +492,7 @@ void registry_key::get_value (const ustring& valname, ratwin::registry::value_ty
     throw X;
     }
  }
- 
+
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
 int registry_key::get_value_int (const ustring& valname) const
@@ -495,7 +509,7 @@ int registry_key::get_value_int (const ustring& valname) const
     }
  return value;
  }
- 
+
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
 ustring registry_key::get_value_string (const ustring& valname, ratwin::registry::value_type& type) const
@@ -526,7 +540,7 @@ ustring registry_key::get_value_string (const ustring& valname, ratwin::registry
     return s;
     }
  }
- 
+
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
 }  //end of namespace

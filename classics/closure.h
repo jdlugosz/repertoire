@@ -1,6 +1,6 @@
 // The Repertoire Project copyright 2006 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: classics\closure.h
-// Revision: public build 8, shipped on 11-July-2006
+// Revision: public build 9, shipped on 18-Oct-2006
 
 /*  Each compiler or platform may have different implementations of this template.  Instead of a maze of
    conditional compilation, each flavor has its own file.  This header just determines which one to use.

@@ -1,0 +1,80 @@
+auto_COM_ptr()
+default ctor makes a NULL pointer.
+
+~auto_COM_ptr()
+dtor calls COM's Release() function
+
+template<typename U>
+   auto_COM_ptr (const auto_COM_ptr<U>& other)
+generalized copy constructor calls Com's AddRef
+   
+void reset (T* newvalue=0)
+Calls COM's Release() function on old value (if any),
+then takes newvalue ~without~ incrementing reference count.
+
+T* get() const
+T* operator-> () const
+Both do the same thing.  Shows you the COM pointer for immediate use, but
+doesn't increment the reference count.
+
+T* relinquish()
+Zero's out the pointer.  Same as std::auto_ptr's release(), here it is relinquish() to avoid confusion with COM's meaning of ->Release().
+In contrast to reset(), it does NOT call COM's Release.  This allows you to get the underlying COM pointer and
+take over ownership of it.
+
+operator T** ()  { reset(); return &p; }
+operator void** ()  { reset(); return reinterpret_cast<void**>(&p); }
+designed for [out] parameters, unsiutable for [in,out] parameters
+
+
+operator bool() const
+operator ! () const
+
+
+Typical Uses
+==========
+
+To declare and obtain a pointer:
+
+auto_COM_ptr<I_foo> p1= bar();  // bar returns a smart pointer
+
+auto_COM_ptr<I_foo> p2; //starts out as null
+function_with_out_parameter (p2);  // function wants T**, this does the right thing.
+// proposed
+   function_with_out_parameter (p2.as_outparam());  // same as what operator T** does implicitly.
+   function_with_out_parameter (p2.as_void_outparam());  // and get rid of operator void** since it confuses the compiler.
+   function_with_out_parameter (p2.as_inoutparam());  //not supported before
+   function_with_out_parameter (p2.as_void_inoutparam());  //not supported before
+   
+   
+
+I_foo* temp= baz();  // baz returns a regular pointer
+auto_COM_ptr<I_foo> p3;
+p3.reset (temp);  // take over ownership without altering reference count.  Now forget about temp.
+
+Assign a new value to a smart pointer:
+
+I_foo* temp= baz();  // baz returns a regular pointer
+auto_COM_ptr<I_foo> p4;
+p4.reset (temp);  // take over ownership without altering reference count.
+p4.reset (p1.relinquish());  // transfer ownership from p1 to p4.  Old value in p4 is Released,
+   p1's value MOVED to p4 without calling either AddRef or Release,
+   p1 set to NULL.
+
+// proposed
+p4.move_from(p1);  // same as p4.reset(p1.relinquish());
+p4.copy_from(p1);  // calls AddRef
+  (copy_from has a form that takes raw pointer, too)
+note: operator= is not defined, since it doesn't know if you wanted to copy or move.
+     call copy_from or move_from specifically, instead of operator=.
+
+
+Behavior of copy constructor:
+
+This is a concept from std::auto_ptr.  It does a MOVE, not a COPY.
+*** This is out-of-date.  It works "normally", since that was too confusing.
+auto_COM_ptr<I_foo>p5 (p1);  // p1 is set to NULL !
+auto_COM_ptr<I_foo>p5= p1;  // same thing.
+This is designed for efficient returns from functions.
+
+

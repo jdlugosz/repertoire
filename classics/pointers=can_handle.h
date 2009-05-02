@@ -1,6 +1,6 @@
 // The Repertoire Project copyright 2006 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: classics\pointers=can_handle.h
-// Revision: public build 8, shipped on 11-July-2006
+// Revision: public build 9, shipped on 18-Oct-2006
 
 #include "classics\common.h"
 
@@ -16,6 +16,7 @@ public:
    CLASSICS_EXPORT lifetime* get_lifetime_object() const;
    lifetime* get_lifetime_object_for_unit_test() const { return reinterpret_cast<lifetime*>(~cloaked_Lifetime); }
    inline void set_lifetime_object (lifetime* p) const { cloaked_Lifetime= ~reinterpret_cast<unsigned>(p); p->deleted=0; }
+      // set_lifetime_objects assumes it is not in the middle of a cow transaction.  
    can_handle() : cloaked_Lifetime(~0) {}
    can_handle (const can_handle&) : cloaked_Lifetime(~0) {}
    ~can_handle() { cloaked_Lifetime=~0;  /* for error trapping */ }

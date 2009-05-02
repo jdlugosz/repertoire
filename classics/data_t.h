@@ -1,6 +1,6 @@
 // The Repertoire Project copyright 2006 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: classics\data_t.h
-// Revision: public build 8, shipped on 11-July-2006
+// Revision: public build 9, shipped on 18-Oct-2006
 
 #pragma once
 #include "classics\copy_semantics.h"
@@ -15,7 +15,7 @@ class data_t : public virtual I_copy_semantics, public can_handle {
    void* Data;
    int Count;
    int Capacity;
-protected:   
+protected:
    const int Elsize;  // redundant, because I_copy_semantics has it, but faster to compute indexes.
    void initialize_all() { initialize_elements (Data, Count); }
    void initialize_all (const data_t& other)  { initialize_elements (Data, other.Data, Count); }
@@ -65,7 +65,7 @@ public:
    ~g_data_t() { destroy_elements (get_buffer(), elcount()); }
    g_data_t (const g_data_t& other)
       : data_t (sizeof(T), other.elcount()) { initialize_all (other); }
-   g_data_t (int elcount) 
+   g_data_t (int elcount)
       : data_t (sizeof(T), elcount) {initialize_all();}
    g_data_t (int elcount, int capacity)
       : data_t (sizeof(T), elcount, capacity) { initialize_all(); }
@@ -95,7 +95,7 @@ T* make_the_empty()
  }
 
 template <typename T>
-T* shared_empty()
+__declspec(noinline) T* shared_empty()
  {
  static T* the_empty= 0;
  if (!the_empty)  the_empty= make_the_empty<T>();
@@ -104,7 +104,7 @@ T* shared_empty()
 
 }
 
- 
+
 //////////////////////////////////////////////////
 
 namespace vararray_internal {
@@ -121,7 +121,7 @@ public:
    CLASSICS_EXPORT data_t* clone() const;
    CLASSICS_EXPORT data_t* clone_empty(int reserve) const;
    };
-   
+
 } // end internal
 
 //////////////////////////////////////////////////
@@ -135,7 +135,7 @@ public:
    s_data_t (int elcount, int capacity) : s_data_ntbase (sizeof(T), elcount, capacity) {}
    s_data_t (int elcount, const void* data) : s_data_ntbase (sizeof(T), elcount, data) {}
    };
-   
+
 
 }
 

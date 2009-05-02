@@ -1,6 +1,6 @@
 // The Repertoire Project copyright 2006 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: classics\COM\prothonotary.cpp
-// Revision: public build 8, shipped on 11-July-2006
+// Revision: public build 9, shipped on 18-Oct-2006
 
 #define CLASSICS_EXPORT __declspec(dllexport)
 #include "classics\COM\prothonotary.h"
@@ -8,6 +8,7 @@
 #include "classics\exception.h"
 #include "ratwin\utilities.h"
 #include "ratwin\MessageBox.h"
+#include "classics\filename_t.h"
 using ratwin::HRESULT;
 
 static const char FNAME[]= __FILE__;
@@ -19,8 +20,7 @@ namespace classics {
 
 static void error_report (classics::exception& X)
  {
- wstring message= X.value();
- // ??? how should I report this?
+ wstring message= X.What();
  ratwin::MessageBox::MessageBox (message.c_str(), L"Error!");    //for now
  }
 
@@ -75,11 +75,12 @@ HRESULT prothonotary::register_server()
        HKEY_CLASSES_ROOT.set_subkey_and_value (wstring(L"AppID\\") + APPID_string, app_name());
        // + HKCR\CLSID\<clsid> [AppID] = appid
        CLSID.set_value (L"AppID", APPID_string);
-       // + HKCR\AppID\<exename> [default] = appid
-       HKEY_CLASSES_ROOT.set_subkey_and_value (wstring(L"AppID\\") + server_name(), APPID_string);
+       // + HKCR\AppID\<exename> [AppID] = appid
+       registry_key akey= HKEY_CLASSES_ROOT.create (wstring(L"AppID\\") + server_name(false));
+       akey.set_value ("AppID", APPID_string);
        }
     // + HKCR\CLSID\<clsid>\<servertag> [default] = server file name
-    CLSID.set_subkey_and_value (server_type_key(server_type()), server_name());
+    CLSID.set_subkey_and_value (server_type_key(server_type()), server_name(true));
     if (server_type() == InprocServer) {
        registry_key ServKey= CLSID.open ("InprocServer32");
        if (ThreadingModel == Legacy_thread)  ServKey.remove_value ("ThreadingModel");
@@ -113,12 +114,14 @@ HRESULT prothonotary::register_server()
 
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
-wstring prothonotary::server_name()
+wstring prothonotary::server_name (bool includepath)
  {
  if (ServerName.elcount()==0) {
-    ServerName= GetModuleFileName (hModule);
+    set_server_name (GetModuleFileName (hModule));
     }
- return ServerName;
+ if (includepath)  return ServerName;
+ filename_t fname (ServerName);
+ return fname.name();
  }
 
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
@@ -168,7 +171,7 @@ static bool ends_in_EXE (wstring name)
 prothonotary::server_type_t prothonotary::server_type()
  {
  if (ServerType == unspecifiedServer) {
-    wstring name= server_name();
+    wstring name= server_name(true);
     // if the name ends in ".exe", it's local, otherwise assume it's a DLL (by any name) thus inproc.
     ServerType= ends_in_EXE(name) ? LocalServer : InprocServer;
     }
@@ -195,38 +198,51 @@ HRESULT prothonotary::unregister_server ()
  // if HKCR\CLSID\<clsid>\<other-servertag> exists, then =only= remove my <servertag> subkey.
  // otherwise, remove everything from HKCR\CLSID\<clsid>\* except for TreatAs.
  // if empty, remove HKCR\CLSID\<clsid> itself, and remove ProgID and AppID things too.
+ HRESULT retval= ratwin::S_OK;
  try {
     wstring CLSID_string= as_string(clsid);
-    registry_key CLSID= HKEY_CLASSES_ROOT.open (wstring(L"CLSID\\") + CLSID_string);
-    // >> If I can't open that, I'm not registered to begin with.
-    if (check_registered_servers() + flagword<server_type_t>(server_type_t(0), server_type())) {
-       // other servers exist, so only remove mine.
-       CLSID.remove (server_type_key(server_type()));
+    registry_key CLSID;
+    try {
+       registry_key temp= HKEY_CLASSES_ROOT.open (wstring(L"CLSID\\") + CLSID_string);
+       registry_key_init t2= temp.pass_off();
+       CLSID= t2;
        }
-    else {
-       const vararray_g<wstring> children= CLSID.all_subkeys();
-       for (int loop= 0;  loop < children.elcount();  loop++) {
-          wstring s= children[loop];
-          if (s == wstring(L"TreatAs"))  continue;  //skip things that may be added by someone else
-          if (s == wstring(L"AutoConvertTo"))  continue;
-          if (s == wstring(L"AutoTreatAs"))  continue;
-          CLSID.remove (s);
+    catch (win_exception& X) {
+       // I get back errors of 5 (denied), 522 (no privilege), 2 (not exist)
+       if (X.errorcode==2)  retval= ratwin::S_FALSE;  // deleting something that does not exist is not a problem.
+       else throw;  // a real error
+       }
+    // If I can't open that, I'm not registered to begin with.
+    if (CLSID.get_HKEY() != 0) {
+       if (check_registered_servers() + flagword<server_type_t>(server_type_t(0), server_type())) {
+          // other servers exist, so only remove mine.
+          CLSID.remove (server_type_key(server_type()));
+          }
+       else {
+          const vararray_g<wstring> children= CLSID.all_subkeys();
+          for (int loop= 0;  loop < children.elcount();  loop++) {
+             wstring s= children[loop];
+             if (s == wstring(L"TreatAs"))  continue;  //skip things that may be added by someone else
+             if (s == wstring(L"AutoConvertTo"))  continue;
+             if (s == wstring(L"AutoTreatAs"))  continue;
+             CLSID.remove (s);
+             }
+          }
+       if (CLSID.subkey_count() == 0) {
+          CLSID.close();
+          HKEY_CLASSES_ROOT.remove (wstring(L"CLSID\\") + CLSID_string);
           }
        }
-    if (CLSID.subkey_count() == 0) {
-       CLSID.close();
-       HKEY_CLASSES_ROOT.remove (wstring(L"CLSID\\") + CLSID_string);
-       if (version_independant_progid.elcount() != 0)
-          HKEY_CLASSES_ROOT.remove (version_independant_progid);
-       if (progid.elcount() != 0)
-          HKEY_CLASSES_ROOT.remove (progid);
-       if (server_type() == LocalServer) {
-          wstring APPID_string= as_string (get_appID());
-          HKEY_CLASSES_ROOT.remove (wstring(L"AppID\\") + APPID_string);
-          HKEY_CLASSES_ROOT.remove (wstring(L"AppID\\") + server_name());
-          }
+    if (version_independant_progid.elcount() != 0)
+       HKEY_CLASSES_ROOT.remove (version_independant_progid);
+    if (progid.elcount() != 0)
+       HKEY_CLASSES_ROOT.remove (progid);
+    if (server_type() == LocalServer) {
+       wstring APPID_string= as_string (get_appID());
+       HKEY_CLASSES_ROOT.remove (wstring(L"AppID\\") + APPID_string);
+       HKEY_CLASSES_ROOT.remove (wstring(L"AppID\\") + server_name(false));
        }
-    return ratwin::S_OK;
+    return retval;
     }
  catch (exception& X) {
     error_report (X);

@@ -1,6 +1,6 @@
 // The Repertoire Project copyright 2006 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: classics\pointers.cpp
-// Revision: public build 8, shipped on 11-July-2006
+// Revision: public build 9, shipped on 18-Oct-2006
 
 #define CLASSICS_EXPORT __declspec(dllexport)
 #include "classics\pointers.h"
@@ -23,7 +23,7 @@ lifetime* can_handle::get_lifetime_object() const
     Lifetime->clear();
     set_lifetime_object(Lifetime);
     }
- if (Lifetime->deleted)  {
+ if (Lifetime->deleted & 3)  { // either flagged as deleted (1) or on the free list (2) but ignore other bits
     // stray pointer bug discovered!
     *(reinterpret_cast<int*>(0));
     // serious problem:  memory may have already been corrupted.
@@ -48,7 +48,7 @@ static lifetime create_null()
  Null.owned_count= 1;
  Null.unowned_count= 1;
  Null.hold= 1;
- Null.deleted= false;
+ Null.deleted= 0x0000;
  return Null;
  }
 
@@ -95,30 +95,23 @@ inline lifetime* handle_structure_nt::atomic_swap (lifetime* B) const
  return reinterpret_cast<lifetime*>(a);
  }
 
+
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
-lifetime* handle_structure_nt::check_out_Lifetime() const
+void handle_structure_nt::atomic_swap (handle_structure_nt* atomic_dest, handle_structure_nt* lone_source)
  {
- #ifdef CLOAK_LIFETIME
-   #error Not yet supported
- #endif
- retry:
- lifetime* L= atomic_swap (0);
- if (!L) {
-    ratwin::util::Sleep (1);
-    goto retry;
-    }
- return L;
+ __int64* dest= reinterpret_cast<__int64*>(atomic_dest);
+ __int64* source= reinterpret_cast<__int64*>(lone_source);
+ *source= classics::internal::Xexchange (dest, *source);
  }
 
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
 void lifetime::claim_owned_reference()
-// Get an owner from a borrower.  If there are no existing owners,
-// the object does not exist so I can't get another owner.
+// Get an owner from a borrower, or a raw pointer.
  {
  inc_hold();
- if (deleted)  {
+ if (deleted&1)  {
     dec_hold();
     throw exception ("classics", "Expired Baro Object", __FILE__, __LINE__);
        /** Exception thrown when you try to construct a regular handle from
@@ -137,6 +130,25 @@ void lifetime::claim_owned_reference()
 int debug_can_handle::object_count;
 
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
+
+namespace internal {
+
+int unique_helper (volatile int& trans)
+ {
+ int already_pending= classics::internal::Xexchange (&trans, 1);
+ if (already_pending) {
+    __asm PAUSE;
+    ratwin::util::Sleep (1);
+    while (trans != 0)  {
+       __asm PAUSE;
+       ratwin::util::Sleep (1);
+       }
+    return 0;  // other thread did (and finished) the work.
+    }
+ return 1;  // I need to do the work.
+ }
+
+}
 
 } // end classics
 ENDWRAP

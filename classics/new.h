@@ -1,6 +1,6 @@
 // The Repertoire Project copyright 2006 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: classics\new.h
-// Revision: public build 8, shipped on 11-July-2006
+// Revision: public build 9, shipped on 18-Oct-2006
 
 /*  This file is provided as a replacement for the Standard <NEW.H> and related
    operator new() issues to overcome problems in the Microsoft 5.x run-time library.
@@ -15,11 +15,7 @@
 #endif
 
 #include "classics\common.h"
-
-#if defined _MSC_VER  && !defined _SIZE_T_DEFINED
-typedef unsigned int size_t;
-#define _SIZE_T_DEFINED
-#endif
+#include "ratwin\size_t.h"
 
 
 STARTWRAP

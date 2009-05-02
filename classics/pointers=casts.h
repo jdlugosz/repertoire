@@ -1,6 +1,6 @@
 // The Repertoire Project copyright 2006 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: classics\pointers=casts.h
-// Revision: public build 8, shipped on 11-July-2006
+// Revision: public build 9, shipped on 18-Oct-2006
 
 //This is not inside the namespace, so I don't have to qualify the names.
 //MS VC++5.0 (still) has problems with using declarations on template names.

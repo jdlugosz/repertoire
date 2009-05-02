@@ -1,6 +1,6 @@
 // The Repertoire Project copyright 2006 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: ratwin\tasking\thread.h
-// Revision: public build 8, shipped on 11-July-2006
+// Revision: public build 9, shipped on 18-Oct-2006
 
 #pragma once
 #if defined RATWIN_NoGlobals
@@ -23,6 +23,7 @@ __declspec(dllimport) int __stdcall TerminateThread (Dlugosz::ratwin::arg::arg32
 __declspec(dllimport) unsigned long __stdcall QueueUserAPC (Dlugosz::ratwin::arg::arg32, Dlugosz::ratwin::arg::arg32, void*);
 __declspec(dllimport) int __stdcall GetThreadTimes (Dlugosz::ratwin::arg::arg32, __int64*, __int64*, __int64*, __int64*);
 __declspec(dllimport) Dlugosz::ratwin::arg::arg32 __stdcall GetCurrentThread();  //obtain the pseudohandle constant.
+__declspec(dllimport) Dlugosz::ratwin::arg::arg32 __stdcall GetCurrentThreadId();
 __declspec(dllimport) void __stdcall ExitThread (Dlugosz::ratwin::arg::arg32);
 }
 
@@ -64,9 +65,13 @@ types::Thread_HANDLE GetCurrentThread()
  {  return reinterpret_cast<types::Thread_HANDLE>( ::GetCurrentThread() ); }
 
 inline
+ulong GetCurrentThreadId()
+ {  return reinterpret_cast<ulong>( ::GetCurrentThreadId() ); }
+
+inline
 void ExitThread (int exitcode)
  {  ::ExitThread (reinterpret_cast<arg::arg32>(exitcode));  }
- 
+
 } //end tasking
 }
 ENDWRAP

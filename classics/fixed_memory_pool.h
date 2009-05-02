@@ -1,6 +1,6 @@
 // The Repertoire Project copyright 2006 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: classics\fixed_memory_pool.h
-// Revision: public build 8, shipped on 11-July-2006
+// Revision: public build 9, shipped on 18-Oct-2006
 
 #pragma once
 #if !defined CLASSICS_EXPORT
@@ -22,15 +22,18 @@ protected:
    int Recsize;
    int cumulative_size;
    int lengthy_operation;
+   int use_count;  // important for delayed destructor
+   bool shutdown_commanded;
    inline void wait();
    inline node* Xexchange (node** dest, node* source);
 public:
    bool single_thread_only;
-   int use_count;  //for auditing and leak detection
+   int get_use_count() const { return use_count; }  //for auditing and leak detection
    void (*callback)(int mode, void* p);
    int Chunksize;
    int wait_count;  //for performance monitoring
-   CLASSICS_EXPORT ~nt_base_fixed_memory_pool();
+   CLASSICS_EXPORT void purge();
+   ~nt_base_fixed_memory_pool() { shutdown_commanded= true;  purge(); }
    void* get_nodelist() const  { return nodelist; }  //for debugging and testing only.
    int get_Recsize() const { return Recsize; }
    const chunk* get_chunklist() const  { return chunklist; }  // for debugging

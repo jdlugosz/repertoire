@@ -1,6 +1,6 @@
 // The Repertoire Project copyright 2006 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: ratwin\registry.h
-// Revision: public build 8, shipped on 11-July-2006
+// Revision: public build 9, shipped on 18-Oct-2006
 
 #pragma once
 #if defined RATWIN_NoGlobals
@@ -42,9 +42,15 @@ const types::HKEY HKEY_CLASSES_ROOT= reinterpret_cast<types::HKEY>(0x80000000);
 const types::HKEY HKEY_CURRENT_USER= reinterpret_cast<types::HKEY>(0x80000001);
 const types::HKEY HKEY_LOCAL_MACHINE= reinterpret_cast<types::HKEY>(0x80000002);
 const types::HKEY HKEY_USERS= reinterpret_cast<types::HKEY>(0x80000003);
+   // the PERFORMANCE_... keys are for NT/2k/XP... line only, not in Win9x.
 const types::HKEY HKEY_PERFORMANCE_DATA= reinterpret_cast<types::HKEY>(0x80000004);
-const types::HKEY HKEY_CURRENT_CONFIG= reinterpret_cast<types::HKEY>(0x80000005);
+   // the following two were added in WinXP (not available in w2k)
+const types::HKEY HKEY_PERFORMANCE_TEXT= reinterpret_cast<types::HKEY>(0x80000050);
+const types::HKEY HKEY_PERFORMANCE_NLSTEXT= reinterpret_cast<types::HKEY>(0x80000060);
+   // the DYN_DATA is for Win9x to get performance data
 const types::HKEY HKEY_DYN_DATA= reinterpret_cast<types::HKEY>(0x80000006);
+   // CURRENT_CONFIG added after NT 3.51 (presumably not in 9x?).  Alias for HKEY_LOCAL_MACHINE\System\CurrentControlSet\Hardware Profiles\Current.
+const types::HKEY HKEY_CURRENT_CONFIG= reinterpret_cast<types::HKEY>(0x80000005);
 
 enum Rights {
    KEY_QUERY_VALUE= 0x0001,
@@ -53,6 +59,8 @@ enum Rights {
    KEY_ENUMERATE_SUB_KEYS= 0x0008,
    KEY_NOTIFY= 0x0010,
    KEY_CREATE_LINK= 0x0020,
+   // non-specific to Registry
+   MAXIMUM_ALLOWED= 0x02000000L,
    // pre-made composites
    KEY_ALL_ACCESS= 0x000F003F   //note: "enumerate subkeys" included, not in Windows.h though documented in SDK.
    };
@@ -60,13 +68,13 @@ enum Rights {
 inline
 long RegOpenKey (types::HKEY parent, const char* subkey, types::HKEY& result)
  {
- return ::RegOpenKeyExA (reinterpret_cast<arg::arg32>(parent), subkey, 0, KEY_ALL_ACCESS, reinterpret_cast<arg::arg32>(&result));
+ return ::RegOpenKeyExA (reinterpret_cast<arg::arg32>(parent), subkey, 0, MAXIMUM_ALLOWED, reinterpret_cast<arg::arg32>(&result));
  }
- 
+
 inline
 long RegOpenKey (types::HKEY parent, const wchar_t* subkey, types::HKEY& result)
  {
- return ::RegOpenKeyExW (reinterpret_cast<arg::arg32>(parent), subkey, 0, KEY_ALL_ACCESS, reinterpret_cast<arg::arg32>(&result));
+ return ::RegOpenKeyExW (reinterpret_cast<arg::arg32>(parent), subkey, 0, MAXIMUM_ALLOWED, reinterpret_cast<arg::arg32>(&result));
  }
 
 inline
@@ -74,7 +82,7 @@ long RegOpenKey (types::HKEY parent, const char* subkey, types::HKEY& result, cl
  {
  return ::RegOpenKeyExA (reinterpret_cast<arg::arg32>(parent), subkey, 0, rights.validdata(), reinterpret_cast<arg::arg32>(&result));
  }
- 
+
 inline
 long RegOpenKey (types::HKEY parent, const wchar_t* subkey, types::HKEY& result, classics::flagword<Rights> rights)
  {
@@ -87,14 +95,14 @@ long RegCloseKey (types::HKEY key)
  return ::RegCloseKey (reinterpret_cast<arg::arg32>(key));
  }
 
-inline 
+inline
 long RegEnumKey (types::HKEY parent, int index, char* dest, int& destsize)
  {
  __int64 time;
  return ::RegEnumKeyExA (reinterpret_cast<arg::arg32>(parent), index, dest, &destsize, 0,0,0,&time);
  }
 
-inline 
+inline
 long RegEnumKey (types::HKEY parent, int index, wchar_t* dest, int& destsize)
  {
  __int64 time;
@@ -121,34 +129,44 @@ inline long RegDeleteValue (types::HKEY parent, const wchar_t* subValue)
  return ::RegDeleteValueW (reinterpret_cast<arg::arg32>(parent), subValue);
  }
 
-inline long RegCreateKey (types::HKEY parent, const char* subkey, types::HKEY& /*out*/ result, bool* created= 0)
+inline long RegCreateKey (types::HKEY parent, const char* subkey, types::HKEY& /*out*/ result, classics::flagword<Rights> rights, bool* created= 0)
  {
- unsigned long disposition; 
+ unsigned long disposition;
  long retval= ::RegCreateKeyExA (reinterpret_cast<arg::arg32>(parent), subkey,
     0, //reserved, is always zero
     0, //class name, default to zero for unused
     0, //REG_OPTION_NON_VOLATILE by default (and only one available under Win98)
-    KEY_ALL_ACCESS,  //desired rights
+    rights.validdata(),  //desired rights
     0, //security absent
     reinterpret_cast<arg::arg32>(&result),
     &disposition);
  if (created)  *created= 1==disposition;  //1:created, 2:opened existing
  return retval;
  }
- 
-inline long RegCreateKey (types::HKEY parent, const wchar_t* subkey, types::HKEY& /*out*/ result, bool* created= 0)
+
+inline long RegCreateKey (types::HKEY parent, const wchar_t* subkey, types::HKEY& /*out*/ result, classics::flagword<Rights> rights, bool* created= 0)
  {
- unsigned long disposition; 
+ unsigned long disposition;
  long retval= ::RegCreateKeyExW (reinterpret_cast<arg::arg32>(parent), subkey,
     0, //reserved, is always zero
     0, //class name, default to zero for unused
     0, //REG_OPTION_NON_VOLATILE by default (and only one available under Win98)
-    KEY_ALL_ACCESS,  //desired rights
+    rights.validdata(),  //desired rights
     0, //security absent
     reinterpret_cast<arg::arg32>(&result),
     &disposition);
  if (created)  *created= 1==disposition;  // 1:created, 2:opened existing
  return retval;
+ }
+
+inline long RegCreateKey (types::HKEY parent, const wchar_t* subkey, types::HKEY& /*out*/ result, bool* created= 0)
+ {
+ return RegCreateKey (parent, subkey, result, MAXIMUM_ALLOWED, created);
+ }
+
+inline long RegCreateKey (types::HKEY parent, const char* subkey, types::HKEY& /*out*/ result, bool* created= 0)
+ {
+ return RegCreateKey (parent, subkey, result, MAXIMUM_ALLOWED, created);
  }
 
 enum value_type {
@@ -164,13 +182,14 @@ enum value_type {
    REG_RESOURCE_LIST= 8,  // Resource list in the resource map
    REG_FULL_RESOURCE_DESCRIPTOR= 9,  // Resource list in the hardware description
    REG_RESOURCE_REQUIREMENTS_LIST= 10,
+   REG_QWORD= 11, // 64-bit number
    };
 
 inline long RegSetValue (types::HKEY parent, const char* valname, value_type valtype, const void* data, int size)
  {
  return ::RegSetValueExA (reinterpret_cast<arg::arg32>(parent), valname, 0, valtype, data, size);
  }
- 
+
 inline long RegSetValue (types::HKEY parent, const wchar_t* valname, value_type valtype, const void* data, int size)
  {
  return ::RegSetValueExW (reinterpret_cast<arg::arg32>(parent), valname, 0, valtype, data, size);

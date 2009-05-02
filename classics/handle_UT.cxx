@@ -1,6 +1,6 @@
 // The Repertoire Project copyright 2006 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: classics\handle_UT.cxx
-// Revision: public build 8, shipped on 11-July-2006
+// Revision: public build 9, shipped on 18-Oct-2006
 
 #include "classics\new.h"
 #include "classics\pointers.h"
@@ -788,6 +788,7 @@ int main (int argc, char* argv[])
     test3();
     check_leaks();
     test4();
+ /**/ report_life_count();
     check_leaks();
     test5();
     check_leaks();

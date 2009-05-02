@@ -1,6 +1,6 @@
 // The Repertoire Project copyright 2006 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: ratwin\base.h
-// Revision: public build 8, shipped on 11-July-2006
+// Revision: public build 9, shipped on 18-Oct-2006
 
 #pragma once
 
@@ -48,6 +48,7 @@ namespace internal {
    // Specializations of HANDLE that are not present in WINDOWS.H
    struct Thread_HANDLE_struct : public Kernel_HANDLE_struct {/*empty*/};
    struct IO_HANDLE_struct : public Kernel_HANDLE_struct {/*empty*/};
+   struct Heap_struct : public HANDLE_struct { /*empty*/ };
 
    struct SOCKET_struct : public IO_HANDLE_struct {/*empty*/};
    struct HWND_struct : public HANDLE_struct {/*empty*/};
@@ -75,6 +76,7 @@ namespace internal {
 typedef internal::HANDLE_struct* HANDLE;
 typedef internal::Kernel_HANDLE_struct* Kernel_HANDLE;
 typedef internal::IO_HANDLE_struct* IO_HANDLE;  // one that works with ReadFile, WriteFile, etc.
+typedef internal::Heap_struct* Heap;
 typedef internal::SOCKET_struct* SOCKET;
 typedef internal::HWND_struct* HWND;
 typedef internal::HINSTANCE_struct* HINSTANCE;

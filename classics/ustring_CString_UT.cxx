@@ -1,6 +1,6 @@
 // The Repertoire Project copyright 2006 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: classics\ustring_CString_UT.cxx
-// Revision: public build 8, shipped on 11-July-2006
+// Revision: public build 9, shipped on 18-Oct-2006
 // one of these two should be specified as a command-line option:
 //   #define _UNICODE  // CString built with Unicode support
 //   #define _MBCS  // CString built with multibyte-character support

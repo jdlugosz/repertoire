@@ -1,6 +1,6 @@
 // The Repertoire Project copyright 2006 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: classics\closure-0.h
-// Revision: public build 8, shipped on 11-July-2006
+// Revision: public build 9, shipped on 18-Oct-2006
 // This file generated from the master code in closure-=-MSonPC.h.
 // The "ParamType" has been removed, to provide a zero-argument form.
 // Redo that if the original changes.
