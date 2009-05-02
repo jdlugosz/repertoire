@@ -1,0 +1,35 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"  "http://www.w3.org/TR/html4/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=windows-1252">
+<TITLE>launch_thread complete documentation</TITLE>
+<META http-equiv="Content-Script-Type" content="text/javascript">
+<SCRIPT type= "text/javascript" src="../helpers.js"></SCRIPT>
+<LINK REL=STYLESHEET HREF="../info.css" TYPE="text/css">
+<META name="date" content="2006-07-26">
+</HEAD>
+
+<BODY>
+<IFRAME id="page_banner" src="../page_banner.html" scrolling="no"></IFRAME>
+
+<H1 id="toptop">launch_thread complete documentation</H1>
+<P>This is a simple type-safe wrapper around the <code>CreateThread</code> API function.  You encapsulate the
+thread’s state with an object.  The only requirement is that the object has a member function named <code>start</code>
+that takes no arguments.</P>
+
+<P>Here is an example:</P>
+<PRE class="code">
+cruncher1* testers[thread_count];
+<I>// &hellip; populate array by newing crunchers</I>
+
+ratwin::types::Kernel_HANDLE handles[thread_count];
+for (loop= 0;  loop &lt; thread_count;  loop++) {
+   handles[loop]= classics::<B>launch_thread</B> (*testers[loop]);
+   }
+ratwin::tasking::WaitForMultipleObjects (thread_count, handles, true);
+
+</PRE>
+
+<IFRAME id="page_footer" src="../page_footer.html"></IFRAME>
+</BODY>
+</HTML>
