@@ -26,8 +26,8 @@
 
 
 <H1 id="overview" >message_tap</H1>
-<P>Base class: <A HREF="../class_summary.html#can_handle" class="code">can_handle</A></P>
-<P>This class provides a WinProc that adds a <I>this</I> pointer and calls a virtual function on
+<P>Base class: <A HREF="HWND_vpapa.html" class="code" target="index">HWND_vpapa</A></P>
+<P>This class provides a WndProc that adds a <I>this</I> pointer and calls a virtual function on
 an object.  It provides the mechanisms for subclassing an <code>HWND</code>.</P>
 
 <P>
@@ -85,7 +85,7 @@ because <A HREF="#hook" class="code">hook</A> installed it using the -W form of 
 If you want to create a "window class" or dialog box using this function directly, then follow these
 guidelines to correctly attach this instance with the HWND.</P>
 
-<P>You can call <A HREF="#set_window_handle" class="code">set_window_handle</A> at first opportunity
+<P>You can call <A HREF="HWND_vpapa.html#set_window_handle" class="code">set_window_handle</A> at first opportunity
 to complete the process, but the hook will automatically set it when it processes the first message, so it is
 guarenteed to be set by the time <A HREF="#handle_message" class="code">handle_message</A> is called.</P>
 
@@ -105,7 +105,7 @@ Dialog Proc returns TRUE/FALSE (most of the time) to specify whether the message
 <A HREF="Dialog_message_tap_index.html" Target="index" class="code">Dialog_message_tap</A>, which is
 designed specifically for this and takes care of these details and others.</P>
 
-<P>It is an error to call this function after calling <A HREF="#set_window_handle">set_window_handle</A>
+<P>It is an error to call this function after calling <A HREF="HWND_vpapa.html#set_window_handle">set_window_handle</A>
 (including implicitly setting the window handle upon getting the first message).  This catches errors from duplicate
 use of the same instance.</P>
 
@@ -145,8 +145,8 @@ class.</P>
 <P>This function will “subclass” the window, pointing the WndProc back to this instance’s
 <A HREF="#handle_message" class="code">handle_message</A> function and remembering the old WndProc.</P>
 <P>It is an error to call this more than once.</P>
-<P>See also: <A HREF="#set_window_handle" class="code">set_window_handle</A>,
-<A HREF="#unhook" class="code">unhook</A><P>
+<P>See also: <A HREF="HWND_vpapa.html#set_window_handle" class="code">set_window_handle</A>,
+<A HREF="#unhook" class="code">unhook</A></P>
 
 <HR class="sep1">
 
@@ -172,7 +172,7 @@ been created.</P>
 <A HREF="#handle_message" class="code">handle_message</A> function will in this case
 receive <code>WM_CREATE</code>.  But if a window is created,
 then <A HREF="#hook" class="code">hook</A> is called, then <A HREF="#handle_message" class="code">handle_message</A>
-will never get a <code>WM_CREATE</code> because it was issued long before this class became involved.<P>
+will never get a <code>WM_CREATE</code> because it was issued long before this class became involved.</P>
 <P>So, if this function is used to  interact with the Window, not just complete its own data setup, it needs
 to be aware of when it might be invoked.  For other uses, it needs only count on the fact that it’s called
 at first oppertunity once the window handle and object are put together.</P>
@@ -218,17 +218,6 @@ For either, return 1 if the translate call returned <code>true</code>, or return
 
 <HR  class="sep1">
 
-<H2 id="report_error">void <SPAN class="signame">report_error</span> (const <A HREF="../class_summary.html#exception">classics::exception</A>&amp; X)</H2>
-<A HREF="message_tap_index.html" TARGET="index" class="memof">message_tap</A>
-<P class="mematt">public, virtual</P>
-<P>This function is called to log non-fatal errors generated within the class, and any exceptions caught by the
-internal hook handler.</P>
-<P>The supplied implementation calls <code>X.show()</code>.  This probably does not
-need to be changed, since you can customize the meaning of <code>show</code> already,
-on an application-wide basis.</P>
-
-<HR  class="sep1">
-
 <H2 id="sane_check">void <SPAN class="signame">sane_check</span>() const</H2>
 <A HREF="message_tap_index.html" TARGET="index" class="memof">message_tap</A>
 <P class="mematt">public</P>
@@ -240,21 +229,6 @@ data (such as a generic lParam received in a message) correctly contains a point
 
 <P>The test is not 100% reliable, as random memory <I>could</I> mimic the signature by coincedence, but is
 handy for spotting bugs and usage errors during development.</P>
-
-<HR  class="sep1">
-
-<H2 id="set_window_handle">void <SPAN class="signame">set_window_handle</span> (HWND)</H2>
-<A HREF="message_tap_index.html" TARGET="index" class="memof">message_tap</A>
-<P class="mematt">public</P>
-<P>This function performs half the work needed to associate this object with the
-specified Win32 Window handle. It sets the data member so that subsequent calls to
-<A HREF="#window_handle" class="code">window_handle</A> will return the specified window handle.</P>
-<P>It is used to complete the circuit if you used <A HREF="#get_WndProc" class="code">get_WndProc</A>
-to directly specify the window proc or dialog proc, as opposed to subclassing an existing window.  Specifically,
-<A HREF="#hook" class="code">hook</A> calls this for you.</P>
-<P>It is an error to call this function more than once (unless it is
-redundant&mdash;the parameter is the same).  This catches errors from duplicate use of the same instance.</P>
-<P>See also: <A HREF="#get_WndProc" class="code">get_WndProc</A></P>
 
 <HR  class="sep1">
 
@@ -292,18 +266,6 @@ objects that subclassed the window <I>after</I> this object have restored their 
 <P>See also: <A HREF="#unhook" class="code">unhook</A>,
 <A HREF="#destructor" class="code">~message_tap</A></P>
 
-
-<HR  class="sep1">
-
-<H2 id="window_handle">HWND <SPAN class="signame">window_handle</span>() const</H2>
-<A HREF="message_tap_index.html" TARGET="index" class="memof">message_tap</A>
-<P class="mematt">public</P>
-<P>This returns the Win32 window handle of the window to which this class is paired with.</P>
-<P>Note that this is a <code>const</code> member, as the state of this object is not
-affected. However, you can still modify the corresponding window object
-through this <code>HWND</code>, since there is no const-ness concept on <code>HANDLE</code>’s.</P>
-<P>See also: <A HREF="#set_window_handle" class="code">set_window_handle</A>,
-<A HREF="#hook" class="code">hook</A>
 
 <HR  class="sep1">
 

@@ -214,6 +214,9 @@
 			RelativePath="..\..\tomahawk\Dialog_message_tap.cpp">
 		</File>
 		<File
+			RelativePath="..\..\tomahawk\HWND_vpapa.cpp">
+		</File>
+		<File
 			RelativePath="..\..\tomahawk\message_tap.cpp">
 		</File>
 		<File

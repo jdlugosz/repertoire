@@ -30,14 +30,24 @@ inline
 types::HPROPSHEETPAGE CreatePropertySheetPage (const PROPSHEETPAGE<wchar_t>& pagedef)
  { return reinterpret_cast<types::HPROPSHEETPAGE>( ::CreatePropertySheetPageW (reinterpret_cast<arg::carg32>(&pagedef)) ); }
 
+template<typename CharT>
+int PropertySheet (const PROPSHEETHEADER<CharT>& sheet);
+
+template<>
 inline
 int PropertySheet (const PROPSHEETHEADER<char>& sheet)
  { return ::PropertySheetA (reinterpret_cast<arg::carg32>(&sheet)); }
 
+template<>
+inline
+int PropertySheet (const PROPSHEETHEADER<wchar_t>& sheet)
+ { return ::PropertySheetW (reinterpret_cast<arg::carg32>(&sheet)); }
+
+
 inline
 bool DestroyPropertySheetPage (types::HPROPSHEETPAGE h)
  { return ::DestroyPropertySheetPage (reinterpret_cast<arg::arg32>(h)); }
- 
+
 }}
 ENDWRAP
 

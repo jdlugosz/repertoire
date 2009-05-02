@@ -4,9 +4,13 @@ H1 {
    font-family: Verdana, Tahoma, sans-serif;
    }
 
-H2 {
+H2, H3 {
    font-family: Verdana, Tahoma, sans-serif;
    }
+
+H3 {
+	margin-bottom: 0pt;
+	}
 
 P { white-space: nowrap }
 
@@ -23,6 +27,10 @@ UL {
 	padding-right: 0;
 	font-family: "Lucida Sans", "Lucida Sans Unicode", sans-serif;
 	text-indent:-1em; margin-left:1em
+	}
+
+H3 + UL {
+	margin-top: 0;
 	}
 
 UL I {

@@ -16,7 +16,7 @@
    checkframe ("Tomahawk/Dialog_message_tap_index.html");
 </SCRIPT>
 
-<META name="date" content="2007-02-23">
+<META name="date" content="2007-02-25">
 </HEAD>
 
 <BODY>
@@ -44,8 +44,7 @@ for more discussion.</P>
 
 <HR  class="sep1">
 
-<H2 id="CreatePropertySheetPage">HPROPSHEETPAGE <SPAN class="signame">CreatePropertySheetPage</span> (PROPSHEETPAGE&lt;char>&amp;)</H2>
-<H2>HPROPSHEETPAGE <SPAN class="signame">CreatePropertySheetPage</span> (PROPSHEETPAGE&lt;wchar_t>&amp;)</H2>
+<H2 id="CreatePropertySheetPage">HPROPSHEETPAGE <SPAN class="signame">CreatePropertySheetPage</span> (PROPSHEETPAGE&lt;CharT>&amp;)</H2>
 <A HREF="Dialog_message_tap_index.html" TARGET="index" class="memof">Dialog_message_tap</A>
 <P class="mematt">public</P>
 <P>This calls the Win32 primitive <code>CreatePropertySheetPage</code>, wrapping it as necessary to use the
@@ -55,11 +54,15 @@ by this call, so for error checking purposes it makes sure that it's 0 initially
 <P>Likewise, the <code>lParam</code> member of the <code>PROPSHEETPAGE</code> structure is used
 internally, so must be 0 when you make this call.  You don't need this "extra information", since you can use any
 member data of this object.</P>
-<P>Currently, this class calls the -A or -W form of the Win32 primitive <code>CreatePropertySheetPage</code> based on
-the use of a narrow or wide parameter, but does not make any distinction within the callbacks.
-Presumably (but not explored yet), this simply means that your implementation of <code>handle_message</code>
-should know what to expect (wide or narrow parameters) based on which call you made to create it.</P>
-<P class="prognote">Change impl. to only allow wide form.  That matches what hook does.</P>
+<P>The declaration is a template which accepts either <code>PROPSHEETPAGE&lt;char></code> or <code>PROPSHEETPAGE&lt;wchar_t></code>,
+and both forms are indeed in the DLL.  However, the <code>char</code> form might not work with the callback functions
+being written to take <code>wchar_t</code> messages.  I have not experimented to see what effect using the -A or -W
+form of the Win32 primitive <code>CreatePropertySheetPage</code> has on the resulting property sheet page.
+Likewise, I don’t know what difference it makes to use the -A form of <code>PropertySheet</code> (by using <code>PROPSHEETHEADER&lt;<EM>char</EM>></code>).
+It seems to work superficially, but needs extensive experimenting to see if it has issues with specific messages or
+other problems.  It’s not worth the effort to avoid typing an <code>L</code> in front of the caption string.
+It’s there if you want to try it, but the example code in <code>demo_prop_page</code> in <span class="filename">message_tap_demo.cxx</span>
+uses <code>wchar_t</code> for both <code>PROPSHEETPAGE</code> and <code>PROPSHEETHEADER</code> structures.</P>
 
 <HR  class="sep1">
 

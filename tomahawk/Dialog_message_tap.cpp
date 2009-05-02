@@ -116,7 +116,8 @@ static int __stdcall dlg_stub_prop (HWND w, unsigned message, unsigned p1, unsig
  {
  if (message == ratwin::WM_constants::WM_INITDIALOG) {
     ratwin::window::SetWindowLong<wchar_t> (w, DWL_DLGPROC, (void*)0);
-    ratwin::property_sheet::PROPSHEETPAGE<char>* page= reinterpret_cast<ratwin::property_sheet::PROPSHEETPAGE<char>*>(p2);
+    ratwin::property_sheet::PROPSHEETPAGE<void>* page= reinterpret_cast<ratwin::property_sheet::PROPSHEETPAGE<void>*>(p2);
+    // the void in the above template indicates that I don't care, and won't use any member that differs based on wide/narrow form.
     Dialog_message_tap* object= reinterpret_cast<Dialog_message_tap*>(page->lParam);
     try { object->sane_check(); }
     catch (classics::exception& X) {  // add to that.
@@ -130,7 +131,8 @@ static int __stdcall dlg_stub_prop (HWND w, unsigned message, unsigned p1, unsig
 
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
-ratwin::types::HPROPSHEETPAGE Dialog_message_tap::CreatePropertySheetPage (ratwin::property_sheet::PROPSHEETPAGE<char>& pagedef)
+template <typename CharT>
+ratwin::types::HPROPSHEETPAGE Dialog_message_tap::CreatePropertySheetPage (ratwin::property_sheet::PROPSHEETPAGE<CharT>& pagedef)
  {
  if (pagedef.pfnDlgProc && pagedef.lParam) {
     exception X ("Tomahawk", "DialogProc and/or lParam is supplied; must be NULL initially", __FILE__, __LINE__);
@@ -141,18 +143,8 @@ ratwin::types::HPROPSHEETPAGE Dialog_message_tap::CreatePropertySheetPage (ratwi
  return ratwin::property_sheet::CreatePropertySheetPage (pagedef);
  }
 
-/* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
-
-ratwin::types::HPROPSHEETPAGE Dialog_message_tap::CreatePropertySheetPage (ratwin::property_sheet::PROPSHEETPAGE<wchar_t>& pagedef)
- {
- if (pagedef.pfnDlgProc && pagedef.lParam) {
-    exception X ("Tomahawk", "DialogProc and/or lParam is supplied; must be NULL initially", __FILE__, __LINE__);
-    throw X;
-    }
- pagedef.pfnDlgProc= dlg_stub_prop;
- pagedef.lParam= reinterpret_cast<long>(this);
- return ratwin::property_sheet::CreatePropertySheetPage (pagedef);
- }
+template TOMAHAWK_EXPORT ratwin::types::HPROPSHEETPAGE Dialog_message_tap::CreatePropertySheetPage<wchar_t> (ratwin::property_sheet::PROPSHEETPAGE<wchar_t>& pagedef);
+template TOMAHAWK_EXPORT ratwin::types::HPROPSHEETPAGE Dialog_message_tap::CreatePropertySheetPage<char> (ratwin::property_sheet::PROPSHEETPAGE<char>& pagedef);
 
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 

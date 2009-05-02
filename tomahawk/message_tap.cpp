@@ -30,7 +30,7 @@ void message_tap::prevent_duplicate_hook() const
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
 message_tap::message_tap()
- : WindowHandle(0), OldWndProc(0), EntryPoint (this, &message_tap::hook_handler),
+ : OldWndProc(0), EntryPoint (this, &message_tap::hook_handler),
    LastMessage (ratwin::WM_constants::WM_NCDESTROY), UnhookASAP(false),
    SaneCheck(SaneMask^reinterpret_cast<long>(this))
  {
@@ -194,12 +194,6 @@ long message_tap::call_old_wndproc (ratwin::message::sMSG& msg)
  else return ratwin::window::DefWindowProc<wchar_t> (msg);
  }
 
-/* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
-
-void message_tap::report_error (const classics::exception& X)
- {
- X.show();
- }
 
 }
 

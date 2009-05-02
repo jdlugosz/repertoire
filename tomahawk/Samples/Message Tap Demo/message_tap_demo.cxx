@@ -1,6 +1,6 @@
-// The Repertoire Project copyright 2006 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
+// The Repertoire Project copyright 2007 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: tomahawk\Samples\Message Tap Demo\message_tap_demo.cxx
-// Revision: public build 9, shipped on 18-Oct-2006
+// Revision: post-public build 9
 
 #include "tomahawk\message_tap.h"
 #include "tomahawk\Dialog_message_tap.h"
@@ -63,16 +63,16 @@ class testhook_2 : public tomahawk::Dialog_message_tap {
       UpDown, UpDownBuddy, CheckGroupBox, Check1, Check2, Check3, Check4, PushButton };
    bool process_COMMAND (const WM_COMMAND_msg&);
 public:
-   testhook_2 (classics::baro<testhook_1> parent) : parent(parent) 
-      { 
+   testhook_2 (classics::baro<testhook_1> parent) : parent(parent)
+      {
       char buf[256];
       sprintf (buf, "constructing testhook_2 object at %08x\n", this);
-      OutputDebugString (buf); 
+      OutputDebugString (buf);
       }
    ~testhook_2() {
       char buf[256];
       sprintf (buf, "destructing testhook_2 object at %08x\n", this);
-      OutputDebugString (buf); 
+      OutputDebugString (buf);
       }
    long handle_message (sMSG& msg);  // supply this function to start getting messages.
    void on_attach();
@@ -82,22 +82,22 @@ public:
 int demo_prop_page (classics::handle<testhook_2> object)
  {
  // first I need a page.
- ratwin::property_sheet::PROPSHEETPAGE<char> page;
+ ratwin::property_sheet::PROPSHEETPAGE<wchar_t> page;
  page.set_v58_size();
  page.dwFlags= 0;  // use defaults
  page.hInstance= ratwin::util::get_Instance();
- page.pszTemplate= "SampleDialog";
+ page.pszTemplate= L"SampleDialog";
  page.pfnDlgProc= 0;  // must use 0 here, real value is supplied by Dialog_message_tap.
  page.lParam= 0;  // ditto.
  // finally...
  ratwin::types::HPROPSHEETPAGE hPage= object->CreatePropertySheetPage (page);
  // Now that I have one page, describe a sheet containing it
- ratwin::property_sheet::PROPSHEETHEADER<char> sheet;
+ ratwin::property_sheet::PROPSHEETHEADER<wchar_t> sheet;
  sheet.dwSize= sizeof sheet;
  sheet.dwFlags= 0;
  sheet.hwndParent= 0;  // or could supply another window here.
  sheet.hInstance= ratwin::util::get_Instance();
- sheet.pszCaption= "Property Sheet Demo";
+ sheet.pszCaption= L"Property Sheet Demo";
  sheet.nPages= 1;  // important! size of array in next line.
  sheet.phpage= &hPage;
  sheet.nStartPage= 0;
@@ -155,7 +155,7 @@ void testhook_2::on_attach()
     ratwin::window::ShowWindow (child, ratwin::window::SW_HIDE);
     }
  }
- 
+
 long testhook_2::handle_message (sMSG& msg)
  {
  using namespace ratwin::WM_constants;
@@ -173,7 +173,7 @@ long testhook_2::handle_message (sMSG& msg)
 // Illustrate/test a basic window
 
 
-testhook_1::testhook_1() 
+testhook_1::testhook_1()
 : child1(0), key_indicators(WM_MOUSEMOVE_msg::KeyIndicators_t(0)), foovalue(0)
 {
 OutputDebugString ("constructing testhook_1 object\n");
@@ -213,7 +213,7 @@ void testhook_1::on_attach()
  dialogbox= new testhook_2 (classics::baro<testhook_1>(this));  // this is a smart pointer handle.
  dialogbox->ModelessDialogBox (ratwin::util::get_Instance(), "SampleDialog", window_handle());
  }
- 
+
 void testhook_1::process_Size (const WM_SIZE_msg& msg)
  {
  // make my child match the new size

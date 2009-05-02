@@ -27,8 +27,9 @@ public:
    TOMAHAWK_EXPORT int ModalDialogBox (ratwin::types::HINSTANCE module_for_resource, const CharT* resource, ratwin::types::HWND parent=0);
    TOMAHAWK_EXPORT int ModalDialogBox (ratwin::types::HINSTANCE module_for_resource, unsigned short resource, ratwin::types::HWND parent=0);
    TOMAHAWK_EXPORT void EndDialog (int result=0);
-   TOMAHAWK_EXPORT ratwin::types::HPROPSHEETPAGE CreatePropertySheetPage (ratwin::property_sheet::PROPSHEETPAGE<char>&);
-   TOMAHAWK_EXPORT ratwin::types::HPROPSHEETPAGE CreatePropertySheetPage (ratwin::property_sheet::PROPSHEETPAGE<wchar_t>&);
+   template <typename CharT>
+   TOMAHAWK_EXPORT ratwin::types::HPROPSHEETPAGE CreatePropertySheetPage (ratwin::property_sheet::PROPSHEETPAGE<CharT>&);
+//   TOMAHAWK_EXPORT ratwin::types::HPROPSHEETPAGE CreatePropertySheetPage (ratwin::property_sheet::PROPSHEETPAGE<wchar_t>&);
    };
 
 
