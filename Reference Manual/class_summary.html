@@ -7,7 +7,7 @@
  CONTENT="Repertoire documentation class index">
 <TITLE>Class Summary</TITLE>
 <LINK REL="STYLESHEET" HREF="info.css" TYPE="text/css">
-<META name="date" content="2007-02-28">
+<META name="date" content="2007-03-15">
 <STYLE TYPE="text/css">
 .ib /* info block */ {
    white-space: pre;
@@ -194,6 +194,18 @@ usage: internal</P>
 
 
 <HR id="Co">
+<H2 id="commission">commission</H2>
+<P class="ib">library: tomahawk
+header: commission.h
+usage: associated with <A HREF="#message_parliament" class="code">message_parliament</A></P>
+<P>A <code>commission</code> associates a <A HREF="#minister" class="code">minister</A> with a sort-order and
+other information to speed up dispatching.  The <code>message_parliament</code> contains an array of
+<code>commission</code>s, which is an ordered array of smart pointers to <code>minister</code>s that should
+try to handle a windows message.</P>
+See the <A HREF="Tomahawk/commission_index.html" TARGET="index"><code>commission</code> class index</A> for more information.
+<HR>
+
+
 <H2 id="const_baro">const_baro</H2>
 <P class="ib">library: classics
 header: pointers.h
@@ -655,7 +667,16 @@ header: Tomahawk\message_parliament.h
 usage: main API</P>
 <P>This class dispatches window messages to components that encapsulate small units of functionality.  It works with other
 "mix-in" classes to form complete window implementations with high granularity and potential for customization.</P>
-<P>See <A HREF="Tomahawk/message_parliament_index.html" TARGET="index" index for <code>message_parliament</code> documentation</A> in the index pane.</P>
+<P>See <A HREF="Tomahawk/message_parliament_index.html" TARGET="index"> index for <code>message_parliament</code> documentation</A> in the index pane.</P>
+
+
+<HR>
+<H2 id="message_range">message_range</H2>
+<P class="ib">library: Tomahawk
+header: Tomahawk\message_range.h
+usage: main API</P>
+<P>description...</P>
+<P>See discussion of this class in the <A HREF="Tomahawk/message_parliament_guide.html#message_range"><code>message_parliament</code> User’s Guide</A>. </P>
 
 
 <HR id="Mf">
@@ -677,6 +698,15 @@ or as a static library.  The single Classics.DLL handles all cases.</P>
 <P>For more information, see <A HREF="classics/ustring.html#CString_support"><I>CString Support</I></A>
 in the <code>ustring</code> documentation.
 </P>
+
+<HR id="Mi">
+<H2 id="minister">minister</H2>
+<P class="ib">library: Tomahawk
+header: Tomahawk\minister.h
+usage: main API</P>
+<P>description...</P>
+<P>See <A HREF="Tomahawk/minister_index.html" TARGET="index"> index for <code>minister</code> documentation</A> in the index pane.</P>
+
 
 <HR id="Ms">
 <H2 id="MSG">MSG</H2>
@@ -838,7 +868,7 @@ implementation is shared among all species of <A HREF="#vararray_s" class="code"
 
 
 <HR id="Sc">
-<H2>schedule_t</H2>
+<H2 id="schedule_t">schedule_t</H2>
 <P class="ib">library: classics
 header: schedule_t.h
 usage: main API</P>

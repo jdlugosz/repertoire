@@ -5,6 +5,7 @@
 #define TOMAHAWK_EXPORT __declspec(dllexport)
 #include "tomahawk\message_parliament.h"
 #include "tomahawk\commission.h"
+#include "ratwin\window.h"
 
 namespace tomahawk {
 
@@ -25,7 +26,11 @@ message_parliament::~message_parliament()
 long message_parliament::handle_message (ratwin::message::sMSG& msg)
  {
  handle_message_return_code= 0;
- return handle_message_return_code;
+ // >>> will iterate over commissions
+// return handle_message_return_code;
+//        if anyone reported handling it.
+// will have "Old WndProc", optional.  Can't assume message_tap from here, so derived class sets it up.
+ return ratwin::window::DefWindowProc<wchar_t> (msg);  // will be in "last ditch".
  }
 
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
