@@ -16,9 +16,6 @@
 #include "classics\directory_list.h"
 using std::endl;
 
-// for debugging
-using std::cout;
-
 STARTWRAP
 namespace classics {
 

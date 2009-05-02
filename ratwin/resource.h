@@ -3,8 +3,9 @@
 // Revision: post-public build 6
 
 #pragma once
-#if !defined RATWIN_RESOURCE_INCLUDED
-#define RATWIN_RESOURCE_INCLUDED
+#if defined RATWIN_NoGlobals
+   #error ratwin\resource.h contains globals.
+#endif
 
 #include "ratwin\NumOrName.h"
 
@@ -122,5 +123,4 @@ inline types::HRSRC FindResource (types::HINSTANCE hInstance, NumOrName<wchar_t>
 
 }
 ENDWRAP
-#endif
 

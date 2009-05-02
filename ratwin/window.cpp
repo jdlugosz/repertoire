@@ -18,8 +18,7 @@ STARTWRAP
 namespace ratwin {
 namespace window {
 
-namespace {  //unnamed namespace
-
+static  // compiler (VC6) couldn't find it in unnamed namespace!
 long __stdcall really_minimal_window_proc (types::HWND wnd, unsigned mess, unsigned p1, ulong p2)
  {
  if (mess == WM_constants::WM_DESTROY) {
@@ -29,9 +28,9 @@ long __stdcall really_minimal_window_proc (types::HWND wnd, unsigned mess, unsig
  else return DefWindowProc (wnd, mess, p1, p2);
  }
 
-} // end of unnamed namespace
 
-window_class::window_class (const char* classname)
+template<typename CharT>
+window_class<CharT>::window_class (const CharT* classname)
  {
  style= 0;
  lpfnWndProc= &really_minimal_window_proc;
@@ -44,6 +43,12 @@ window_class::window_class (const char* classname)
  lpszMenuName= 0;
  lpszClassName= classname;
  }
+
+
+// explicit instantiations
+template class window_class<char>;
+template class window_class<wchar_t>;
+
 
 types::HWND CreateWindow (const char* lpClassName, const char* lpWindowName, ulong dwStyle)
  {

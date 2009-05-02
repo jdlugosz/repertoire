@@ -1,8 +1,12 @@
-// The Repertoire Project copyright 1999 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
+// The Repertoire Project copyright 2001 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: ratwin\io\console.h
-// Revision: public build 6, shipped on 28-Nov-1999
+// Revision: 
 
 #pragma once
+#if defined RATWIN_NoGlobals
+   #error ratwin\console.h contains globals.  Include console=struct.h instead.
+#endif
+
 #include "ratwin\io\console=struct.h"
 
 extern "C" {

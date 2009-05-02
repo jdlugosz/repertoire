@@ -3,6 +3,9 @@
 // Revision: initial
 
 #pragma once
+#if defined RATWIN_NoGlobals
+   #error ratwin\sysinfo.h contains globals.
+#endif
 
 #include "ratwin\base.h"
 

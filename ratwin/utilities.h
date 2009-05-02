@@ -1,8 +1,11 @@
 // The Repertoire Project copyright 2001 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: ratwin\utilities.h
-// Revision: post-public build 5
+// Revision: post-public build 6
 
 #pragma once
+#if defined RATWIN_NoGlobals
+   #error ratwin\utilities.h contains globals.
+#endif
 
 #include "ratwin\base.h"
 
@@ -49,6 +52,10 @@ inline ushort LOWORD (int x) { return x; }
 inline ushort HIWORD (ulong x) { return ushort(x >> 16); }
 inline ulong MAKELONG (ushort H, ushort L) { return L | (H<<16); }
 
+
+
+
+/////////////>>>>>>>>>>> shouldn't these be in sysinfo.h?
 struct SYSTEM_INFO {
    unsigned short wProcessorArchitecture;
    unsigned short wReserved;

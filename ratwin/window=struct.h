@@ -3,7 +3,7 @@
 // Revision: post-public build 6
 
 #pragma once
-#include "ratwin\base.h"
+#include "ratwin\message=struct.h"
 
 STARTWRAP
 namespace ratwin {
@@ -18,15 +18,18 @@ namespace window {
    CS_BYTEALIGNWINDOW   CS_GLOBALCLASS  CS_IME
    WS_OVERLAPPED  WS_POPUP  WS_CHILD WS_MINIMIZE WS_VISIBLE WS_DISABLED   WS_CLIPSIBLINGS WS_CLIPCHILDREN  WS_MAXIMIZE
    WS_CAPTION WS_BORDER   WS_DLGFRAME  WS_VSCROLL  WS_HSCROLL  WS_SYSMENU  WS_THICKFRAME  WS_GROUP  WS_TABSTOP         
-   WS_MINIMIZEBOX  WS_MAXIMIZEBOX WS_TILED WS_ICONIC   WS_SIZEBOX  WS_TILEDWINDOW  
+   WS_MINIMIZEBOX  WS_MAXIMIZEBOX WS_TILED WS_ICONIC   WS_SIZEBOX WS_OVERLAPPEDWINDOW WS_TILEDWINDOW  
+   WS_POPUPWINDOW WS_CHILDWINDOW
    WS_EX_DLGMODALFRAME   WS_EX_NOPARENTNOTIFY WS_EX_TOPMOST    WS_EX_ACCEPTFILES WS_EX_TRANSPARENT   WS_EX_MDICHILD          
    WS_EX_TOOLWINDOW    WS_EX_WINDOWEDGE    WS_EX_CLIENTEDGE  WS_EX_CONTEXTHELP  WS_EX_RIGHT  WS_EX_LEFT WS_EX_RTLREADING        
    WS_EX_LTRREADING  WS_EX_LEFTSCROLLBAR  WS_EX_RIGHTSCROLLBAR   WS_EX_CONTROLPARENT   WS_EX_STATICEDGE   WS_EX_APPWINDOW         
    WS_EX_OVERLAPPEDWINDOW WS_EX_PALETTEWINDOW
    SBS_HORZ SBS_VERT SBS_TOPALIGN SBS_LEFTALIGN SBS_BOTTOMALIGN SBS_RIGHTALIGN SBS_SIZEBOXTOPLEFTALIGN
    SBS_SIZEBOXBOTTOMRIGHTALIGN SBS_SIZEBOX SBS_SIZEGRIP   
+   CW_USEDEFAULT
    GWL_WNDPROC GWL_HINSTANCE GWL_HWNDPARENT GWL_STYLE GWL_EXSTYLE GWL_USERDATA GWL_ID              
    GW_HWNDFIRST GW_HWNDLAST GW_HWNDNEXT GW_HWNDPREV GW_OWNER GW_CHILD          GW_MAX
+   SIZE_RESTORED SIZE_MINIMIZED SIZE_MAXIMIZED SIZE_MAXSHOW SIZE_MAXHIDE     
 */
 // ## BEGIN MacroCloak Generated Code
 #if defined (SW_HIDE)
@@ -82,7 +85,10 @@ namespace window {
 #undef WS_TILED
 #undef WS_ICONIC
 #undef WS_SIZEBOX
+#undef WS_OVERLAPPEDWINDOW
 #undef WS_TILEDWINDOW
+#undef WS_POPUPWINDOW
+#undef WS_CHILDWINDOW
 #undef WS_EX_DLGMODALFRAME
 #undef WS_EX_NOPARENTNOTIFY
 #undef WS_EX_TOPMOST
@@ -114,6 +120,7 @@ namespace window {
 #undef SBS_SIZEBOXBOTTOMRIGHTALIGN
 #undef SBS_SIZEBOX
 #undef SBS_SIZEGRIP
+#undef CW_USEDEFAULT
 #undef GWL_WNDPROC
 #undef GWL_HINSTANCE
 #undef GWL_HWNDPARENT
@@ -128,6 +135,11 @@ namespace window {
 #undef GW_OWNER
 #undef GW_CHILD
 #undef GW_MAX
+#undef SIZE_RESTORED
+#undef SIZE_MINIMIZED
+#undef SIZE_MAXIMIZED
+#undef SIZE_MAXSHOW
+#undef SIZE_MAXHIDE
 #endif
 // ## END Generated Code
 
@@ -148,11 +160,24 @@ enum SW_window {
    SW_MAX= 10
    };
 
-typedef long (__stdcall* WNDPROC)(types::HWND, unsigned, unsigned, ulong);
+enum SIZE_window {
+   SIZE_RESTORED,
+   SIZE_MINIMIZED,
+   SIZE_MAXIMIZED,
+   SIZE_MAXSHOW  ,
+   SIZE_MAXHIDE
+   };
 
+typedef long (__stdcall* WNDPROC)(types::HWND, unsigned, unsigned, ulong);
+typedef long (__stdcall* WNDPROC_2)(message::sMSG);  // same stack image, but treated as a single structure instead of individual items
+
+template <typename CharT>
 struct WNDCLASS {
    unsigned style;
-   WNDPROC lpfnWndProc;
+   union {
+      WNDPROC lpfnWndProc;
+      WNDPROC_2 WndProc2;
+      };
    int cbClsExtra;
    int cbWndExtra;
    types::HINSTANCE hInstance;
@@ -162,16 +187,17 @@ struct WNDCLASS {
       types::HBRUSH hbrBackground;         //handle
       int /*1 + color::sys_color_index*/ colorBackground;  //pre-defined background
       };
-   const char* lpszMenuName;
+   const CharT* lpszMenuName;
    union {
-      const char* lpszClassName;
-      const char* className;
+      const CharT* lpszClassName;  // yucky name
+      const CharT* className;  // clean name for same variable
       };
    };
 
-class window_class : public WNDCLASS {
+template <typename CharT>
+class window_class : public WNDCLASS<CharT> {
 public:
-   RATWIN_EXPORT window_class (const char* classname = 0);
+   RATWIN_EXPORT window_class (const CharT* classname = 0);
    };
 
 enum WC_style {  //first member of Window Class
@@ -367,7 +393,10 @@ using ratwin::window::WS_MAXIMIZEBOX;
 using ratwin::window::WS_TILED;
 using ratwin::window::WS_ICONIC;
 using ratwin::window::WS_SIZEBOX;
+using ratwin::window::WS_OVERLAPPEDWINDOW;
 using ratwin::window::WS_TILEDWINDOW;
+using ratwin::window::WS_POPUPWINDOW;
+using ratwin::window::WS_CHILDWINDOW;
 using ratwin::window::WS_EX_DLGMODALFRAME;
 using ratwin::window::WS_EX_NOPARENTNOTIFY;
 using ratwin::window::WS_EX_TOPMOST;
@@ -399,6 +428,7 @@ using ratwin::window::SBS_SIZEBOXTOPLEFTALIGN;
 using ratwin::window::SBS_SIZEBOXBOTTOMRIGHTALIGN;
 using ratwin::window::SBS_SIZEBOX;
 using ratwin::window::SBS_SIZEGRIP;
+using ratwin::window::CW_USEDEFAULT;
 using ratwin::window::GWL_WNDPROC;
 using ratwin::window::GWL_HINSTANCE;
 using ratwin::window::GWL_HWNDPARENT;
@@ -413,6 +443,11 @@ using ratwin::window::GW_HWNDPREV;
 using ratwin::window::GW_OWNER;
 using ratwin::window::GW_CHILD;
 using ratwin::window::GW_MAX;
+using ratwin::window::SIZE_RESTORED;
+using ratwin::window::SIZE_MINIMIZED;
+using ratwin::window::SIZE_MAXIMIZED;
+using ratwin::window::SIZE_MAXSHOW;
+using ratwin::window::SIZE_MAXHIDE;
 #endif
 // ## END Generated Code
 

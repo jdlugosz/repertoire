@@ -1,8 +1,11 @@
 // The Repertoire Project copyright 2001 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: ratwin\datetime.h
-// Revision: post-public build 6
+// Revision: 
 
 #pragma once
+#if defined RATWIN_NoGlobals
+   #error ratwin\datetime.h contains globals.
+#endif
 
 #include "ratwin\base.h"
 

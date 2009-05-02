@@ -1,10 +1,11 @@
-// The Repertoire Project copyright 2000 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
+// The Repertoire Project copyright 2001 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: ratwin\MessageBox.h
 // Revision: post - public build 6
 
 #pragma once
-#if !defined I2f23c6d0_fb52_11d3_8ded_0006296222ef
-#define I2f23c6d0_fb52_11d3_8ded_0006296222ef
+#if defined RATWIN_NoGlobals
+   #error ratwin\MessageBox.h contains globals.
+#endif
 
 
 #include "ratwin\base.h"
@@ -84,5 +85,4 @@ result MessageBox (const wchar_t* text, const wchar_t* caption, classics::flagwo
  { return static_cast<result>(::MessageBoxExW (0, text, caption, options.validdata(), LangID)); }
 
 }}
-#endif
 

@@ -40,7 +40,7 @@ HRESULT __stdcall factory_ntbase::LockServer (int bLock)
 
 HRESULT __stdcall factory_ntbase::QueryInterface (const ratwin::IID& iid, void** ppv)
  {    
- if ( inline_eq(iid, __uuidof(ratwin::IUnknown)) || inline_eq(iid, __uuidof(ratwin::IClassFactory)) ) {
+ if ( iid.inline_eq(__uuidof(ratwin::IUnknown)) || iid.inline_eq(__uuidof(ratwin::IClassFactory)) ) {
     ratwin::IClassFactory* p= this;
     p->AddRef();
     *ppv= p;

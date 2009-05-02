@@ -1,10 +1,12 @@
-// The Repertoire Project copyright 1999 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
+// The Repertoire Project copyright 2001 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: ratwin\LZexpand.h
 // Revision: post - public build 6
 
 #pragma once
-#if !defined Iec2d3d60_865c_11d3_8dc6_0006296222ef
-#define Iec2d3d60_865c_11d3_8dc6_0006296222ef
+#if defined RATWIN_NoGlobals
+   #error ratwin\LZexpand.h contains globals.
+#endif
+
 
 #include "ratwin\base.h"
 #include "classics\flagword.h"
@@ -76,5 +78,4 @@ int LZCopy (int source, int dest)
  
 } // end namespace ratwin
 ENDWRAP
-#endif  //include only once
 

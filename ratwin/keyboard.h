@@ -1,10 +1,12 @@
-// The Repertoire Project copyright 1999 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
+// The Repertoire Project copyright 2001 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: ratwin\keyboard.h
-// Revision: public build 6, shipped on 28-Nov-1999
+// Revision: 
 
 #pragma once
-#if !defined RATWIN_KEYBOARD_INCLUDED
-#define RATWIN_KEYBOARD_INCLUDED
+#if defined RATWIN_NoGlobals
+   #error ratwin\keyboard.h contains globals.
+#endif
+
 
 #include "ratwin\base.h"
 
@@ -35,5 +37,4 @@ short GetKeyState (vkey k)
 
 }
 ENDWRAP
-#endif
 

@@ -1,12 +1,14 @@
-// The Repertoire Project copyright 1999 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
+// The Repertoire Project copyright 2001 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: ratwin\INI_file.h
 // Revision: post - public build 6
 
 #pragma once
-#if !defined I2ea5f090_8635_11d3_8dc6_0006296222ef
-#define I2ea5f090_8635_11d3_8dc6_0006296222ef
+#if defined RATWIN_NoGlobals
+   #error ratwin\atom.h contains globals.
+#endif
 
 #include "ratwin\base.h"
+
 
 extern "C" {
 __declspec(dllimport) int __stdcall WritePrivateProfileStringW (Dlugosz::ratwin::arg::carg32, Dlugosz::ratwin::arg::carg32, Dlugosz::ratwin::arg::carg32, Dlugosz::ratwin::arg::carg32);
@@ -44,6 +46,4 @@ bool WriteProfileString (const char* section, const char* key, const char* value
 
 } // end ratwin namespace
 ENDWRAP
-
-#endif  //include only once
 

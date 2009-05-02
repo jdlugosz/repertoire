@@ -1,10 +1,11 @@
-// The Repertoire Project copyright 1999 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
+// The Repertoire Project copyright 2001 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: ratwin\dialog.h
-// Revision: public build 6, shipped on 28-Nov-1999
+// Revision: 
 
-#if !defined RATWIN_DIALOG_INCLUDED
-#define RATWIN_DIALOG_INCLUDED
-
+#pragma once
+#if defined RATWIN_NoGlobals
+   #error ratwin\dialog.h contains globals.
+#endif
 #include "ratwin\base.h"
 
 // DLL imports "cloaked" for overloading
@@ -110,7 +111,4 @@ inline bool DefDlgProc (types::HWND hWnd, unsigned Msg, unsigned wParam, ulong l
 
 }
 ENDWRAP
-
-
-#endif
 

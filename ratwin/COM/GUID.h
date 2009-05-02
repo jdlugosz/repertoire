@@ -20,53 +20,55 @@ struct _GUID {
    unsigned __int8       reserved : 2; // 2 or 3, depending
    unsigned __int8       clock_seq_low;
    unsigned __int8       node[6];
-   inline int to_string (wchar_t* dest, int destsize) const;  //returns chars used including terminating NUL.
-   inline void generate();
-   };
+};
+
+
+#endif /* GUID_DEFINED */
+
 
 STARTWRAP
 namespace ratwin {
+
 namespace Win32API {
 int __stdcall StringFromGUID2 (const _GUID*, wchar_t*, int);
 unsigned __stdcall CoCreateGuid (_GUID*);
-}}  //end of namespaces
-ENDWRAP
+}  // end namespace Win32API
 
 
-inline
-void _GUID::generate()
- {
- ratwin::Win32API::CoCreateGuid (this);
- }
+class GUID : public _GUID {
+public:
+   GUID (const _GUID& x) : _GUID(x) {}  // implicit conversion
+   inline int to_string (wchar_t* dest, int destsize) const;  //returns chars used including terminating NUL.
+   inline void generate();
+   inline bool inline_eq (const GUID& right) const {
+      struct S { __int64 a,b; };
+      const S* L= reinterpret_cast<const S*>(this);
+      const S* R= reinterpret_cast<const S*>(&right);
+      return L->a == R->a && L->b == R->b;
+      }
 
-inline bool inline_eq (const _GUID& left, const _GUID& right)
- {
- struct S { __int64 a,b; };
- const S* L= reinterpret_cast<const S*>(&left);
- const S* R= reinterpret_cast<const S*>(&right);
- return L->a == R->a && L->b == R->b;
- }
+   };
 
-RATWIN_EXPORT bool operator== (const _GUID& left, const _GUID& right);  //not inline
+RATWIN_EXPORT bool operator== (const GUID& left, const GUID& right);  //not inline
 
-inline bool operator!= (const _GUID& left, const _GUID& right)
+inline bool operator!= (const GUID& left, const GUID& right)
  {
  return !(left==right);
  }
 
-
-inline int _GUID::to_string (wchar_t* dest, int destsize) const
-// needs 32 chars for digits, 6 for punctuation, and 1 for terminating NUL.  39 Total.
+inline
+void GUID::generate()
  {
- return ratwin::Win32API::StringFromGUID2 (this, dest, destsize);
+ Win32API::CoCreateGuid (this);
  }
 
-#endif /* GUID_DEFINED */
+inline int GUID::to_string (wchar_t* dest, int destsize) const
+// needs 32 chars for digits, 6 for punctuation, and 1 for terminating NUL.  39 Total.
+ {
+ return Win32API::StringFromGUID2 (this, dest, destsize);
+ }
 
-STARTWRAP
-namespace ratwin {
 
-typedef _GUID GUID;
 typedef GUID IID;
 typedef GUID CLSID;
 
@@ -74,4 +76,7 @@ typedef GUID CLSID;
 } // end ratwin namespace
 ENDWRAP
 
-
+typedef _GUID GUID;
+   // note this is the primitive one, without functions.
+   // This is global for compatibility with <WINDOWS.H>
+   

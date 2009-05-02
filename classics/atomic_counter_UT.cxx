@@ -1,6 +1,6 @@
-// The Repertoire Project copyright 1999 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
+// The Repertoire Project copyright 2001 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: classics\atomic_counter_UT.cxx
-// Revision: public build 6, shipped on 28-Nov-1999
+// Revision: updated
 
 // This tests the atomic_counter template class
 
@@ -28,6 +28,7 @@ template <typename T>
 class tester {
    static classics::atomic_counter<T> counter;
    static volatile T control;
+   classics::atomic_counter<T> swapper;
 public:
    void start();
    void show_results (int count) const;
@@ -39,11 +40,15 @@ classics::atomic_counter<T> tester<T>::counter;
 template <typename T>
 volatile T tester<T>::control;
 
+classics::atomic_counter<int> threads_started;
+classics::atomic_counter<int> collisions;
+
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
 template <typename T>
 void tester<T>::start()
  {
+ int sequence_number= ++threads_started;  // unique number for each worker thread
  for (int loop= 0;  loop < loopcount;  loop++) {
     ++counter;
     ++control;
@@ -61,6 +66,7 @@ void tester<T>::start()
     --control;
     --counter;  //dec 3.  Net gain of +2.
     --control;
+    if (!swapper.compare_and_swap (sequence_number, swapper))  ++collisions;
     }
  }
 
@@ -78,6 +84,7 @@ void tester<T>::show_results(int count) const
     cout << " PASSED" << endl;
     ++passed_count;
     }
+ cout << "compare_and_swap showed " << collisions << " collisions detected." << endl;
  }
  
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */

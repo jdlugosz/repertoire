@@ -1,6 +1,6 @@
-// The Repertoire Project copyright 1999 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
+// The Repertoire Project copyright 2001 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: ratwin\io\general=struct.h
-// Revision: public build 6, shipped on 28-Nov-1999
+// Revision: 
 
 #pragma once
 #include "ratwin\base.h"
@@ -8,9 +8,12 @@
 STARTWRAP
 namespace ratwin {
 namespace io {
-
-#if !defined STD_INPUT_HANDLE
-  // skip these if #define symbols are already present.
+// The following structured comment lists all the WINDOWS macros used here.
+// The Perl script MacroCloak adds code after reading this.
+/* ## Macro_Cloak_Def (ratwin::io)
+   STD_INPUT_HANDLE STD_OUTPUT_HANDLE STD_ERROR_HANDLE ERROR_HANDLE_EOF ERROR_BROKEN_PIPE ERROR_PIPE_CONNECTED
+   ERROR_IO_PENDING
+*/
   
 enum StdHandle {
    STD_INPUT_HANDLE= -10,
@@ -25,7 +28,6 @@ enum errors {
    ERROR_IO_PENDING= 997,
    };
 
-#endif
 
 struct OVERLAPPED {
    ulong   Internal;
@@ -47,4 +49,5 @@ typedef void (__stdcall *COMPLETION_ROUTINE) (ulong error, ulong bytes_transferr
 } //end io
 }
 ENDWRAP
+// ## Macro_Cloak_After
 

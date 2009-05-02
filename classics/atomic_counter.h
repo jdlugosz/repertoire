@@ -56,6 +56,20 @@ namespace internal {
       { return Xexchange ((volatile long*)p, newvalue); }
    inline byte Xexchange (volatile byte* p, int newvalue)
       { return Xexchange ((volatile char*)p, newvalue); }
+   CLASSICS_EXPORT bool __fastcall CompareAndSwap (volatile __int64* dest, int source, int comparend);  // 8 bytes
+   CLASSICS_EXPORT bool __fastcall CompareAndSwap (volatile int* dest, int source, int comparend);  // 4 bytes
+   CLASSICS_EXPORT bool __fastcall CompareAndSwap (volatile short* dest, int source, int comparend);  // 2 bytes
+   CLASSICS_EXPORT bool __fastcall CompareAndSwap (volatile char* dest, int source, int comparend);  // 1 byte
+   inline long CompareAndSwap (volatile long* dest, int source, int comparend)
+   	{ return CompareAndSwap ((volatile int*)dest, source, comparend); }
+   inline long CompareAndSwap (volatile unsigned* dest, int source, int comparend)
+   	{ return CompareAndSwap ((volatile int*)dest, source, comparend); }
+   inline long CompareAndSwap (volatile ushort* dest, int source, int comparend)
+   	{ return CompareAndSwap ((volatile short*)dest, source, comparend); }
+   inline long CompareAndSwap (volatile ulong* dest, int source, int comparend)
+   	{ return CompareAndSwap ((volatile long*)dest, source, comparend); }
+   inline long CompareAndSwap (volatile byte* dest, int source, int comparend)
+   	{ return CompareAndSwap ((volatile char*)dest, source, comparend); }
 } // end of internal
 
 
@@ -78,6 +92,7 @@ public:
    T operator+= (T) volatile;
    T operator-= (T) volatile;
    T exchange (T) volatile;
+   bool compare_and_swap (T source, T compare) volatile;
    };
 
 // The implementation of the general case requires a critical
@@ -107,6 +122,8 @@ public:
       { return internal::Xadd (&value,-delta) - delta; }
    T exchange (T newval) volatile
       { return internal::Xexchange (&value, newval); }
+   bool compare_and_swap (T source, T compare) volatile
+      { return internal::CompareAndSwap (&value, source, compare); }
    };
 
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */

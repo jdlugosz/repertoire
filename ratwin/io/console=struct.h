@@ -1,6 +1,6 @@
-// The Repertoire Project copyright 1999 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
+// The Repertoire Project copyright 2001 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: ratwin\io\console=struct.h
-// Revision: public build 6, shipped on 28-Nov-1999
+// Revision: 
 
 #pragma once
 #include "ratwin\base.h"
@@ -9,6 +9,23 @@
 STARTWRAP
 namespace ratwin {
 namespace io {
+// The following structured comment lists all the WINDOWS macros used here.
+// The Perl script MacroCloak adds code after reading this.
+/* ## Macro_Cloak_Def (ratwin::io)
+   KEY_EVENT MOUSE_EVENT WINDOW_BUFFER_SIZE_EVENT MENU_EVENT FOCUS_EVENT
+*/ 
+// ## BEGIN MacroCloak Generated Code
+#if defined (KEY_EVENT)
+// if one of these is defined, user included WINDOWS.H first.
+#pragma message ("WINDOWS.H was included before " __FILE__ ", changing macros to enums.")
+#define DIDTHAT_856a80c0_4ba5_11d4_8e10_0006296222ef      //remember for later.
+#undef KEY_EVENT
+#undef MOUSE_EVENT
+#undef WINDOW_BUFFER_SIZE_EVENT
+#undef MENU_EVENT
+#undef FOCUS_EVENT
+#endif
+// ## END Generated Code
 
 template <typename CharType>
 struct KEY_EVENT_RECORD {
@@ -71,5 +88,16 @@ struct CONSOLE_CURSOR_INFO {
 } //end io
 }
 ENDWRAP
+// ## Macro_Cloak_After
+// ## BEGIN MacroCloak Generated Code
+#if defined DIDTHAT_856a80c0_4ba5_11d4_8e10_0006296222ef
+#undef DIDTHAT_856a80c0_4ba5_11d4_8e10_0006296222ef
+using ratwin::io::KEY_EVENT;
+using ratwin::io::MOUSE_EVENT;
+using ratwin::io::WINDOW_BUFFER_SIZE_EVENT;
+using ratwin::io::MENU_EVENT;
+using ratwin::io::FOCUS_EVENT;
+#endif
+// ## END Generated Code
 
 

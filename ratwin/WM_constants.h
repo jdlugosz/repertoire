@@ -76,6 +76,10 @@ namespace WM_constants {
 #undef WM_MBUTTONDBLCLK
 #undef WM_MOUSELAST
 #undef WM_USER
+#undef WM_INITMENUPOPUP
+#undef WM_INITMENU
+#undef WM_ERASEBKGND
+#undef WM_CTLCOLORSTATIC
 #endif
 // ## END Generated Code
 
@@ -195,6 +199,10 @@ using ratwin::WM_constants::WM_MBUTTONUP;
 using ratwin::WM_constants::WM_MBUTTONDBLCLK;
 using ratwin::WM_constants::WM_MOUSELAST;
 using ratwin::WM_constants::WM_USER;
+using ratwin::WM_constants::WM_INITMENUPOPUP;
+using ratwin::WM_constants::WM_INITMENU;
+using ratwin::WM_constants::WM_ERASEBKGND;
+using ratwin::WM_constants::WM_CTLCOLORSTATIC;
 #endif
 // ## END Generated Code
 

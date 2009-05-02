@@ -1,135 +1,87 @@
-// The Repertoire Project copyright 1999 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
-// File: tomahawk\message_tap.cpp
-// Revision: public build 6, shipped on 28-Nov-1999
+// The Repertoire Project copyright 2001 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
+// File: 
+// Revision: fresh
 
 #define TOMAHAWK_EXPORT __declspec(dllexport)
-
 #include "tomahawk\message_tap.h"
-#include "tomahawk\event.h"
-#include "tomahawk\event_router\elementary.h"
+#include "ratwin\window.h"
+#include "classics\exception.h"
 
 STARTWRAP
 namespace tomahawk {
 
-message_tap_1 message_tap_1::instance;
-message_tap_2 message_tap_2::instance;
+const char FNAME[]= __FILE__;
+using classics::exception;
 
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
-namespace {
-__declspec(thread) ratwin::window::WNDPROC old_proc;
-// Borland 5.0 doesn't like the declarations.  Introducing the typedef is a work-around.
-typedef message_tap* mytap_type;
-__declspec(thread) mytap_type mytap= 0;
-typedef event_router_n::window_router* object_type;
-__declspec(thread) object_type object= 0;
-
-
-// the internal helpers are all grouped together here, rather than declared
-// with the stuff that uses it, because Borland 5.0 has troubles with
-// multiple unnamed namespaces.
-long __stdcall hook1 (ratwin::types::HWND wnd, unsigned mess, unsigned p1, ulong p2)
+message_tap::message_tap()
+ : WindowHandle(0), OldWndProc(0), EntryPoint (this, &message_tap::hook_handler)
  {
- event_router_n::window_router* object= static_cast<event_router_n::window_router*>(ratwin::window::GetWindowLong (wnd, 0));
- event e (wnd, mess, p1, p2);
- object->process_event (e);
- return e.ret;
  }
 
+/* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
-long __stdcall hook2 (ratwin::types::HWND wnd, unsigned mess, unsigned p1, ulong p2)
+message_tap::~message_tap()
  {
- using ratwin::window::GWL_USERDATA;
- event_router_n::window_router* object= static_cast<event_router_n::window_router*>(ratwin::window::GetWindowLong (wnd, GWL_USERDATA));
- event e (wnd, mess, p1, p2);
- object->process_event (e);
- return e.ret;
- }
-
-}
-
-void message_tap::pre_create (event_router_n::window_router* x, ratwin::window::WNDPROC proc)
- {
- if (mytap)  throw "hook failure!";
- mytap= this;
- object= x;
- old_proc= proc;
- }
-
-void message_tap::post_create (ratwin::types::HWND wnd)
- {
- if (mytap) {
-    mytap->link (wnd, *object);
-    mytap= 0;
+ if (WindowHandle) {
+     // this SHOULD HAVE been done already, because the Window owns this object!
+     // but to be hardened against misuse, check again anyway.
+    // >> issue a warning here.
+    unhook();
     }
- }
-
-long __stdcall message_tap::install_hook (ratwin::types::HWND wnd, unsigned mess, unsigned p1, ulong p2)
- {
- // first message has been received.  Install the tap.
- if (mytap) {
-    mytap->link (wnd, *object);
-    object->old_proc (old_proc);
-    mytap= 0;    //for error checking in prepare_to_hook, and
-                 //watching for cached send's during window creation.
-    }             
- event e (wnd, mess, p1, p2);
- object->process_event (e);
- return e.ret;
+ // >> could also check to make sure Lifetime object says it's OK, to catch manual deletion before the smart pointer said it can. 
  }
 
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
-ratwin::window::WNDPROC message_tap::subclass (ratwin::types::HWND hwnd, ratwin::window::WNDPROC proc)
+void message_tap::hook (ratwin::types::HWND window)
  {
- if (!hwnd)  throw "can't subclass without a window handle!";
+ if (WindowHandle) {
+    exception X ("Tomahawk", "Duplicate hook", FNAME, __LINE__);
+    throw X;
+    }
  using namespace ratwin::window;
- return reinterpret_cast<WNDPROC>(SetWindowLong (hwnd, GWL_WNDPROC, proc));
+ WindowHandle= window;
+ WindowOwnsMe= this;
+ OldWndProc= static_cast<WNDPROC_2>( SetWindowLong (window, GWL_WNDPROC, EntryPoint.callptr()) );
  }
 
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
-void message_tap_1::link (ratwin::types::HWND hwnd, event_router_n::window_router& er)
+bool message_tap::unhook()
  {
- if (!hwnd)  throw "can't link without a window handle!";
- using namespace ratwin::window;
- const int data_offset= 0;
- SetWindowLong (hwnd, data_offset, &er);
-        // that's the stuff that might get altered.  Break it
-        // into its own virtual function.
- er.old_proc (subclass(hwnd,&hook1));
- }
- 
-/* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
-
-void message_tap_1::unlink (ratwin::types::HWND, event_router_n::window_router&)
-// ... promote this to the base class, since restoring the old
-// windows procedure is general behavior.  I don't need to
-// do anything with the data pointer.
-// ... but, WHEN is unlink performed?  Window shutdown needs
-// to accomplish this, so I need to call this from the router.
-// general idea: have router maintain a pointer back to the tap object?
- {
+ // >> implement!!
+ return true;
  }
 
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
-void message_tap_2::link (ratwin::types::HWND hwnd, event_router_n::window_router& er)
+long message_tap::hook_handler (ratwin::message::sMSG msg)
+// This is where the message hits the class.
  {
- if (!hwnd)  throw "can't link without a window handle!";
- using namespace ratwin::window;
- const int data_offset= GWL_USERDATA;
- SetWindowLong (hwnd, data_offset, &er);
- er.old_proc (subclass(hwnd,&hook2));
+ // >> do my own needs first.  WM_NCDESTROY unhooks.
+ return handle_message (msg);
  }
- 
+
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
-void message_tap_2::unlink (ratwin::types::HWND, event_router_n::window_router&)
+long message_tap::handle_message (ratwin::message::sMSG& msg)
+// not inline because it's virtual.
  {
+ return call_old_wndproc (msg);
  }
 
+/* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
+
+long message_tap::call_old_wndproc (ratwin::message::sMSG& msg)
+ {
+ if (OldWndProc)
+    return ratwin::window::CallWindowProc (OldWndProc, msg);
+ else return ratwin::window::DefWindowProc (msg);
+ }
+
+/* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
 }
-ENDWRAP
 

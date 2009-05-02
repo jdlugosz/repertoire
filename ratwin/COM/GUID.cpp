@@ -1,20 +1,17 @@
-// The Repertoire Project copyright 1999 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
+// The Repertoire Project copyright 2001 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: ratwin\COM\GUID.cpp
-// Revision: public build 6, shipped on 28-Nov-1999
+// Revision: 
 
 #define RATWIN_EXPORT __declspec(dllexport)
 #include "ratwin\COM\GUID.h"
 
-// outside of namespace
-bool operator== (const _GUID& left, const _GUID& right)
- {
- return inline_eq (left, right);
- }
-
-
 STARTWRAP
 namespace ratwin {
 
+bool operator== (const GUID& left, const GUID& right)
+ {
+ return left.inline_eq (right);
+ }
 
 }  //end of namespace
 ENDWRAP

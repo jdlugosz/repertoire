@@ -3,8 +3,9 @@
 // Revision: post-public build 6
 
 #pragma once
-#if !defined Ib9a6bdc0_4b7d_11d4_8e10_0006296222ef
-#define Ib9a6bdc0_4b7d_11d4_8e10_0006296222ef
+#if defined RATWIN_NoGlobals
+   #error ratwin\io\filemapping.h contains globals.  Include filemapping=struct.h instead.
+#endif
 
 #include "ratwin\io\general.h"
 #include "ratwin\io\filemapping=struct.h"
@@ -56,6 +57,4 @@ bool UnmapViewOfFile (void* p)
 } //end io
 }
 ENDWRAP
-#endif
-
 

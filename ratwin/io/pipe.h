@@ -1,10 +1,12 @@
-// The Repertoire Project copyright 1999 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
+// The Repertoire Project copyright 2001 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: ratwin\io\pipe.h
-// Revision: public build 6, shipped on 28-Nov-1999
+// Revision: 
 
 #pragma once
-#if !defined RATWIN_IO_PIPE_INCLUDED
-#define RATWIN_IO_PIPE_INCLUDED
+#if defined RATWIN_NoGlobals
+   #error ratwin\pipe.h contains globals.
+#endif
+
 
 #include "ratwin\io\general.h"
 
@@ -58,5 +60,4 @@ inline bool ConnectNamedPipe (types::HANDLE h, OVERLAPPED* ov)
 
 }
 ENDWRAP
-#endif
 

@@ -3,6 +3,10 @@
 // Revision: updated
 
 #pragma once
+#if defined RATWIN_NoGlobals
+   #error ratwin\menu.h contains globals.
+#endif
+
 
 #include "ratwin\base.h"
 

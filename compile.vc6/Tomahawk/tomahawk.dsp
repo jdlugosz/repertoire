@@ -1,5 +1,5 @@
 # Microsoft Developer Studio Project File - Name="tomahawk" - Package Owner=<4>
-# Microsoft Developer Studio Generated Build File, Format Version 5.00
+# Microsoft Developer Studio Generated Build File, Format Version 6.00
 # ** DO NOT EDIT **
 
 # TARGTYPE "Win32 (x86) Dynamic-Link Library" 0x0102
@@ -17,12 +17,12 @@ CFG=tomahawk - Win32 Release
 !MESSAGE 
 !MESSAGE Possible choices for configuration are:
 !MESSAGE 
-!MESSAGE "tomahawk - Win32 Release" (based on\
- "Win32 (x86) Dynamic-Link Library")
+!MESSAGE "tomahawk - Win32 Release" (based on "Win32 (x86) Dynamic-Link Library")
 !MESSAGE "tomahawk - Win32 Debug" (based on "Win32 (x86) Dynamic-Link Library")
 !MESSAGE 
 
 # Begin Project
+# PROP AllowPerConfigDependencies 0
 # PROP Scc_ProjName ""
 # PROP Scc_LocalPath ""
 CPP=cl.exe
@@ -54,7 +54,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /machine:I386
-# ADD LINK32 kernel32.lib user32.lib gdi32.lib comdlg32.lib /nologo /subsystem:windows /dll /machine:I386 /out:"..\Release/Dlugosz Repertoire Tomahawk.vc5{pb5}.dll"
+# ADD LINK32 kernel32.lib user32.lib gdi32.lib comdlg32.lib /nologo /subsystem:windows /dll /machine:I386 /out:"..\Release/Dlugosz Repertoire Tomahawk.vc5{pb6+}.dll"
 
 !ELSEIF  "$(CFG)" == "tomahawk - Win32 Debug"
 
@@ -70,7 +70,7 @@ LINK32=link.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir "."
 # ADD BASE CPP /nologo /MTd /W3 /Gm /GX /Zi /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /YX /c
-# ADD CPP /nologo /MDd /W3 /GR /GX /Od /I "..\.." /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /FD /ZI /c
+# ADD CPP /nologo /MDd /W3 /GR /GX /Zi /Od /I "..\.." /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /FD /c
 # SUBTRACT CPP /YX
 # ADD BASE MTL /nologo /D "_DEBUG" /win32
 # ADD MTL /nologo /D "_DEBUG" /mktyplib203 /win32
@@ -81,7 +81,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /debug /machine:I386
-# ADD LINK32 kernel32.lib user32.lib gdi32.lib comdlg32.lib /nologo /subsystem:windows /dll /debug /machine:I386 /out:"..\Debug/Dlugosz Repertoire Tomahawk.vc5.debug{pb5}.dll"
+# ADD LINK32 kernel32.lib user32.lib gdi32.lib comdlg32.lib /nologo /subsystem:windows /dll /incremental:no /debug /machine:I386 /out:"..\Debug/Dlugosz Repertoire Tomahawk.vc5.debug{pb6+}.dll"
 
 !ENDIF 
 
@@ -89,181 +89,9 @@ LINK32=link.exe
 
 # Name "tomahawk - Win32 Release"
 # Name "tomahawk - Win32 Debug"
-# Begin Group "Source Files"
-
-# PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;hpj;bat;for;f90"
-# Begin Source File
-
-SOURCE=..\..\tomahawk\event_router\bare_essentials.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\tomahawk\controls\base.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\tomahawk\controls\binder.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\tomahawk\event_router\contributer.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\tomahawk\cursor.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\tomahawk\gdi\dc.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\tomahawk\event_router\delegator.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\tomahawk\dialog_window.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\tomahawk\controls\edit.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\tomahawk\event_router\elementary.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\tomahawk\embellishee.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\tomahawk\file.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\tomahawk\global.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\tomahawk\limpidity.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\tomahawk\memory_mapped_file.cpp
-# End Source File
 # Begin Source File
 
 SOURCE=..\..\tomahawk\message_tap.cpp
 # End Source File
-# Begin Source File
-
-SOURCE=..\..\tomahawk\multimatte.cpp
-# End Source File
-# Begin Source File
-
-SOURCE="..\..\tomahawk\multimatte=drag_slider.cpp"
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\tomahawk\tasking\named_pipe_server.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\tomahawk\resources\resources.rc
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\tomahawk\scroll.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\tomahawk\controls\tab.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\tomahawk\gdi\text_drawer.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\tomahawk\controls\tree.cpp
-# End Source File
-# Begin Source File
-
-SOURCE="..\..\tomahawk\controls\tree=reflector.cpp"
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\tomahawk\window.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\tomahawk\window_factory.cpp
-# End Source File
-# End Group
-# Begin Group "Header Files"
-
-# PROP Default_Filter "h;hpp;hxx;hm;inl;fi;fd"
-# Begin Source File
-
-SOURCE=..\..\tomahawk\controls\base.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\tomahawk\controls\binder.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\tomahawk\gdi\dc.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\tomahawk\dialog_window.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\tomahawk\controls\edit.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\tomahawk\event_router.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\tomahawk\message_tap.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\tomahawk\scroll.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\tomahawk\window.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\tomahawk\window_factory.h
-# End Source File
-# End Group
-# Begin Group "Resource Files"
-
-# PROP Default_Filter "ico;cur;bmp;dlg;rc2;rct;bin;cnt;rtf;gif;jpg;jpeg;jpe"
-# Begin Source File
-
-SOURCE=..\..\tomahawk\resources\h_splitter.cur
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\tomahawk\resources\hv_splitter.cur
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\tomahawk\resources\icon1.ico
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\tomahawk\resources\v_splitter.cur
-# End Source File
-# End Group
 # End Target
 # End Project

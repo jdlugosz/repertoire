@@ -1,10 +1,11 @@
-// The Repertoire Project copyright 1999 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
+// The Repertoire Project copyright 2001 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: ratwin\atom.h
-// Revision: public build 6, shipped on 28-Nov-1999
+// Revision: 
 
 #pragma once
-#if !defined RATWIN_ATOM_INCLUDED
-#define RATWIN_ATOM_INCLUDED
+#if defined RATWIN_NoGlobals
+   #error ratwin\atom.h contains globals.
+#endif
 
 #include "ratwin\base.h"
 
@@ -30,5 +31,4 @@ types::ATOM FindAtom (const char* name)
 
 }}
 ENDWRAP
-#endif
 

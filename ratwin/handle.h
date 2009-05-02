@@ -1,8 +1,12 @@
-// The Repertoire Project copyright 1999 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
+// The Repertoire Project copyright 2001 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: ratwin\handle.h
 // Revision: post-public build 6
 
 #pragma once
+#if defined RATWIN_NoGlobals
+   #error ratwin\handle.h contains globals.
+#endif
+
 #include "ratwin\base.h"
 
 // DLL imports "cloaked" for overloading

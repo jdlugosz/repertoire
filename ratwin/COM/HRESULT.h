@@ -8,8 +8,31 @@
 
 STARTWRAP
 namespace ratwin {
+// The following structured comment lists all the WINDOWS macros used here.
+// The Perl script MacroCloak adds code after reading this.
+/* ## Macro_Cloak_Def (ratwin)
+  S_OK S_FALSE E_NOINTERFACE E_UNEXPECTED CLASS_E_NOAGGREGATION E_OUTOFMEMORY CLASS_E_CLASSNOTAVAILABLE
+  E_NOTIMPL RPC_E_SERVERFAULT
+*/
+// ## BEGIN MacroCloak Generated Code
+#if defined (S_OK)
+// if one of these is defined, user included WINDOWS.H first.
+#pragma message ("WINDOWS.H was included before " __FILE__ ", changing macros to enums.")
+#define DIDTHAT_856a80c0_4ba5_11d4_8e10_0006296222ef      //remember for later.
+#undef S_OK
+#undef S_FALSE
+#undef E_NOINTERFACE
+#undef E_UNEXPECTED
+#undef CLASS_E_NOAGGREGATION
+#undef E_OUTOFMEMORY
+#undef CLASS_E_CLASSNOTAVAILABLE
+#undef E_NOTIMPL
+#undef RPC_E_SERVERFAULT
+#endif
+// ## END Generated Code
 
 namespace internal {
+
 
    struct hr_xxx {
       unsigned information_code : 16;
@@ -4546,4 +4569,19 @@ static const HRESULT RPC_E_SERVERFAULT= reinterpret_cast<HRESULT>(0x80010105); /
 
 } //end namespace ratwin
 ENDWRAP
+// ## Macro_Cloak_After
+// ## BEGIN MacroCloak Generated Code
+#if defined DIDTHAT_856a80c0_4ba5_11d4_8e10_0006296222ef
+#undef DIDTHAT_856a80c0_4ba5_11d4_8e10_0006296222ef
+using ratwin::S_OK;
+using ratwin::S_FALSE;
+using ratwin::E_NOINTERFACE;
+using ratwin::E_UNEXPECTED;
+using ratwin::CLASS_E_NOAGGREGATION;
+using ratwin::E_OUTOFMEMORY;
+using ratwin::CLASS_E_CLASSNOTAVAILABLE;
+using ratwin::E_NOTIMPL;
+using ratwin::RPC_E_SERVERFAULT;
+#endif
+// ## END Generated Code
 

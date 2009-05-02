@@ -77,6 +77,48 @@ __declspec(naked) char __fastcall Xexchange (volatile char*, int)
  
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
+// >> add a cmpxchg8 (64-bit) form, too.
+
+ __declspec(naked) bool __fastcall CompareAndSwap (volatile int* dest, int source, int comparend)
+ {
+ __asm {
+    mov EAX, [ESP+4]
+    lock cmpxchg dword ptr [ECX], EDX   ;// if([ECX]==EAX){ZF=1;[ECX]=EDX;}else ZF=0;
+    setZ AL  // return boolean based on Z flag.
+    // that makes more sense than always returning comparend, regardless!
+    ret 4
+    }
+ }
+
+/* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
+
+ __declspec(naked) bool __fastcall CompareAndSwap (volatile short* dest, int source, int comparend)
+ {
+ __asm {
+    mov EAX, [ESP+4]
+    lock cmpxchg word ptr [ECX], DX   ;// if([ECX]==EAX){ZF=1;[ECX]=EDX;}else ZF=0;
+    setZ AL  // return boolean based on Z flag.
+    // that makes more sense than always returning comparend, regardless!
+    ret 4
+    }
+ }
+
+/* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
+
+ __declspec(naked) bool __fastcall CompareAndSwap (volatile char* dest, int source, int comparend)
+ {
+ __asm {
+    mov EAX, [ESP+4]
+    lock cmpxchg byte ptr [ECX], DL   ;// if([ECX]==EAX){ZF=1;[ECX]=EDX;}else ZF=0;
+    setZ AL  // return boolean based on Z flag.
+    // that makes more sense than always returning comparend, regardless!
+    ret 4
+    }
+ }
+
+/* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
+/* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
+
 } // end internal
 } // end classics
 ENDWRAP

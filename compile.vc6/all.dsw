@@ -82,6 +82,21 @@ Package=<4>
 
 ###############################################################################
 
+Project: "closure_UT"=.\Classics\closure_UT.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name classics
+    End Project Dependency
+}}}
+
+###############################################################################
+
 Project: "crc32_UT"=.\classics\crc32_UT.dsp - Package Owner=<4>
 
 Package=<5>
@@ -261,6 +276,21 @@ Package=<4>
 ###############################################################################
 
 Project: "string_ios_UT"=.\classics\string_ios_UT.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name classics
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "tomahawk"=.\Tomahawk\tomahawk.dsp - Package Owner=<4>
 
 Package=<5>
 {{{

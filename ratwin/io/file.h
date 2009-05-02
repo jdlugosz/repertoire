@@ -3,9 +3,9 @@
 // Revision: post - public build 6
 
 #pragma once
-#if !defined Iaac0f2b0_2fec_11d3_aacf_0020af6bccd6
-#define Iaac0f2b0_2fec_11d3_aacf_0020af6bccd6
-
+#if defined RATWIN_NoGlobals
+   #error ratwin\io\file.h contains globals.  Include file=struct.h instead.
+#endif
 
 #include "classics\flagword.h"
 #include "ratwin\io\file=struct.h"
@@ -291,5 +291,4 @@ int MoveFile(const wchar_t* lpExistingFileName, const wchar_t* lpNewFileName, cl
 } //end io
 }
 ENDWRAP
-#endif
 

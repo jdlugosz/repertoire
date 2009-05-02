@@ -1,10 +1,11 @@
-// The Repertoire Project copyright 2000 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
+// The Repertoire Project copyright 2001 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: ratwin\socket2.h
-// Revision: post- public build 5, modified 24-August-2000 or later
+// Revision: 
 
 #pragma once
-#if !defined RATWIN_SOCKET2_INCLUDED
-#define RATWIN_SOCKET2_INCLUDED
+#if defined RATWIN_NoGlobals
+   #error ratwin\socket2.h contains globals.  Include socket2=struct.h instead.
+#endif
 
 #include "ratwin\socket2=struct.h"
 #include "ratwin\io\general.h"
@@ -158,5 +159,4 @@ int WSAEventSelect (SOCKET s, types::HANDLE ev, long flags)
 
 } //ratwin
 ENDWRAP
-#endif
 
