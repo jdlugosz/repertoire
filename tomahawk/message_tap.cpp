@@ -7,11 +7,17 @@
 #include "ratwin\window.h"
 #include "classics\exception.h"
 #include "ratwin\WM_constants.h"
+#include "tomahawk\MSG\WM_TOMAHAWK.h"
+#include "classics\string_ios.h"
 
 namespace tomahawk {
 
 const char FNAME[]= __FILE__;
 using classics::exception;
+using classics::wFmt;
+const long SaneMask= 0x19F52204;  // a random number.
+
+classics::atomic_counter<int> internal::message_tap_count::ObjectCount= 0;
 
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
@@ -26,7 +32,9 @@ void message_tap::prevent_duplicate_hook() const
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
 message_tap::message_tap()
- : WindowHandle(0), OldWndProc(0), EntryPoint (this, &message_tap::hook_handler), LastMessage (ratwin::WM_constants::WM_NCDESTROY)
+ : WindowHandle(0), OldWndProc(0), EntryPoint (this, &message_tap::hook_handler), 
+   LastMessage (ratwin::WM_constants::WM_NCDESTROY), UnhookASAP(false),
+   SaneCheck(SaneMask^reinterpret_cast<long>(this))
  {
  }
 
@@ -37,17 +45,26 @@ message_tap::~message_tap()
  if (WindowHandle) {
      // this SHOULD HAVE been done already, because the Window owns this object!
      // but to be hardened against misuse, check again anyway.
-    // >> issue a warning here.
+    exception X ("Tomahawk", "Bug found: object improperly destroyed.", __FILE__, __LINE__);
+    report_error (X);
+    // If you get this, it might mean that you did not use the smart-pointer mechanism to control
+    // the lifetime, but caused it to be destroyed before all references were dropped.
     unhook();
     }
- // >> could also check to make sure Lifetime object says it's OK, to catch manual deletion before the smart pointer said it can. 
+ if (get_reference_count()) {
+    exception X ("Tomahawk", "Bug found: object improperly destroyed.", __FILE__, __LINE__);
+    report_error (X);
+    // If you get this, it might mean that you did not use the smart-pointer mechanism to control
+    // the lifetime, but caused it to be destroyed before all references were dropped.
+    }
+ SaneCheck= 0;
  }
 
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
 void message_tap::on_attach()
  {
- // does nothing here.  Virtual function derived classes to use.
+ // does nothing here.  Virtual function for derived classes to use.
  }
  
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
@@ -83,12 +100,13 @@ void message_tap::set_window_handle (ratwin::types::HWND window)
 
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
-bool message_tap::unhook()
+bool message_tap::unhook (bool force)
  {
  if (!WindowHandle)  return true;  // nothing to do.
  using namespace ratwin::window;
  WNDPROC_2 current= static_cast<WNDPROC_2>( GetWindowLong (WindowHandle, GWL_WNDPROC) );
  bool graceful= (current == EntryPoint.callptr());
+ if (!graceful && !force)  return false;  // can't do it.
  SetWindowLong (WindowHandle, GWL_WNDPROC, graceful ? OldWndProc : &::DefWindowProcA);
  // reset the data members
  OldWndProc= 0;
@@ -99,17 +117,59 @@ bool message_tap::unhook()
 
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
+void message_tap::sane_check() const
+// This is not 100% reliable, but it is a sanity check to catch a bug
+// where the object gets messages after it has been deleted.
+ {
+ if (SaneCheck != (SaneMask^reinterpret_cast<long>(this))) {
+    exception X ("Tomahawk", "Invalid object", __FILE__, __LINE__);
+    wFmt(X) << L"The memory at " << (void*)this << L" is not a message_tap object.";
+    throw X;
+    }
+ }
+
+/* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
+
 long message_tap::hook_handler (ratwin::message::sMSG msg)
 // This is where the message hits the class.
  {
- if (!WindowHandle)  {  // automatically set upon first message.
-    WindowHandle= msg.hwnd;
-    on_attach(); 
+ using tomahawk::MSG::WM_TOMAHAWK_msg;
+ sane_check();
+ // the above is OUTSIDE the try block, so it does indeed propagate out.
+ try {
+    if (!WindowHandle)  {  // automatically set upon first message.
+       WindowHandle= msg.hwnd;
+       on_attach(); 
+       }
+    static unsigned const WM_TOMAHAWK= WM_TOMAHAWK_msg::get_TOMAHAWK_id();
+    if (msg.message == WM_TOMAHAWK) {
+       const WM_TOMAHAWK_msg& Tmsg= ratwin::message::MSG_cast<WM_TOMAHAWK_msg>(msg);
+       if (Tmsg.notification_code() == WM_TOMAHAWK_msg::pre_translate_message) {
+          ratwin::message::MSG* premessage= reinterpret_cast<ratwin::message::MSG*>(Tmsg.param2);
+          return pre_translate_message (*premessage);
+          }
+       }
+    int result= handle_message (msg);
+    if (msg.message == LastMessage) unhook();  // May have triggered deletion!
+    else if (UnhookASAP) unhook(false);  // *try* to unhook after every message.
+    return result;
     }
- // TODO: break out translate_message case.
- int result= handle_message (msg);
- if (msg.message == LastMessage) unhook();  // May have triggered deletion!
- return result;
+ catch (exception& X)
+    {
+    X ("Tomahawk", "Exception caught in message handler", __FILE__, __LINE__);
+    report_error (X);
+    }
+ catch (std::exception& E)
+    {
+    exception X ("Tomahawk", "Exception caught in message handler", __FILE__, __LINE__);
+    X += E.what();
+    report_error (X);
+    }
+ catch (...) {
+    exception X ("Tomahawk", "Unknown Exception caught in message handler", __FILE__, __LINE__);
+    report_error (X);
+    }
+ return 0;
  }
 
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
@@ -122,9 +182,9 @@ long message_tap::handle_message (ratwin::message::sMSG& msg)
 
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
-bool message_tap::translate_message (const ratwin::message::sMSG&)
+int message_tap::pre_translate_message (const ratwin::message::MSG&)
  {
- return false;
+ return 0;
  }
 
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
@@ -137,6 +197,11 @@ long message_tap::call_old_wndproc (ratwin::message::sMSG& msg)
  }
 
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
+
+void message_tap::report_error (const classics::exception& X)
+ {
+ X.show();
+ }
 
 }
 

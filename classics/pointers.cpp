@@ -32,6 +32,15 @@ lifetime* can_handle::get_lifetime_object() const
  
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
+int can_handle::get_reference_count() const 
+ {
+ lifetime* Lifetime= reinterpret_cast<lifetime*>(~cloaked_Lifetime);
+ if (!Lifetime)  return 0;
+ return Lifetime->owned_count; 
+ }
+
+/* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
+
 static lifetime create_null()
  {
  lifetime Null;

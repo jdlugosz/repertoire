@@ -91,6 +91,10 @@ LINK32=link.exe
 # Name "tomahawk - Win32 Debug"
 # Begin Source File
 
+SOURCE=..\..\tomahawk\Dialog_message_tap.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\tomahawk\message_tap.cpp
 # End Source File
 # End Target

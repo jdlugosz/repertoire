@@ -29,7 +29,9 @@ namespace window {
    CW_USEDEFAULT
    GWL_WNDPROC GWL_HINSTANCE GWL_HWNDPARENT GWL_STYLE GWL_EXSTYLE GWL_USERDATA GWL_ID              
    GW_HWNDFIRST GW_HWNDLAST GW_HWNDNEXT GW_HWNDPREV GW_OWNER GW_CHILD          GW_MAX
-   SIZE_RESTORED SIZE_MINIMIZED SIZE_MAXIMIZED SIZE_MAXSHOW SIZE_MAXHIDE     
+   SIZE_RESTORED SIZE_MINIMIZED SIZE_MAXIMIZED SIZE_MAXSHOW SIZE_MAXHIDE
+   GA_PARENT GA_ROOT GA_ROOTOWNER GA_MAC 
+
 */
 // ## BEGIN MacroCloak Generated Code
 #if defined (SW_HIDE)
@@ -140,6 +142,10 @@ namespace window {
 #undef SIZE_MAXIMIZED
 #undef SIZE_MAXSHOW
 #undef SIZE_MAXHIDE
+#undef GA_PARENT
+#undef GA_ROOT
+#undef GA_ROOTOWNER
+#undef GA_MAC
 #endif
 // ## END Generated Code
 
@@ -335,7 +341,9 @@ struct SCROLLINFO {  // used with Get/SetScrollInfo
     int     nTrackPos;
     };
 
-
+enum GA_mode {
+   GA_PARENT=   1, GA_ROOT, GA_ROOTOWNER, GA_MAC 
+   };
 
 } } //ratwin
 ENDWRAP
@@ -448,6 +456,10 @@ using ratwin::window::SIZE_MINIMIZED;
 using ratwin::window::SIZE_MAXIMIZED;
 using ratwin::window::SIZE_MAXSHOW;
 using ratwin::window::SIZE_MAXHIDE;
+using ratwin::window::GA_PARENT;
+using ratwin::window::GA_ROOT;
+using ratwin::window::GA_ROOTOWNER;
+using ratwin::window::GA_MAC;
 #endif
 // ## END Generated Code
 

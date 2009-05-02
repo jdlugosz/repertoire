@@ -18,7 +18,7 @@ public:
    can_handle() : cloaked_Lifetime(~0) {}
    can_handle (const can_handle&) : cloaked_Lifetime(~0) {}
    ~can_handle() { cloaked_Lifetime=~0;  /* for error trapping */ }
-   int get_reference_count() const { return get_lifetime_object()->owned_count; }
+   CLASSICS_EXPORT int get_reference_count() const;
    };
 
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */

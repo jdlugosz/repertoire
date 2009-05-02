@@ -18,7 +18,7 @@ class Dialog_message_tap : public message_tap {
 public:
    TOMAHAWK_EXPORT Dialog_message_tap();
    TOMAHAWK_EXPORT ~Dialog_message_tap();
-   TOMAHAWK_EXPORT long handle_message (ratwin::message::sMSG& msg);
+   TOMAHAWK_EXPORT int pre_translate_message (const ratwin::message::MSG& msg);
    TOMAHAWK_EXPORT ratwin::types::HWND ModelessDialogBox (ratwin::types::HINSTANCE module_for_resource, ratwin::NumOrName<char> resource, ratwin::types::HWND parent=0);
    bool is_modal() const { return isModal; }
    TOMAHAWK_EXPORT int ModalDialogBox (ratwin::types::HINSTANCE module_for_resource, ratwin::NumOrName<char> resource, ratwin::types::HWND parent=0);

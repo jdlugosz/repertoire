@@ -3,20 +3,24 @@
 // Revision: fresh
 
 #pragma once
+#include "ratwin\message=struct.h"
+#include "classics\exception.h"
 
 namespace tomahawk {
-namespace MSG {
 
 class simple_message_pump {
 protected:
    // override these functions to supply the corresponding functionality in the standard loop.
-   virtual void thread_message (ratwin::message::sMSG);
-   virtual bool translate_key_event (ratwin::message::sMSG);
+   virtual void thread_message (ratwin::message::MSG&)  {}
+   TOMAHAWK_EXPORT virtual bool pre_translate (ratwin::message::MSG&);  // call TranslateAccelerator, IsDialog
+   TOMAHAWK_EXPORT virtual bool translate_key_event (ratwin::message::MSG&);  // call TranslateMessage
    // override the mainloop to change the logic.
-   virtual int mainloop();
+   TOMAHAWK_EXPORT virtual int mainloop();
 public:
-   int pumpit();  // calls mainloop, surrounds with EH handlers.
+   TOMAHAWK_EXPORT simple_message_pump();
+   TOMAHAWK_EXPORT int pumpit()  throw();  // calls mainloop, surrounds with EH handlers.
+   TOMAHAWK_EXPORT virtual bool report_error (const classics::exception&);
    };
 
-}}
+}
 

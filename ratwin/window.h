@@ -44,7 +44,7 @@ __declspec(dllimport) Dlugosz::ratwin::arg::arg32 __stdcall
 
 __declspec(dllimport) int __stdcall ShowWindow (Dlugosz::ratwin::arg::arg32 hWnd, int nCmdShow);
 __declspec(dllimport) int __stdcall UpdateWindow (Dlugosz::ratwin::arg::arg32);
-__declspec(dllimport) long __stdcall SendMessageA (Dlugosz::ratwin::arg::arg32 hWnd, unsigned Msg, unsigned wParam, long lParam);
+__declspec(dllimport) long __stdcall SendMessageA (ratwin::message::sMSG);
 __declspec(dllimport) void __stdcall PostQuitMessage (Dlugosz::ratwin::arg::arg32);
 __declspec(dllimport) long __stdcall DefWindowProcA (ratwin::message::sMSG);
 __declspec(dllimport) unsigned short __stdcall RegisterClassA (Dlugosz::ratwin::arg::arg32);
@@ -72,6 +72,7 @@ __declspec(dllimport) int __stdcall InvalidateRect (Dlugosz::ratwin::arg::arg32,
 __declspec(dllimport) int __stdcall ScrollWindowEx (Dlugosz::ratwin::arg::arg32, int, int, const void*, const void*, Dlugosz::ratwin::arg::arg32, void*, unsigned);
 __declspec(dllimport) int __stdcall UnregisterClassA (const char*, Dlugosz::ratwin::arg::arg32);
 __declspec(dllimport) int __stdcall MapWindowPoints (Dlugosz::ratwin::arg::arg32, Dlugosz::ratwin::arg::arg32, void*, int);
+__declspec(dllimport) Dlugosz::ratwin::arg::arg32 __stdcall GetAncestor (Dlugosz::ratwin::arg::arg32, int);
 }
 
 ///////////////////////////////////////////////////
@@ -199,12 +200,16 @@ bool UpdateWindow (types::HWND hWnd)
 { return ::UpdateWindow (reinterpret_cast<arg::arg32>(hWnd)); }
 
 inline
+long SendMessage (const message::sMSG& msg)
+ { return ::SendMessageA (msg); }
+
+inline
 long SendMessage (types::HWND hWnd, unsigned Msg, unsigned wParam=0, ulong lParam=0)
-{ return ::SendMessageA (reinterpret_cast<arg::arg32>(hWnd), Msg,wParam, lParam); }
+{ return ::SendMessageA (*reinterpret_cast<const message::sMSG*>(&hWnd)); }
 
 inline
 long SendMessage (types::HWND hWnd, unsigned Msg, unsigned wParam, const void* lParam)
-{ return ::SendMessageA (reinterpret_cast<arg::arg32>(hWnd), Msg,wParam, reinterpret_cast<ulong>(lParam)); }
+{ return ::SendMessageA (*reinterpret_cast<const message::sMSG*>(&hWnd)); }
 
 inline void PostQuitMessage (int ExitCode)
  { ::PostQuitMessage (reinterpret_cast<arg::arg32>(ExitCode)); }
@@ -345,6 +350,10 @@ inline int ScrollWindow (
 
 inline int UnregisterClass (const char* szClass, types::HINSTANCE hInstance)
 { return ::UnregisterClassA(szClass, reinterpret_cast<arg::arg32>(hInstance)); }
+
+inline
+types::HWND GetAncestor (types::HWND w, GA_mode mode)
+ { return reinterpret_cast<types::HWND>( ::GetAncestor (reinterpret_cast<arg::arg32>(w), mode) ); }
 
 } //end of window
    
