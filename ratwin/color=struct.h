@@ -1,0 +1,151 @@
+// The Repertoire Project copyright 2001 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
+// File: ratwin\color=struct.h
+// Revision: updated
+
+#pragma once
+
+#include "ratwin\base.h"
+
+STARTWRAP
+namespace ratwin {
+namespace color {
+
+// The following structured comment lists all the WINDOWS macros used here.
+// The Perl script MacroCloak adds code after reading this.
+/* ## Macro_Cloak_Def (ratwin::color)
+   COLOR_SCROLLBAR COLOR_BACKGROUND COLOR_ACTIVECAPTION COLOR_INACTIVECAPTION COLOR_MENU COLOR_WINDOW COLOR_WINDOWFRAME
+   COLOR_MENUTEXT COLOR_WINDOWTEXT COLOR_CAPTIONTEXT COLOR_ACTIVEBORDER COLOR_INACTIVEBORDER COLOR_APPWORKSPACE COLOR_HIGHLIGHT
+   COLOR_HIGHLIGHTTEXT COLOR_BTNFACE COLOR_BTNSHADOW COLOR_GRAYTEXT COLOR_BTNTEXT COLOR_INACTIVECAPTIONTEXT COLOR_BTNHIGHLIGHT
+   COLOR_3DDKSHADOW COLOR_3DLIGHT COLOR_INFOTEXT COLOR_INFOBK COLOR_DESKTOP COLOR_3DFACE COLOR_3DSHADOW COLOR_3DHIGHLIGHT
+   COLOR_3DHILIGHT COLOR_BTNHILIGHT COLOR_HOTLIGHT COLOR_GRADIENTACTIVECAPTION  COLOR_GRADIENTINACTIVECAPTION
+*/
+// ## BEGIN MacroCloak Generated Code
+#if defined (COLOR_SCROLLBAR)
+// if one of these is defined, user included WINDOWS.H first.
+#pragma message ("WINDOWS.H was included before " __FILE__ ", changing macros to enums.")
+#define DIDTHAT_856a80c0_4ba5_11d4_8e10_0006296222ef      //remember for later.
+#undef COLOR_SCROLLBAR
+#undef COLOR_BACKGROUND
+#undef COLOR_ACTIVECAPTION
+#undef COLOR_INACTIVECAPTION
+#undef COLOR_MENU
+#undef COLOR_WINDOW
+#undef COLOR_WINDOWFRAME
+#undef COLOR_MENUTEXT
+#undef COLOR_WINDOWTEXT
+#undef COLOR_CAPTIONTEXT
+#undef COLOR_ACTIVEBORDER
+#undef COLOR_INACTIVEBORDER
+#undef COLOR_APPWORKSPACE
+#undef COLOR_HIGHLIGHT
+#undef COLOR_HIGHLIGHTTEXT
+#undef COLOR_BTNFACE
+#undef COLOR_BTNSHADOW
+#undef COLOR_GRAYTEXT
+#undef COLOR_BTNTEXT
+#undef COLOR_INACTIVECAPTIONTEXT
+#undef COLOR_BTNHIGHLIGHT
+#undef COLOR_3DDKSHADOW
+#undef COLOR_3DLIGHT
+#undef COLOR_INFOTEXT
+#undef COLOR_INFOBK
+#undef COLOR_DESKTOP
+#undef COLOR_3DFACE
+#undef COLOR_3DSHADOW
+#undef COLOR_3DHIGHLIGHT
+#undef COLOR_3DHILIGHT
+#undef COLOR_BTNHILIGHT
+#undef COLOR_HOTLIGHT
+#undef COLOR_GRADIENTACTIVECAPTION
+#undef COLOR_GRADIENTINACTIVECAPTION
+#endif
+// ## END Generated Code
+
+
+enum COLORREF { 
+   COLORREF_lowest=0, COLORREF_highest= 0xffffffff  // force or assure enum to be 32 bits.
+   };
+
+enum sys_color_index {
+   COLOR_SCROLLBAR,
+   COLOR_BACKGROUND,
+   COLOR_ACTIVECAPTION,
+   COLOR_INACTIVECAPTION,
+   COLOR_MENU,
+   COLOR_WINDOW,
+   COLOR_WINDOWFRAME,
+   COLOR_MENUTEXT,
+   COLOR_WINDOWTEXT,
+   COLOR_CAPTIONTEXT,
+   COLOR_ACTIVEBORDER,
+   COLOR_INACTIVEBORDER,
+   COLOR_APPWORKSPACE,
+   COLOR_HIGHLIGHT,
+   COLOR_HIGHLIGHTTEXT,
+   COLOR_BTNFACE,
+   COLOR_BTNSHADOW,
+   COLOR_GRAYTEXT,
+   COLOR_BTNTEXT,
+   COLOR_INACTIVECAPTIONTEXT,
+   COLOR_BTNHIGHLIGHT,
+   COLOR_3DDKSHADOW,
+   COLOR_3DLIGHT,
+   COLOR_INFOTEXT,
+   COLOR_INFOBK,
+   COLOR_DESKTOP=     COLOR_BACKGROUND,
+   COLOR_3DFACE=      COLOR_BTNFACE,
+   COLOR_3DSHADOW=    COLOR_BTNSHADOW,
+   COLOR_3DHIGHLIGHT= COLOR_BTNHIGHLIGHT,
+   COLOR_3DHILIGHT=   COLOR_BTNHIGHLIGHT,
+   COLOR_BTNHILIGHT=  COLOR_BTNHIGHLIGHT,
+   // there is no 25
+   COLOR_HOTLIGHT=   26,
+   COLOR_GRADIENTACTIVECAPTION    ,
+   COLOR_GRADIENTINACTIVECAPTION
+   };
+
+} //end color
+}
+ENDWRAP
+
+// ## Macro_Cloak_After
+// ## BEGIN MacroCloak Generated Code
+#if defined DIDTHAT_856a80c0_4ba5_11d4_8e10_0006296222ef
+#undef DIDTHAT_856a80c0_4ba5_11d4_8e10_0006296222ef
+using ratwin::color::COLOR_SCROLLBAR;
+using ratwin::color::COLOR_BACKGROUND;
+using ratwin::color::COLOR_ACTIVECAPTION;
+using ratwin::color::COLOR_INACTIVECAPTION;
+using ratwin::color::COLOR_MENU;
+using ratwin::color::COLOR_WINDOW;
+using ratwin::color::COLOR_WINDOWFRAME;
+using ratwin::color::COLOR_MENUTEXT;
+using ratwin::color::COLOR_WINDOWTEXT;
+using ratwin::color::COLOR_CAPTIONTEXT;
+using ratwin::color::COLOR_ACTIVEBORDER;
+using ratwin::color::COLOR_INACTIVEBORDER;
+using ratwin::color::COLOR_APPWORKSPACE;
+using ratwin::color::COLOR_HIGHLIGHT;
+using ratwin::color::COLOR_HIGHLIGHTTEXT;
+using ratwin::color::COLOR_BTNFACE;
+using ratwin::color::COLOR_BTNSHADOW;
+using ratwin::color::COLOR_GRAYTEXT;
+using ratwin::color::COLOR_BTNTEXT;
+using ratwin::color::COLOR_INACTIVECAPTIONTEXT;
+using ratwin::color::COLOR_BTNHIGHLIGHT;
+using ratwin::color::COLOR_3DDKSHADOW;
+using ratwin::color::COLOR_3DLIGHT;
+using ratwin::color::COLOR_INFOTEXT;
+using ratwin::color::COLOR_INFOBK;
+using ratwin::color::COLOR_DESKTOP;
+using ratwin::color::COLOR_3DFACE;
+using ratwin::color::COLOR_3DSHADOW;
+using ratwin::color::COLOR_3DHIGHLIGHT;
+using ratwin::color::COLOR_3DHILIGHT;
+using ratwin::color::COLOR_BTNHILIGHT;
+using ratwin::color::COLOR_HOTLIGHT;
+using ratwin::color::COLOR_GRADIENTACTIVECAPTION;
+using ratwin::color::COLOR_GRADIENTINACTIVECAPTION;
+#endif
+// ## END Generated Code
+
