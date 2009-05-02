@@ -2,7 +2,7 @@
 <HEAD>
 <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=windows-1252">
 <META NAME="Generator" CONTENT="Microsoft Word 97">
-<TITLE>Title</TITLE>
+<TITLE>Smart Pointers Overview</TITLE>
 <META NAME="description"
  CONTENT="An introduction to the concepts used to design a technically advanced smart pointer class in C++.">
 <META NAME="keywords"
@@ -192,7 +192,7 @@ const const_handle&lt;C&gt; h4 (new C);&#9;//const in both places
 that checks for the continued existence of the object before returning.  But that’s not the best solution, because of the threading issues.  What if you call
 <code>foo</code> through a <code>baro</code> handle, and before <code>foo</code> returns, another thread drops the last regular
 <code>handle</code>, destroying the object?  In short, a <code>baro</code> doesn’t own the object, but when the object is actually in use, the object <I>does</I> need to be owned, until the call returns.</P>
-<P>Instead, a <code>baro</code> doesn’t have an <code>operator-&gt;</code> at all!  You cannot dereference a
+<P id="baro_resolve">Instead, a <code>baro</code> doesn’t have an <code>operator-&gt;</code> at all!  You cannot dereference a
 <code>baro</code>.  What you can do is construct a <code>handle</code>, <code>const_handle</code>, or
 <code>cow</code> using a <code>baro</code> handle.  The <code>handle</code> refers to the same object as the
 <code>baro</code>, assuming there was one, and hence gives you ownership.  You then use the object through the
