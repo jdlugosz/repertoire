@@ -1,0 +1,37 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"  "http://www.w3.org/TR/html4/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=windows-1252">
+<TITLE>makeframe.html didn't work</TITLE>
+</HEAD>
+
+<BODY>
+<H1>Makeframe.html didn't work?</H1>
+<P>This pane is <I>supposed</I> to show the main document that was chosen.  If you
+can see this instead, and the file isn't still loading, that didn't happen.</P>
+
+<H2>Usage of mainframe.html</H2>
+<P>If you entered the url for makeframe.html directly, this is what you'll get.  You
+probably meant to use <A href="mainframe.html">mainframe.html</A> instead.</P>
+<P>To use makeframe.html, give two arguments like so:</P>
+<PRE>
+  &hellip;/makeframe.html?infodoc+indexdoc
+</PRE>
+<P>Where <code>infodoc</code> is the URL of the document you want to appear
+in this space, and <code>indexdoc</code> is the URL to put in the left pane.</P>
+
+<H2>Got this instead of the desired document</H2>
+<P>If you used a url of a document in this set, e.g. message_tap.html, then that document
+will invoke makeframe.html to put itself together with the proper index page.  Somehow, that
+process started but did not complete.</P>
+
+<P>I've seen this happen in Microsoft's IE6 when the file is served locally.  If the
+url is a file, rather than a web host, then it ignores the stuff after the '?' on the
+address line!  It's rather flakey in what it takes for a filename, too.
+</P>
+
+<P>To suppress this behavior and look at the document alone, append "?NOFRAMES"
+to the URL.  For example, message_tap.html becomes "message_tap.html?NOFRAMES".
+Or, disable javascript for this set of pages.</P>
+</BODY>
+</HTML>

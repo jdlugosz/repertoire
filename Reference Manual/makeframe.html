@@ -1,0 +1,43 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN"  "http://www.w3.org/TR/html4/frameset.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=windows-1252">
+<META http-equiv="Content-Script-Type" content="text/javascript">
+<TITLE>Repertoire Library Reference Manual</TITLE>
+<SCRIPT type= "text/javascript" src="helpers.js"></SCRIPT>
+
+<SCRIPT type="text/javascript">
+   function changeURLs()
+    {
+    if (!is_home_url()) {
+       footer.location.href= "static.html";
+       parent.document.title += " (Mirror)";
+       }
+    var result= new Object;
+    if (!get_params(window, result))  return;  // do nothing
+    info.location.href= result.param1;
+    if (result.param2)
+       index.location.href= result.param2;
+    }
+</SCRIPT>
+
+</HEAD>
+
+<FRAMESET ROWS="15%,80%,10%"  onload= "changeURLs()" >
+	<FRAME SRC="header.html" LONGDESC="perminant navigation buttons and header">
+	<FRAMESET COLS="25%,75%">
+		<FRAME NAME="index" LONGDESC="index or contents, linked to the right panel">
+		<FRAME SRC="makeframe_notes.html" NAME="info" LONGDESC="main information panel">
+	</FRAMESET>
+	<FRAME SRC="footer.html" NAME="footer" LONGDESC="copyright info and occasional footnotes">
+
+	<NOFRAMES>
+		<P>This manual is meant to be viewed through this frame set.  To stop an individual document from
+		automatically trying to load this frame around itself, append <code>?NOFRAMES</code> to its URL.</P>
+		<P>Here is the <A HREF="class_summary.html">Class Summary</A>, a good place to start.</P>
+	</NOFRAMES>
+
+</FRAMESET>
+
+</HTML>
+
