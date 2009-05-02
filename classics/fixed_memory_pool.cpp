@@ -24,17 +24,30 @@ struct static_fixed_memory_pool::chunk {
    };
    
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
+
+void static_fixed_memory_pool::purge()
+ {
+ if (use_count > 0)  return;  // can't do it (yet).
+ //abandon the nodelist (which should be empty), and free the items in the chunklist.
+ chunk* p= chunklist;
+ callback= 0;
+ while (p) {
+	chunk* q= p->next;
+	byte* top= reinterpret_cast<byte*>(p->top);
+	delete[] top;
+	p= q;
+	}
+ chunklist= 0;
+ nodelist= 0;
+ // keep shutdown_commanded set, so it will re-purge later.
+ }
  
+ /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
+
 static_fixed_memory_pool::~static_fixed_memory_pool()
  {
- //abandon the nodelist, and free the items in the chunklist.
- chunk* p= chunklist;
- while (p) {
-    chunk* q= p->next;
-    byte* top= reinterpret_cast<byte*>(p->top);
-    delete[] top;
-    p= q;
-    }
+ shutdown_commanded= true;
+ purge();
  }
 
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
@@ -123,12 +136,13 @@ void* static_fixed_memory_pool::alloc (int size)
  
 void static_fixed_memory_pool::free (void* p_raw)
  {
- --use_count;
  if (callback)  callback (2, p_raw);
  node* p= static_cast<node*>(p_raw);
  // push the node onto my freelist
  p->next= nodelist;
  nodelist= p;
+ --use_count;
+ if (use_count == 0 && shutdown_commanded)  purge();
  }
 
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */

@@ -18,7 +18,7 @@ struct lifetime {
    CLASSICS_EXPORT static ts_static_fixed_memory_pool pool;
    static void* operator new (size_t size) { return pool.alloc (size); }
    static void operator delete (void* p)  { pool.free(p); }
-   static int get_pool_use_count()  { return pool.use_count; }
+   static int get_pool_use_count()  { return pool.get_use_count(); }
    atomic_counter<int> owned_count;
    atomic_counter<int> unowned_count;
    atomic_counter<short> hold;

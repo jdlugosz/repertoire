@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "classics\copy_semantics.h"
 #include "classics\pointers.h"
 #include "classics\dynalloc_reservation.h"
 #include <new>
@@ -20,7 +21,7 @@ enum make_alias_t { alias };
 //////////////////////////////////////////////////
 
 // internal array, with virtual functions for handling actual element type.
-class data_t : public can_handle {
+class data_t : public I_copy_semantics, public can_handle {
    void* Data;
    int Count;
    int Capacity;
@@ -29,11 +30,6 @@ protected:
    void initialize_all() { initialize_elements (Data, Count); }
    void initialize_all (const data_t& other)  { initialize_elements (Data, other.Data, Count); }
    void initialize_all (const void* data)  { initialize_elements (Data, data, Count); }
-   virtual void initialize_elements (void* dest, int count) const =0;
-   virtual void initialize_elements (void* dest, const void* src, int count) const =0;
-   virtual void copy_elements (void* dest, const void* src, int count) const =0;
-   virtual void destroy_elements (void* dest, int count) const =0;
-   virtual void move_elements (void* dest, void* src, int count) const =0;   
 public:
    void* offset (void* data, int count) const  { return static_cast<byte*>(data) + (count*Elsize); }
    const void* offset (const void* data, int count) const  { return static_cast<const byte*>(data) + (count*Elsize); }

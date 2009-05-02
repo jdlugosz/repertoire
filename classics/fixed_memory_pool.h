@@ -19,6 +19,9 @@ class static_fixed_memory_pool {
    chunk* chunklist;
    node* nodelist;
    int Recsize;
+   int use_count;  //for auditing and leak detection, as well as delayed shutdown feature.
+   bool shutdown_commanded;
+   void purge();
    void newchunk();
 protected:
    int Chunksize;
@@ -28,7 +31,7 @@ public:
    CLASSICS_EXPORT void* alloc (int size);
    CLASSICS_EXPORT void free (void*);
    CLASSICS_EXPORT void clean();
-   int use_count;  //for auditing and leak detection
+   int get_use_count() const { return use_count; }
    int cumulative_size;
    void (*callback)(int mode, void* p);
    void* get_nodelist() const  { return nodelist; }  //for debugging and testing only.
