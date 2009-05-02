@@ -24,17 +24,21 @@ P {	/* browser defaults differ, so set it up explicitly so I get consistant resu
 	margin-bottom: 1em;
 	}
 
-PRE {
+PRE, .PRElike {
 	font-family: "Lucida Sans Typewriter", monospace;
 	overflow: auto;
+	/* turn off margins because these are commonly floated and the margins don't collapse, leaving too large of a gap.
+	   When they are not, they usually have a P or Hn on either side.  So really this margin is needed only
+	   for consecutive PRE's, and perhaps it looks fine anyway.  I'll refine with the need arises.
+	*/
+	margin-top: 0;
+	margin-bottom: 0;
 	}
 
 .PRElike { /* if I want to do something not allowed in a PRE */
 	/* make it the same as P */
 	display: block;
-	font-family: "Lucida Sans Typewriter", monospace;
 	white-space: pre;
-	overflow: auto;
 	color: #000;
 	border-style: solid;
 	padding: 0.5em;
@@ -102,6 +106,12 @@ PRE I , .PRElike I{
 PRE.code EM {
 	background-color: #EEEED4;
 	font-style: inherit;
+	}
+
+PRE.code CITE {
+	float:right;
+	font-size: xx-small;
+	color: #888
 	}
 
 .left {
