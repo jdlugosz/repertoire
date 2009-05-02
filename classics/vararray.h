@@ -21,12 +21,12 @@ enum make_alias_t { alias };
 //////////////////////////////////////////////////
 
 // internal array, with virtual functions for handling actual element type.
-class data_t : public I_copy_semantics, public can_handle {
+class data_t : public virtual I_copy_semantics, public can_handle {
    void* Data;
    int Count;
    int Capacity;
 protected:   
-   const int Elsize;
+   const int Elsize;  // redundant, because I_copy_semantics has it, but faster to compute indexes.
    void initialize_all() { initialize_elements (Data, Count); }
    void initialize_all (const data_t& other)  { initialize_elements (Data, other.Data, Count); }
    void initialize_all (const void* data)  { initialize_elements (Data, data, Count); }
@@ -34,8 +34,8 @@ public:
    void* offset (void* data, int count) const  { return static_cast<byte*>(data) + (count*Elsize); }
    const void* offset (const void* data, int count) const  { return static_cast<const byte*>(data) + (count*Elsize); }
    CLASSICS_EXPORT data_t (int elsize);
-   data_t (int elsize, int elcount, void* mem) : Count(elcount), Capacity(elcount), Elsize(elsize), Data(mem) {}
-   data_t (int elsize, int elcount, int capacity, void* mem) : Count(elcount), Capacity(capacity), Elsize(elsize), Data(mem) {}
+   CLASSICS_EXPORT data_t (int elsize, int elcount);
+   CLASSICS_EXPORT data_t (int elsize, int elcount, int capacity);
    CLASSICS_EXPORT virtual ~data_t();
    CLASSICS_EXPORT void* access (int index);
    void* iaccess (int index);  //internal access
@@ -62,160 +62,81 @@ public:
 //////////////////////////////////////////////////
 
 template <class T>
-class g_data_t : public data_t {
-   void initialize_elements (void* dest, int count) const;
-   void initialize_elements (void* dest, const void* src, int count) const;
-   void copy_elements (void* dest, const void* src, int count) const;
-   void move_elements (void* dest, void* src, int count) const;
-   void destroy_elements (void* dest, int count) const;
+class g_data_t : private copy_semantics_g<T>, public data_t {
 public:
-   g_data_t ();
+   g_data_t () : data_t (sizeof(T)) {}
    ~g_data_t() { destroy_elements (get_buffer(), elcount()); }
-   g_data_t (const g_data_t&);
-   g_data_t (int elcount);
-   g_data_t (int elcount, int capacity);
-   g_data_t (int elcount, const void* data);
-   data_t* clone() const;
-   data_t* clone_empty(int reserve) const;
+   g_data_t (const g_data_t& other)
+      : data_t (sizeof(T), other.elcount()) { initialize_all (other); }
+   g_data_t (int elcount) 
+      : data_t (sizeof(T), elcount) {initialize_all();}
+   g_data_t (int elcount, int capacity)
+      : data_t (sizeof(T), elcount, capacity) { initialize_all(); }
+   g_data_t (int elcount, const void* data)
+     : data_t (sizeof(T), elcount) { initialize_all (data); }
+   g_data_t<T>* clone() const { return new g_data_t<T> (*this); }
+   g_data_t<T>* clone_empty(int reserve) const { return new g_data_t<T> (0,reserve); }
    };
 
-// This is not inline because of an optomization problem with VC++5.0
-template <typename T>
-g_data_t<T>::g_data_t()
- : data_t (sizeof(T))
- {}
-
-template <class T>
-data_t* g_data_t<T>::clone() const
- {
- return new g_data_t<T> (*this);
- }
+namespace vararray_internal {
+// I can't make a static template member of a class, or these
+// would go into data_t.
 
 template <typename T>
-data_t* g_data_t<T>::clone_empty (int reserve) const
+T* make_the_empty()
  {
- return new g_data_t<T> (0,reserve);
+ static dynalloc_reservation<T> placement;
+ T* p= ::new (placement) T;
+ static dynalloc_reservation<lifetime> life_placement;
+ lifetime* life= ::new(life_placement) lifetime;
+ life->clear();
+ life->inc_owned_count();
+ p->set_lifetime_object(life);
+ return p;
  }
 
-template <class T>
-void g_data_t<T>::initialize_elements (void* dest_raw, int count) const
+template <typename T>
+T* shared_empty()
  {
- T* dest= static_cast<T*>(dest_raw);
- for (int loop= 0;  loop < count;  loop++) {
-    ::new (dest++) T();  // JMD 2-Sept-2003  Compilers before VC++7.1 initialized even without the () initializer on POD types.  Put in () to keep behavior of known initialization to zero.
-    }
+ static T* the_empty= 0;
+ if (!the_empty)  the_empty= make_the_empty<T>();
+ return the_empty;
  }
 
-template <class T>
-void g_data_t<T>::initialize_elements (void* dest_raw, const void* src_raw, int count) const
- {
- T* dest= static_cast<T*>(dest_raw);
- const T* src= static_cast<const T*>(src_raw);
- for (int loop= 0;  loop < count;  loop++) {
-    ::new (dest++) T (*src++);
-    }
- }
+}
+
  
-template <class T>
-void g_data_t<T>::copy_elements (void* dest_raw, const void* src_raw, int count) const
- {
- T* dest= static_cast<T*>(dest_raw);
- const T* src= static_cast<const T*>(src_raw);
- if (dest < src) {  // in case they overlap...
-    // copy left-to-right
- for (int loop= 0;  loop < count;  loop++) {
-    *dest++ = *src++;  //assignment
-    }
- }
- else {  // copy right-to-left
-    dest += count;
-    src += count;
-    for (int loop= 0;  loop < count;  loop++) {
-       *--dest = *--src;  // assignment
-       }
-    }
- }
- 
-template <class T>
-void g_data_t<T>::move_elements (void* dest_raw, void* src_raw, int count) const
- {
- T* dest= static_cast<T*>(dest_raw);
- T* src= static_cast<T*>(src_raw);
- if (dest < src) {  // in case they overlap...
-    // copy left-to-right
- for (int loop= 0;  loop < count;  loop++) {
-       ::new (dest++) T (*src);  //duplicate at new position
-    src->T::~T();  //destroy the old
-    ++src;
-    }
- }
- else {  // copy right-to-left
-    dest += count;
-    src += count;
-    for (int loop= 0;  loop < count;  loop++) {
-       --src;
-       ::new (--dest) T (*src);  //duplicate at new position
-       src->T::~T();  //destroy the old
-       }
-    }
- }
-
-template <class T>
-void g_data_t<T>::destroy_elements (void* dest_raw, int count) const
- {
- T* dest= static_cast<T*>(dest_raw);
- for (int loop= 0;  loop < count;  loop++) {
-    dest->T::~T();
-    ++dest;
-    }
- }
-
-template <class T>
-g_data_t<T>::g_data_t (int elcount)
- : data_t (sizeof(T), elcount, ::operator new (elcount*sizeof(T)))
- {
- initialize_all();
- }
-
-template <class T>
-g_data_t<T>::g_data_t (int elcount, int capacity)
- : data_t (sizeof(T), elcount, capacity, ::operator new (capacity*sizeof(T)))
- {
- initialize_all();
- }
-
-template <class T>
-g_data_t<T>::g_data_t (int elcount, const void* data)
- : data_t (sizeof(T), elcount, ::operator new (elcount*sizeof(T)))
- {
- initialize_all (data);
- }
-
-template <class T>
-g_data_t<T>::g_data_t (const g_data_t& other)
- : data_t (sizeof(T), other.elcount(), ::operator new (sizeof(T)*other.elcount()))
- {
- initialize_all (other);
- }
-
 //////////////////////////////////////////////////
 
-class s_data_t : public data_t {
-   CLASSICS_EXPORT void initialize_elements (void* dest, int count) const;
-   CLASSICS_EXPORT void initialize_elements (void* dest, const void* src, int count) const;
-   CLASSICS_EXPORT void copy_elements (void* dest, const void* src, int count) const;
-   CLASSICS_EXPORT void move_elements (void* dest, void* src, int count) const;
-   void destroy_elements (void* dest, int count) const   { /* does nothing */ }
+namespace vararray_internal {
+// non-template base class for s_data_t
+// because the code only needs the size, not the type itself.
+class s_data_ntbase : public copy_semantics_s, public data_t {
 public:
-   s_data_t (int elsize) : data_t (elsize) {}
-   ~s_data_t() { }
-   CLASSICS_EXPORT s_data_t (const s_data_t&);
-   CLASSICS_EXPORT s_data_t (int elsize, int elcount);
-   CLASSICS_EXPORT s_data_t (int elsize, int elcount, int capacity);
-   CLASSICS_EXPORT s_data_t (int elsize, int elcount, const void* data);
+   s_data_ntbase (int elsize) : data_t (elsize), copy_semantics_s (elsize) {}
+   ~s_data_ntbase() { }
+   CLASSICS_EXPORT s_data_ntbase (const s_data_ntbase&);
+   CLASSICS_EXPORT s_data_ntbase (int elsize, int elcount);
+   CLASSICS_EXPORT s_data_ntbase (int elsize, int elcount, int capacity);
+   CLASSICS_EXPORT s_data_ntbase (int elsize, int elcount, const void* data);
    CLASSICS_EXPORT data_t* clone() const;
    CLASSICS_EXPORT data_t* clone_empty(int reserve) const;
    };
+   
+} // end internal
+
+//////////////////////////////////////////////////
+
+template <typename T>
+class s_data_t : public vararray_internal::s_data_ntbase {
+public:
+   s_data_t() : s_data_ntbase (sizeof(T)) {}
+   s_data_t (const s_data_t& other) : s_data_ntbase (other) {}
+   s_data_t (int elcount) : s_data_ntbase (sizeof(T), elcount) {}
+   s_data_t (int elcount, int capacity) : s_data_ntbase (sizeof(T), elcount, capacity) {}
+   s_data_t (int elcount, const void* data) : s_data_ntbase (sizeof(T), elcount, data) {}
+   };
+   
 
 //////////////////////////////////////////////////
 
@@ -245,6 +166,7 @@ public:
 
 //////////////////////////////////////////////////
 
+namespace vararray_internal {
 // A non-template base to abstract code out of all instantiations.
 class nt_base {
    chdata data;
@@ -264,7 +186,6 @@ protected:
    const void* access (int index) const { return get_core().access(index); }
    const void* raccess (int index, int len) const { return get_core().raccess(index, len); }
    CLASSICS_EXPORT void replace (int pos, int lendel, const void* data, int buflen);
-   virtual data_t* create_core (int capacity)  { return 0; } //***
    bool lazy_dup_core (data_t*&core)
       { return data.get_data()->lazy_dup_core (core); }
    ~nt_base() {}
@@ -282,12 +203,12 @@ public:
    };
 
 
-//}  //end of internal
+}  //end of internal
 
 //////////////////////////////////////////////////
 
 template <class T>
-class vararray : public /*vararray_internal::*/nt_base {
+class vararray : public vararray_internal::nt_base {
 public:
    typedef T eltype;
    vararray (const /*vararray_internal::*/chdata& data) : nt_base(data) {}
@@ -395,12 +316,11 @@ int binary_search (const vararray<ElementT>& A, const KeyT& searchkey, int (*com
 
 template <class T>
 class vararray_g : public vararray<T> {
-   static /*vararray_internal::*/g_data_t<T>* empty();
-   static /*vararray_internal::*/g_data_t<T>* make_the_empty();
-   data_t* create_core (int capacity);
-   static g_data_t<T>* the_empty;
 public:
-   vararray_g() : vararray<T> (empty()) {}
+   typedef g_data_t<T> Core_T;
+   static Core_T* the_empty;
+public:
+   vararray_g() : vararray<T> (vararray_internal::shared_empty<Core_T>()) {}
    explicit vararray_g (int elcount);
    vararray_g (int elcount, int capacity);
    void alias_with (vararray_g<T>& other) { nt_base::alias_with (other); }
@@ -409,48 +329,19 @@ public:
    ~vararray_g() {}
    };
 
-template <typename T>
-data_t* vararray_g<T>::create_core (int capacity)
- {
- return new /*vararray_internal::*/g_data_t<T>(0,capacity);
- }
-
-template <class T>
-g_data_t<T>* vararray_g<T>::the_empty;
-
-template <class T>
-g_data_t<T>* vararray_g<T>::make_the_empty()
- {
- static dynalloc_reservation<g_data_t<T> > placement;
- g_data_t<T>* p= ::new (placement) g_data_t<T>;
- static dynalloc_reservation<lifetime> life_placement;
- lifetime* life= ::new(life_placement) lifetime;
- life->clear();
- life->inc_owned_count();
- p->set_lifetime_object(life);
- return p;
- }
-
-template <class T>
-g_data_t<T>* vararray_g<T>::empty()
- {
- if (!the_empty)  the_empty= make_the_empty();
- return the_empty;
- }
-
 template <class T>
 vararray_g<T>::vararray_g (int elcount)
- : vararray<T> (new /*vararray_internal::*/g_data_t<T> (elcount))
+ : vararray<T> (new Core_T (elcount))
  { }
 
 template <class T>
 vararray_g<T>::vararray_g (int elcount, int capacity)
- : vararray<T> (new /*vararray_internal::*/g_data_t<T> (elcount, capacity))
+ : vararray<T> (new Core_T (elcount, capacity))
  { }
 
 template <class T>
 vararray_g<T>::vararray_g (const T* data, int elcount)
- : vararray<T> (new /*vararray_internal::*/g_data_t<T> (elcount, data))
+ : vararray<T> (new Core_T (elcount, data))
  { }
 
 
@@ -458,12 +349,10 @@ vararray_g<T>::vararray_g (const T* data, int elcount)
 
 template <class T>
 class vararray_s : public vararray<T> {
-   static /*vararray_internal::*/s_data_t* make_the_empty();
-   static /*vararray_internal::*/s_data_t* empty();
-   data_t* create_core (int capacity)  { return new /*vararray_internal::*/s_data_t(sizeof(T),0,capacity); }
-   static s_data_t* the_empty;
+   typedef s_data_t<T> Core_T;
+   static vararray_internal::s_data_ntbase* the_empty;
 public:
-   vararray_s() : vararray<T> (empty()) {}
+   vararray_s() : vararray<T> (vararray_internal::shared_empty<Core_T>()) {}
    explicit vararray_s (int elcount);
    vararray_s (int elcount, int capacity);
    void alias_with (vararray_s<T>& other) { nt_base::alias_with (other); }
@@ -474,42 +363,19 @@ public:
 
 
 template <class T>
-s_data_t* vararray_s<T>::the_empty;
-
-template <class T>
 vararray_s<T>::vararray_s (int elcount)
- : vararray<T> (new /*vararray_internal::*/s_data_t (sizeof T, elcount))
+ : vararray<T> (new Core_T (elcount))
  { }
-
-template <class T>
-s_data_t* vararray_s<T>::make_the_empty()
- {
- static dynalloc_reservation<lifetime> life_placement;
- lifetime* life= ::new (life_placement) lifetime();
- static dynalloc_reservation<s_data_t> placement;
- s_data_t* p= ::new (placement) s_data_t (sizeof(T));
- life->clear();
- life->inc_owned_count();
- p->set_lifetime_object(life);
- return p;
- }
-
-template <typename T>
-s_data_t* vararray_s<T>::empty()
- {
- if (!the_empty)  the_empty= make_the_empty();
- return the_empty;
- }
 
 
 template <class T>
 vararray_s<T>::vararray_s (int elcount, int capacity)
- : vararray<T> (new /*vararray_internal::*/s_data_t (sizeof T, elcount, capacity))
+ : vararray<T> (new Core_T (elcount, capacity))
  { }
 
 template <class T>
 vararray_s<T>::vararray_s (const T* data, int elcount)
- : vararray<T> (new /*vararray_internal::*/s_data_t (sizeof T, elcount, data))
+ : vararray<T> (new Core_T (elcount, data))
  { }
 
 
