@@ -1,0 +1,305 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"  "http://www.w3.org/TR/html4/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=windows-1252">
+<TITLE>closure complete documentation</TITLE>
+<META http-equiv="Content-Script-Type" content="text/javascript">
+<SCRIPT type= "text/javascript" src="../helpers.js"></SCRIPT>
+<LINK REL=STYLESHEET HREF="../info.css" TYPE="text/css">
+<SCRIPT type="text/javascript">
+   checkframe ("class_summary_index.html");
+</SCRIPT>
+</HEAD>
+
+<BODY>
+<IFRAME id="page_banner" src="../page_banner.html" scrolling="no"></IFRAME>
+
+<H1 id="toptop">closure (a.k.a. thunks)</H1>
+
+<H2>Contents</H2>
+<UL>
+	<LI><A HREF="#overview">What Is A Closure?</A>
+	<LI><A HREF="#member_callback_thunk">Using the <code>member_callback_thunk</code> Template</A>
+	<UL>
+		<LI><A HREF="#limitations">Limitations</A>
+	</UL>
+	<LI><A HREF="#others">Other Kinds Of Thunks</A>
+	<LI><A HREF="#internals">Internals: How It Works</A>
+	<LI><A HREF="how_fast">How Fast Is It?</A>
+</UL>
+
+<H2 id="overview">What Is A Closure?</H1>
+
+<P>In C++, you can have a pointer to a member function.  This requires an instance to be called
+upon, so the syntax is:</P>
+
+<PRE class="code">
+(instance.*ptr)(args)
+</PRE>
+
+<P>When you call a member function normally, the syntax is:</P>
+
+<PRE class="code">
+instance.member(args)
+</PRE>
+
+<P>Normally, every expression in C++ has a well-defined type.  But what is <code>instance.*ptr</code>
+and what is <code>instance.member</code>?  They are clearly subexpressions in that they are made up
+of more primitive things and an operator, and the resulting thing is something that is used as part of
+a function call, which is itself classified as a <I>postfix expression</I>.</P>
+
+<P>Clearly it is something, but what is it?  It is called a <I>class closure</I> and is something that has
+very little support in C++.  That is, the only thing you can do with it is call the function right away.  You can’t
+save the result in a variable and use it later, e.g.</P>
+
+<PRE class="code">
+<I>// hypothetical code, not legal C++!</I>
+p1= instance.*ptr;
+p1(args);
+
+p2= &instance.member;
+p2 (args);
+</PRE>
+
+<P>This looks like it should work, if only there was some way in C++ to define <code>p1</code> or <code>p2</code>.
+This incomplete feature is referred to as a class closure by Stroustrup and others who speculate on such
+things.</P>
+
+<P>When I need to give a callback pointer to Windows, such as for a WinProc, what I really want is <code>p2</code>,
+so I can use a member of a specific object.  This module in Classics provides this capability.</P>
+
+<H2>Using a Closure</H2>
+<P>The file <code>Classics/closure_UT.cxx</code> illustrates the use of a class closure.</P>
+
+<PRE class="code">
+typedef int (__stdcall callback_t) (int);
+callback_t* callback;
+
+&hellip;
+
+<I>//Normal set-up of a pointer to a function.</I>
+callback= &callback1;
+<I>//And use it.</I>
+y= callback(x);
+
+<I>//Here is my magic:</I>
+<I>// I really want to say  callback= &object.member</I>
+<I>//But I get the same result with:</I>
+member_callback_thunk&lt;C,int,int> thunk (&object, &C::member);
+callback= thunk.callptr();
+<I>//And use it.</I>
+y= callback(x);
+</PRE>
+
+<P>In this example, code that only knows about normal pointers to functions can be given
+the function created by <code>thunk.callptr()</code> and it will work, calling
+<code>object.member</code> when invoked.  Note that this is not the same as using
+STL to make functors that are triggered with the same function calling syntax as normal
+functions.  This is really a normal function!  It can be passed to code that is
+already compiled and expecting a pointer to a regular function.  This specifically includes
+the WinProc and any of the Enum... API functions in Windows.</P>
+
+<P>Basically, the template <code>member_callback_thunk</code> holds a pointer to
+an object and a pointer-to-member of a member function.  If this class had an <code>operator()</code>
+defined on it, it would be a functor as used with STL.  But instead, it has <code>callptr()</code>.</P>
+
+<P>The instance of the <code>member_callback_thunk</code>, called <code>thunk</code> in the
+example above, causes a function to exist.  This normal (non-member) function contains code to
+call the member on the object, with the same argument.  <code>callptr</code> gives you a
+pointer to this function.</P>
+
+<P><IMG src="../images/oneway-sign-50U.png" ALIGN="right" ALT="One Way road sign" TITLE="This icon indicates that you must create objects in the proscribed manner">The function is dynamically generated to match the specific object and member needed, and it
+exists within the <code>member_callback_thunk</code> object.  When the destructor is called,
+the function you got from <code>callptr</code> isn’t any good anymore.</P>
+
+<H2 id="member_callback_thunk">Using the <code>member_callback_thunk</code> template</H2>
+
+<H3 id="limitations">Limitations</H3>
+
+<H4>The function takes exactly one argument.</H4>
+
+<P>To make it handle various numbers of arguments would
+greatly increase the complexity, and compilers available at the time I
+originally developed this were rather flakey on template
+support in the first place so I didn’t want to press my luck.</P>
+
+<P>This is not too much of a restriction, it turns out.  If you have more than one argument, you can
+declare the function to take a single <code>struct</code> instead.  Make the memory layout of the
+structure on the stack the same as what passing multiple arguments would be.  For the WinProc, I
+ended up liking it better this way!</P>
+
+<H4>The member must be <code>__thiscall</code></H4>
+
+<P>Member functions, in Microsoft’s compiler, other than those with ellipses, are normally
+passed using the <code>__thiscall</code> calling convention.  Only by specifiying otherwise
+does it do something different.  The code is necessarily specific to how the function expects
+to pass arguments, return, and manage the stack.</P>
+
+<P>It would be possible to write
+additional templates for other calling conventions, but that’s not a priority.  A work-around
+is to create a member function that is a one-line wrapper.  For example, see the members
+in the <A HREF="../class_summary.html#atomic_counter">atomic_counter</A>, which
+are available both as <code>__fastcall</code> and as the default <code>__thiscall</code>.</P>
+
+<H4>The resulting closure is <code>__stdcall</code></H4>
+<P>The code is necessarily specific to how the function expects to pass arguments, return, and
+manage the stack.  I chose to implement only the <code>__stdcall</code> case, but
+additional templates could certainly be created for other cases.  Providing for more calling
+conventions for both member and thunk results in an explosion of combinations, since each
+pair needs unique code.  Furthermore, C++ doesn’t have overloading based on calling convention
+so you would need to specify these things (correctly!) when creating a thunk.  In short, it’s easier
+all around to not have them unless they really are needed.</P>
+
+<P>The Windows operating system uses <code>__stdcall</code> for its API entry points.
+COM uses it.  DLL exports are assumed to use it.  Windows callbacks use it.  Since providing
+a thunk for outside code (e.g. Windows callbacks) is the main point (for stuff within C++ we
+can just use functors without problems), <code>__stdcall</code> is the way to go.</P>
+
+<H4>Nonstandard and Compiler Specific</H4>
+
+<P>Since this is not something that is possible in C++, the implementation <I>must</I> be
+non-standard and therefore compiler-specific.  If you want to supply code for other compilers, I’ll
+be happy to merge it in.  Note that the <code>closure.h</code> file just includes the proper
+implementation, and each implementation goes in its own file.  That is, each file is written
+for the platform rather than having a nest of conditional compilation.</P>
+
+<H2 id="others">Other kinds of thunks</H2>
+
+<P>The provided code centers on getting a normal <code>__stdcall</code> pointer to
+call a member function of a particular instance.  Other things are possible, such as adding
+a parameter to a function (called <I>currying</I> in some languages).  However, before
+getting very far in experimenting with other kinds, I realized that I can always design the code
+to use a member function.  Once the thunking capability exists in any form, the rest can be
+done within the C++ language.</P>
+
+<H2 id="internals">Internals: How It Works (Microsoft VC++)</H2>
+
+<P><A HREF="#after_internals">[skip it]</A></P>
+
+<H3>Basic Thunk</H3>
+<P>The real magic is done with the <code>closure_stdcall_to_thiscall</code>
+class.  The idea is that the code to call exists inside the instance.</P>
+<P>To create the code, I use a structure.  The layout of the structure is such
+that the object’s address and the member function’s address (or values computed
+simply from them) slide right in where they are needed in the code.  Around them, I
+defined fields whose name reflects the assembly language opcodes to be placed
+in them.</P>
+<P>Once the structure is populated with the values and the opcodes, the
+address of that structure can be cast to a function pointer!</P>
+
+<H3>Different Grades of Member Pointers</H3>
+<P>The compiler generates pointers to member functions in three different ways.
+In the simpest case, it is simply a pointer to the function.  If the member is
+virtual, it points to a VCALL Thunk generated by the compiler that does the
+virtual lookup.  In any case, all that needs to be done is to load
+the <code>ECX</code> register with the object’s <code>this</code> pointer and jump to the function
+pointed to.</P>
+
+<P>In the case of multiple inheritence, things are a little more complicated.
+Not every base class can be at the same address of the drived class, so
+all base classes other than the first need a <I>this adjustment</I> when
+calling a function implemented in that base.  That is, when calling a member
+that’s inherited, the <code>this</code> pointer needs to be adjusted to point to the
+proper base object.  In single inheritence, the adjustment is always zero.
+With multiple inheritence, the member pointer dereference code needs to
+take care of this.</P>
+
+<P>So, a pointer to a member in this case contains two fields.  The first
+is a pointer to the entry point, and the second is a constant to add to 
+<code>this</code> before calling it.  Since a pointer to a member can hold different
+members at different times, this needs to be done at run time.
+However, since my thunk is bound to a specific object, rather than
+being called on different objects at different times, I can do that
+calculation at initialization time.  That is, the thunk is exactly as in
+the simpler case, and the object pointer is pointing to the correct
+base object already.</P>
+
+<P>With virtual base classes, things are even more complex.
+The location of a particular base class can vary from instance
+to instance (since the instance may really be of some
+further-derived class).  If the member to call is inherited from
+one of those virtual bases that like to move around, the code
+to locate the base uses lookups from the vtable in the object.
+Since the pointer can point to different members at different
+times, it must also note which base class contains the member
+being pointed to.</P>
+
+<P>So, the pointer to member in this case contains three
+fields. The first is again the actual function entry point.
+The third is involved with looking up the virtual base’s
+location.  The second is again a <code>this</code> adjustment, applied
+after locating the correct virtual base, in case the member
+is inherited from some non-virtual base class of the virtual base.
+Sound complicated?  It gets worse!  The code to do the
+call also contains a constant known at compile time, which
+is dependant on the declared class type and how it’s layed out.
+I cannot write code to call a member pointer, since there is no way
+to determine this other constant from the class name alone and
+information provided through the C++ language (which is basically
+the <code>sizeof</code> the final class and the location of the very beginning of
+the most-complete object).</P>
+
+<P>To get around this, I have the compiler figure it out for me.
+The code in <code>create_probe</code> sets up a pointer
+to a member with the same adjustment values, but points
+to a &ldquo;fake&rdquo; member function.  Then the template, which
+expands into the proper code for the types given, performs
+the <code>->*</code> operator that only it knows how to
+do.  But it calls my function!  My function simply notes the
+address of <code>this</code>.  Now, I know the correct subobject for the
+given object and the real member, and once again set up
+the most simple thunk with this information.</P>
+
+<H3>Efficient, No Matter What</H3>
+
+<P>You’ll notice that calling a thunk is more efficient than calling
+a normal pointer to a member function!  Because the object is
+fixed, the calculations are done once, when the thunk is created,
+rather than every time it is called.  The thunks are just as efficient
+for calling back things in fancy virtual inheritence trees as they
+are with the simplest class.</P>
+
+<P>There is a slight difference at initialization time, though.
+The single and multiple inheritence cases call a non-template
+function.  Only one function exists, no matter how many
+types are instantiated.</P>
+
+<P>The virtual inheritence case requires that the <code>->*</code>
+operation be generated by the template, knowing the correct object
+type.  So, a different helper function is generated for every
+object class, though different parameter and return types can
+share one.  However, it is inlined anyway.  Basically, the
+initialization requires more code than for the other cases: it performs
+the <code>->*</code> call, and one more additional call compared
+with the non-virtual-base case.</P>
+
+<A NAME="after_internals"></A>
+<H2 id="how_fast">How Fast Is It?</H2>
+
+<P>The code present in the generated thunk contains two instructions:</P>
+
+<PRE class="code">
+mov ECX, object  <I>; mov immediate</I>
+jmp target <I>; jmp relative immediate</I>
+</PRE>
+
+<P>That’s the same amount of code as the compiler’s VCALL thunk.  With only
+two instructions it’s hard to get simpler: calling a function in a DLL goes through
+an extra jump too, but does not need to load a register.</P>
+
+<P>By all rights, this ought to be extremely fast, and is certainly as fast as is possible to
+accomplish this.  But measuring the actual speed is problematic.  Because of the
+nature of the modern superscaler CPUs, trying to measure a bunch of copies of
+this code gives funny results.  For example, making the called function do one more
+layer of recursion made it run almost twice as fast!  It only makes sence to time it
+when the CPU is doing other things, not just millions of concecutive calls.  If the
+called function is realistic in its complexity, the overhead of the thunk is not even
+measurable with a simple timing program.</P>
+
+
+<HR>
+<IFRAME id="page_footer" src="../page_footer.html"></IFRAME>
+</BODY>
+</HTML>
+
+

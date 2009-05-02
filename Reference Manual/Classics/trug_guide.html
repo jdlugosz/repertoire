@@ -1,0 +1,156 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"  "http://www.w3.org/TR/html4/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=windows-1252">
+<TITLE>trug User’s Guide</TITLE>
+<META http-equiv="Content-Script-Type" content="text/javascript">
+<SCRIPT type= "text/javascript" src="../helpers.js"></SCRIPT>
+<LINK REL=STYLESHEET HREF="../info.css" TYPE="text/css">
+<SCRIPT type="text/javascript">
+   checkframe ("Classics/trug_index.html");
+</SCRIPT>
+</HEAD>
+
+<BODY>
+<IFRAME id="page_banner" src="../page_banner.html" scrolling="no"></IFRAME>
+
+<H1 id="toptop">trug User’s Guide</H1>
+
+<H2>Related Documents</H2>
+<UL>
+	<LI>Class Member Reference
+	<LI>Class <code>trule</code>
+</UL>
+
+<H2 id="overview">Overview</H2>
+
+<P>A <I>trug</I> is a general container.  It holds something else.  The term <I>trug</I> can be used to refer to any
+concrete implementation of the proper interface (see <A HREF="#hypothetical" class="code">hypothetical_trug</A>),
+and the actual template named trug has a few supplied specializations.</P>
+
+<P>A trug of a pointer type, e.g. <code>trug&lt;int&></code>, provides strict ownership semantics
+and automatic destruction for pointers, similarly to the standard <code>std::auto_ptr</code> class.</P>
+
+<P>A trug of a Windows <code>HANDLE</code> type provides strict ownership and automatic destruction in an analogous way 
+to the pointers.  For example, <code>trug&lt;HKEY></code> knows to call the Win32 API function <code>RegCloseKey</code>
+when &ldquo;freed&rdquo;.</P>
+
+<H2>Contents</H2>
+<UL>
+	<LI><A HREF="#housekeeping">Threading and Housekeeping Issues</A>
+	<LI><A HREF="#purpose">Purpose and Concept</A>
+	<LI><A HREF="#what">What Do I Do With It?</A>
+	
+	<LI><A HREF="#hypothetical">the <code>hypothetical_trug</code> class</A>
+	<LI><A HREF="#trug_for_pointers">specialized <code>trug</code> for pointers</A>
+	<LI><A HREF="#trug_for_HANDLEs">specialized <code>trug</code> for Windows HANDLEs</A>
+</UL>
+
+
+
+<H2 id="housekeeping">Threading and Housekeeping Issues</H2>
+
+<P>The supplied trug classes don’t have any particular thread safety built in.  The various members
+should be serialized, but may be called from any thread as long as only one member is called at
+a time.</P>
+
+<P>The &ldquo;housekeeping&rdquo; is what this class is all about.  The point of using a trug
+is to impose automatic housekeeping management and/or error checking on the contained
+object.</P>
+
+<P>A trug may not be copied directly.  So, its copy constructor and copy assignment operator
+are disabled.  However, the trug will give the sense of copying (in particular, returning
+a trug from a function) by using the matching trule class.</P>
+
+<H2 id="purpose">Purpose and Concept</H2>
+
+<P>A trug is a generalized container.  The purpose of a trug is to hold something else.  The reasons
+for putting such a wrapper around something include abstracting an indirect storage mechanism and
+imposing houskeeping semantics.</P>
+
+<P>The name <I>trug</I> comes from the English gardening basket (for examples, see <A HREF="http://www.sussextrugs.com/" TARGET="external">
+Royal Sussex Trug</A> store).  Lately I've seen it used for any kind of general-purpose container,
+such as <A HREF="http://www.leevalley.com/garden/page.asp?SID=&ccurrency=2&page=44667&category=2,2120,33278" TARGET="external">these</A>
+that have nothing to do with the traditional shape and construction.  This template’s purpose as a
+handy often-used container lives up to its namesake.</P>
+
+<H2 id="what">What Do I Do With It?</H2>
+
+<UL>
+	<LI>Pass and return pointers or HANDLEs without losing track of who’s responsibility it is to delete it.
+	<LI>Make local variables of these types safe for exceptions.
+	<LI>Add destructor semantics to pointers or HANDLEs, for ease in making them members of a class.
+	<LI>Have pointers that need to be deleted in an unusual way automatically do so.
+	<LI>Generalize a container for use in writing templates, so template code can use indirect or proxy references.
+</UL>
+
+<P>Consider the following examples.  The trug is being used to hold a primitive pointer, and you can see
+it gives the same benifits as the <code>std::auto_ptr</code>.</P>
+
+<PRE class="code" style="float:left; margin-right:2em">
+typedef array_trug&lt;int*> atp;
+
+atp::trule foo (int size)
+ {
+ atp <B>p1</B> (new int [size]);
+ do_stuff_1();
+ atp <B>p2</B> (new int [size*2]);
+ do_stuff_2();
+ return p1;
+ }
+
+<I>// later&hellip;</I>
+atp p3= foo (x);
+</PRE>
+
+<P>You’ll notice that <code>p1</code>, <code>p2</code>, and <code>p3</code> are defined to be of type
+<code>atp</code> rather than type <code>int*</code>.   Here is what that does for us.</P>
+
+<P>First of all, notice that <code>p2</code> is never explicitly deleted.  Like with any normal self-respecting
+object type, it takes care of itself and knows to delete the pointer when it goes out of scope.</P>
+
+<P>That may be a handy bit of help that avoids a little typing and some effort to pay attention to the
+needs, but the benefit is more serious than that.  What happens if the function throws an exception?  If an
+exception is thrown during <code>do_stuff_1</code>, then it will automatically delete <code>p1</code>
+when unwinding the stack.  If the exception is thrown during <code>do_stuff_1</code>, then it knows
+to delete both <code>p1</code> and <code>p2</code>.  Meanwhile, if the function runs to completion
+it knows to delete <code>p2</code> but leave <code>p1</code> to be transfered to the caller!  Making
+this function exception-safe with two ordinary pointers would require a lot of care and quite a few more lines,
+wrapping the whole thing in a try block and moving the definitions of the variables away from their point of
+first use.  Simply giving them destructors is so much easier!  It makes them work the way stuff
+ought to work in C++.</P>
+
+<P>Meanwhile, the caller knows that <code>foo</code> will return a pointer and that the caller
+takes responsibility for the pointer returned.  Such responsibilities are often under-documented,
+while here the compiler enforces it.  This is explored further in the next example.</P>
+
+<PRE class="code" style="clear:both; float:right; margin-left:2em">
+typedef array_trug&lt;int*> atp;
+
+void f1 (atp param1);  // wrong!
+void f2 (const atp& param2);
+void f3 (int* param4);
+
+<I>// later&hellip;</I>
+atp p1 (new int [42]);
+
+f1 (p1);  <I>// compile-time error!</I>
+f2 (p1);
+f3 (p1);  <I>// compile-time error!</I>
+f3 (p1.eject());
+f3 (p1.duplicate());
+f3 (p1.get_r());  // not a good idea
+</PRE>
+
+<P>fffffff fffffff fffffffff ffffffffff
+</P>
+
+<H2 id="hypothetical" style="clear:left">the <code>hypothetical_trug</code> class</H2>
+
+<H2 id="trug_for_pointers">specialized <code>trug</code> for pointers</H2>
+
+<H2 id="trug_for_HANDLEs">specialized <code>trug</code> for Windows HANDLEs</H2>
+
+<IFRAME id="page_footer" src="../page_footer.html"></IFRAME>
+</BODY>
+</HTML>
