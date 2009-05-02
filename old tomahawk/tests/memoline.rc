@@ -1,0 +1,125 @@
+//Microsoft Developer Studio generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// English (U.S.) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_DIALOG1 DIALOG DISCARDABLE  0, 0, 301, 176
+STYLE DS_MODALFRAME | DS_NOIDLEMSG | DS_3DLOOK | WS_MINIMIZEBOX | WS_POPUP | 
+    WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+CAPTION "Memo Line"
+FONT 8, "MS Sans Serif"
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,244,7,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,244,24,50,14
+    LTEXT           "Date:",IDC_STATIC,7,13,18,8
+    EDITTEXT        IDC_EDIT1,7,21,65,14,ES_AUTOHSCROLL
+    LTEXT           "Name:",IDC_STATIC,92,13,22,8
+    EDITTEXT        IDC_EDIT2,92,21,40,14,ES_AUTOHSCROLL
+    LTEXT           "this chore",IDC_STATIC,13,53,32,8
+    EDITTEXT        IDC_EDIT3,13,62,65,14,ES_AUTOHSCROLL
+    LTEXT           "that chore",IDC_STATIC,13,82,33,8
+    EDITTEXT        IDC_EDIT4,13,90,65,14,ES_AUTOHSCROLL
+    LTEXT           "net surfing",IDC_STATIC,13,110,34,8
+    EDITTEXT        IDC_EDIT5,13,119,65,14,ES_AUTOHSCROLL
+    LTEXT           "fixing computers",IDC_STATIC,13,138,52,8
+    EDITTEXT        IDC_EDIT6,13,148,65,14,ES_AUTOHSCROLL
+    GROUPBOX        "Hours",IDC_STATIC,7,41,77,124
+    EDITTEXT        IDC_EDIT7,92,56,202,113,ES_MULTILINE | ES_WANTRETURN | 
+                    WS_VSCROLL
+    LTEXT           "Notes:",IDC_STATIC,92,46,22,8
+    CONTROL         102,IDC_STATIC,"Static",SS_BITMAP,142,7,86,40
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO DISCARDABLE 
+BEGIN
+    IDD_DIALOG1, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 294
+        VERTGUIDE, 72
+        VERTGUIDE, 92
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 169
+        HORZGUIDE, 21
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Bitmap
+//
+
+KittyFace               BITMAP  DISCARDABLE     "kittyfac.bmp"
+#endif    // English (U.S.) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

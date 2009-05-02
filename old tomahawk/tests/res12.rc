@@ -1,0 +1,112 @@
+//Microsoft Developer Studio generated resource script.
+//
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// English (U.S.) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+OUTPUT DIALOGEX 0, 0, 420, 193
+STYLE DS_MODALFRAME | DS_NOIDLEMSG | DS_3DLOOK | WS_MINIMIZEBOX | WS_POPUP | 
+    WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+CAPTION "Output"
+MENU DialogMainMenu
+FONT 8, "MS Sans Serif"
+BEGIN
+    CTEXT           "This space intentionally left blank.",100,11,23,399,160,
+                    NOT WS_GROUP,WS_EX_NOPARENTNOTIFY
+    CONTROL         "Tab2",1006,"SysTabControl32",0x0,7,7,406,179
+END
+
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+DialogMainMenu MENU DISCARDABLE 
+BEGIN
+    MENUITEM "File",                        65535, GRAYED
+    MENUITEM "Edit",                        65535, GRAYED
+    MENUITEM "Font",                        65535, GRAYED
+    MENUITEM "Options",                     65535, GRAYED
+    MENUITEM "Status",                      65535, GRAYED
+    MENUITEM "Help",                        65535, GRAYED
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO DISCARDABLE 
+BEGIN
+    "OUTPUT", DIALOG
+    BEGIN
+        VERTGUIDE, 255
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+#endif    // English (U.S.) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+
