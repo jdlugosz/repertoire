@@ -1,0 +1,18 @@
+The _*Repertoire*_ is a set of code I've kept and maintained across many projects.  Much of it was developed as an academic exercise, taking patterns I've used in professional code and making a definitive well-engineered version of that.
+
+This includes several things that were the subject of magazine articles over the years.  The "atomic counters" were first published in the August 1998 issue of <I>Visual C++ Developer</I> and was then featured on the Microsoft Developer Network (MSDN) library until July 2001.
+
+Another popular component is the ultimate multi-threaded smart pointer classes.  An overview was published in a magazine (I can't even remember which) but it went out of business before I could write the 6-part series I had planned.
+
+This code is known for being _extremely_ solid and robust, with modules going for years without any bug being found.  It uses Test Driven Development before TDD was a buzzword.  The documentation is extensive, and that is one of my principles of library design: to separate specified behavior from incidental behavior.  Also, many classes were written originally for publication in the form of tutorials and lessons.
+
+Some of this was used for medical imaging equipment, where I worked for 13 years at Kodak, Health Imaging division.  My interest in highly robust code is what led me to that job.  Your word processor may crash and lose the file, but you do not want that to happen to your brain scan!  Such systems are built to much higher standards than typical desktop software.
+
+Most people who used these components would simply incorporate some into their own work, rather than using the whole DLL as presented.  The atomic counters in particular are self sufficient, and to that end I've now made the unit test code stand-alone as well.  You can simply drop those source files into your own project.
+
+Other times, such as the @ustring@ class for Unicode/ANSI migration and intercompatability, people would read my presentation, download the code, and seriously rework it to fit their programs.  That is true for very small items too, like issues on the Windows Registry API for gotcha's, work-arounds, and compatability between old (Win9x) and new (NT/2k) versions of Windows.  That is, you may just copy and paste the wrapper into your own function and edit it to use your own infrastructure.
+
+The Repertoire library supports this kind of usage.  The license is simply, "Use freely with attribution".
+
+Now programmer's magazines aren't what they used to be.  But time doesn't only take away, it provides as well:  I'm looking forward to using <I>github</I> as a new means of sharing this code.  Meanwhile, I am applying it to new issues, such as x64 systems.
+
