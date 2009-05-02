@@ -1,0 +1,115 @@
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=windows-1252">
+<TITLE>non-printing delimiter characters</TITLE>
+<LINK REL=STYLESHEET HREF="../info.css" TYPE="text/css">
+</HEAD>
+
+<BODY>
+<H1>non-printing delimiter characters</H1>
+
+Sometimes, it is convienient to produce a string or text file that contains
+multiple items, or other rich structure, in a delimited format.</P>
+
+<P>When you have such information, you typically have a need to parse it back up
+into individual fields.  Common formats such as quotes and commas, tabs and
+linebreaks, suffer from two problems:  First, you need to provide a way to
+escape out the delimiter character itself, so it may be present in the data.  This
+complicates the otherwise simple problem of parsing the string.  Second, it doesn't
+provide for nested data.</P>
+
+<P>In the old days before modern networking concepts, text data contained
+embedded controls that "meant something" rather than being a printed character.
+The '\n' is a reminant of this concept.  However, on PC's the entire 256-character
+character set was assigned printable glyphs, so sometimes these "control characters"
+were indeed found in strings.  The idea of a reserved range of control characters had
+been lost.</P>
+
+<P>In Unicode, there is a reserved range of control characters that indeed have
+no printable glyph and are meant as "controls" in the old sence of the word.  Unicode
+has assigned codes for every character, so you have no business grabbing these
+reserved characters for other needs.  Because they have no printable image, they
+have no business ever appearing in a string of text.</P>
+
+<P>Instead, these characters are ideal for use as delimiters to separate and mark
+information stored as text.  The Classics library defines the following characters
+for the purpose:</P>
+
+<pre>
+static const wchar_t ESC= L'\x001b';
+static const wchar_t Split4= L'\x001c';
+static const wchar_t Split3= L'\x001d';
+static const wchar_t Split2= L'\x001e';
+static const wchar_t Split1= L'\x001f';
+static const wchar_t Open1= L'\x0011';
+static const wchar_t Close1= L'\x0012';
+static const wchar_t Open2= L'\x0013';
+static const wchar_t Close2= L'\x0014';
+</pre>
+
+<P>There are two kinds of markers here:  Splits and Groupers.</P>
+
+<P>A split character, because its a control code with no printable
+representation, has no business being part of a text message and is
+therefore used in the higher-level protocal combining messages.  Point
+is, the Split character should be unique in the passage of text to be
+parsed.  It is a simple process to split the text up at the Split characters,
+and not worry about escaping out delimiters that appear within the text.</P>
+
+<P>So, since this system is designed to be general and extendable, what
+happens if software component A generates strings containing splits, and
+passes it to software component B that uses splits for its own purpose and
+prohibits splits within its underlying data?  Allowing for general use seems
+to undermine the very idea of having a reserved character.</P>
+
+<P>That is why this complete description (along with code known as the
+<A HREF="string_marker_index.html" TARGET="index">string_marker</A>
+module) is provided.
+A more elaborate standard is needed so that Splits are indeed generally
+useful, yet easy and efficient to use.</P>
+
+<P>A component that uses splits will prohibit the apparance of splits in
+its input data.  So another component that generated data with splits needs
+to escape out the offending characters first.  The "escape" process defined
+here avoids complicating the parser because the offending character does not
+appear (in an escaped-out context) in the resulting text.</P>
+
+<P>All the above listed characters must be escaped out.  To escape out
+character X, replace X with ESC Y, where Y is 128+X.  Because ESC is itself
+escaped out, any existing ESC Y is replaced with ESC ESC-prime Y, which does
+not alter Y, but introduces another ESC-prime (128+ESC) which preserves the
+level of escaping, and can be easily and precicely reversed. Code that simply
+looks for the Split character can be oblivious to the presence of escaped out
+splits within its contained data.</P>
+
+<P>The functions <code>escape</code> and <code>unescape</code> in the
+<A HREF="string_marker_index.html" TARGET="index">string_marker</A>
+module perform this function.
+
+<P>Although this works in the general case, it's a little cumbersome for
+data that is essentially hierarchial in the first place.  So, another concept,
+Groupers, is also available.</P>
+
+<P>While Splits are used to simply separate data, Groupers surround data in
+ballanced pairs, and therefore easily nest.  There are two Groupers, which I
+think of as two different kinds of parenthesis (like () and {}) which nest
+independently.</P>
+
+<P>When looking for Splits, ballanced pairs of Groupers are skipped.  So a
+Split <I>within</I> a group is ignored.  Only the Split at the same level
+is significant.  Likewise, looking for ballanced Groupers will automatically
+skip nested Groupers contained within it.  The functions <code>scan_for</code>
+and <code>scan_for_match</code> are used to look for Splits and ballanced
+Group pairs, respectivly, while ignoring internal nested groupings.</P>
+
+
+<!-- Stock footer-->
+<FONT size="-2">Page content copyright 1998 by John M. Dlugosz.
+Home:<A HREF="http://www.dlugosz.com">http://www.dlugosz.com</A>,
+email:<A HREF="mailto:john@dlugosz.com">mailto:john@dlugosz.com</A>
+</FONT>
+<!-- End footer-->
+</BODY>
+</HTML>
+
+

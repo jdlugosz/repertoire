@@ -1,0 +1,24 @@
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=windows-1252">
+<TITLE>thread safety semantic classification</TITLE>
+</HEAD>
+
+<BODY>
+<H1>thread safety semantic classification</H1>
+
+<P>Leading <B>I</B> - description applies per-instance.</P>
+<P>Leading <B>C</B> - description applies across all instances of the class</P>
+<P><B>OTO</B> - One Thread Only.  The thread that owns the object is the only one that may use it.</P>
+<P><B>OTT</B> - One Thread At A Time.  Any thread may use the object, but only one at a time.  Use
+	some kind of mutual exclusion mechanism to allow multiple threads to safely access the same object.</P>
+<P><B>GRP</B> - Group.  It's complex, in that different groups of members have different access rules, and
+	context dictates whether some particular useage is allowed when other threads are already using the object.</P>
+<P><B>R/W</B> - Reader/Writer.  A special (and common) case of GRP.  One writer may access the object,
+	or multiple readers may access the object.</P>
+<P><B>FT</B> - Free Threaded.  Anything goes.</P>
+
+</BODY>
+</HTML>
+
+

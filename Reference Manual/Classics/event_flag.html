@@ -1,0 +1,45 @@
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=windows-1252">
+<TITLE>event_flag complete documentation</TITLE>
+<LINK REL=STYLESHEET HREF="../info.css" TYPE="text/css">
+</HEAD>
+
+<BODY>
+<H1>event_flag</H1>
+
+This class encapsulates the Win32 'event' kernel object.
+
+<H2>Creation</H2>
+
+<PRE>
+enum type { auto_reset= 0, manual_reset=1 };
+event_flag::event_flag (type tp, bool initial_state=false, const char* name= 0);
+</PRE>
+
+The constructor requires you to specify whether this is to be a manual reset or auto reset event.
+Unlike the Win32 CreateEvent function where I can never remember which way uses TRUE and which
+uses FALSE, this constructor names them clearly using an enumeration type.</P>
+
+<P>Optionally, you can specify the initial state of the event flag, and a name, which has the same meaning
+as the last parameter of CreateEvent.</P>
+
+<H2>Setting and Resetting</H2>
+
+There are member functions for
+<UL>
+	<LI>set
+	<LI>reset
+	<LI>pulse
+</UL>
+
+<H2>Waiting</H2>
+There is a <code>wait</code> member which takes an optional timeout value.  This does full error checking
+(see win_handle's wait function), but is obviously limited to a simple useage.</P>
+
+<P>For more elaborate use, obtain the underlying kernel handle by calling the <code>h</code> member.
+</P>
+
+</BODY>
+</HTML>
+

@@ -1,0 +1,125 @@
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=windows-1252">
+<TITLE>handle class reference</TITLE>
+<LINK REL=STYLESHEET HREF="../info.css" TYPE="text/css">
+</HEAD>
+
+<BODY>
+<H1>handle, const_handle, cow class reference</H1>
+The templates <code>handle</code>, <code>const_handle</code>, and <code>cow</code> are general purpose
+smart pointers.  They provide reference-counted shared ownership of the referenced object, so the object
+is destroyed automatically when the last reference to it is dropped.</P>
+<P>A <code>const_handle</code> provides read-only access to the referenced object.  A regular <code>handle</code>
+provides read/write access.  And a <code>cow</code> provides copy-on-write semantics.  See the
+<A HREF="handle_guide.html">User's Guide</A> for more explaination.</P>
+<HR SIZE=10 COLOR=black>
+<!-- WWWW		wwww		wwww		wwww		wwww		wwww -->
+
+
+
+<A NAME="constructor"><H2>explicit const_handle (const T* p=0)</H2></A><BR>
+<H2>explicit const_handle (T* p)</H2><BR>
+<H2>explicit handle (T* p=0)</H2><BR>
+<H2>explicit cow (T* p=0)</H2><BR>
+<P ALIGN="right"><FONT SIZE="-1">constructor, public</FONT></P>
+The primary constructors take a regular pointer as an argument, and produce a smart
+pointer.  This constructor does increment the reference count, so the plain object
+should be constructed initially with a reference count of zero.</P>
+Note that the null pointer is supported, and a default constructor will create a null smart pointer.</P>
+<HR SIZE=3 COLOR=black>
+
+<H2>const_handle (const const_handle& other)</H2><BR>
+<H2>handle (const handle& other)</H2><BR>
+<H2>cow (const cow& other)</H2><BR>
+<P ALIGN="right"><FONT SIZE="-1">constructor, public</FONT></P>
+The copy constructors create a new counted reference to an existing object.  Note that since
+handle and cow are both derived from const_handle, the "isa" relationship applies.  So, you
+can use a cow or a handle anywhere that a const_handle is declared.  This means that
+the const_handle copy constructor can copy cows and handles as well.</P>
+<HR SIZE=3 COLOR=black>
+
+<H2>explicit handle (const baro<T>& other)</H2>
+<H2>explicit const_handle (const const_baro<T>& other)</H2>
+<P ALIGN="right"><FONT SIZE="-1">constructor, public</FONT></P>
+This form allows you to create a usable handle from a baro.  See the Baro User's Guide
+for more information.</P>
+<HR SIZE=10 COLOR=black>
+<!-- WWWW		wwww		wwww		wwww		wwww		wwww -->
+
+
+<A NAME="destructor"><H2>~const_handle()</H2></A>
+<P ALIGN="right"><FONT SIZE="-1">destructor, public</FONT></P>
+
+<HR SIZE=10 COLOR=black>
+<!-- WWWW		wwww		wwww		wwww		wwww		wwww -->
+
+<A NAME=
+"assignment"><H2>const_handle& const_handle::operator= (const const_handle& other)</H2></A><BR>
+// no non-const form?  Hiding problem?<BR>
+<H2>handle& handle::operator= (T* other)</H2><BR>
+<H2>const_handle& const_handle::operator= (T* other)</H2>
+<P ALIGN="right"><FONT SIZE="-1">assignment, public</FONT></P>
+
+<HR SIZE=10 COLOR=black>
+<!-- WWWW		wwww		wwww		wwww		wwww		wwww -->
+
+<A NAME="operator arrow"><H2>const T* const_handle::operator->() const</H2></A></BR>
+<H2>T* handle::operator->() const</H2><BR>
+<H2>T* cow::operator->() const</H2>
+<P ALIGN="right"><FONT SIZE="-1">public</FONT></P>
+Dereferencing a handle of any flavor provides access to the referenced object.  For a plain
+handle, read/write access is provided.  For a const_handle, read-only access is provided
+because the return value is a const T*.  For a cow, the referenced object is cloned first
+if it is being shared, so the returned object is always unique.</P>
+
+<HR SIZE=10 COLOR=black>
+<!-- WWWW		wwww		wwww		wwww		wwww		wwww -->
+
+
+<A NAME="operator bool"><H2>operator bool() const</H2></A>
+<P ALIGN="right"><FONT SIZE="-1">public</FONT></P>
+Returns <code>true</code> if the pointer is not null.
+<HR SIZE=10 COLOR=black>
+<!-- WWWW		wwww		wwww		wwww		wwww		wwww -->
+
+<A NAME="operator!"><H2>bool operator!() const</H2>
+<P ALIGN="right"><FONT SIZE="-1">public</FONT></P>
+Returns <code>true</code> if the pointer is null.
+<HR SIZE=10 COLOR=black>
+<!-- WWWW		wwww		wwww		wwww		wwww		wwww -->
+
+
+<A NAME="get_lifetime_object"><H2>const lifetime* get_lifetime_object() const</H2>
+<P ALIGN="right"><FONT SIZE="-1">public</FONT></P>
+<HR SIZE=10 COLOR=black>
+<!-- WWWW		wwww		wwww		wwww		wwww		wwww -->
+
+<A NAME="is_unique"><H2>bool is_unique() const</H2>
+<P ALIGN="right"><FONT SIZE="-1">public</FONT></P>
+<HR SIZE=10 COLOR=black>
+<!-- WWWW		wwww		wwww		wwww		wwww		wwww -->
+
+<A NAME="points_to"><H2>bool points_to (const T* p) const</H2>
+<P ALIGN="right"><FONT SIZE="-1">public</FONT></P>
+<HR SIZE=10 COLOR=black>
+<!-- WWWW		wwww		wwww		wwww		wwww		wwww -->
+
+<A NAME="Type"><H2>typedef T Type</H2>
+<P ALIGN="right"><FONT SIZE="-1">public</FONT></P>
+<HR SIZE=10 COLOR=black>
+<!-- WWWW		wwww		wwww		wwww		wwww		wwww -->
+
+
+
+
+<!-- Stock footer-->
+<FONT size="-2">Page content copyright 1998 by John M. Dlugosz.
+Home:<A HREF="http://www.dlugosz.com">http://www.dlugosz.com</A>,
+email:<A HREF="mailto:john@dlugosz.com">mailto:john@dlugosz.com</A>
+</FONT>
+<!-- End footer-->
+
+</BODY>
+
+</HTML>

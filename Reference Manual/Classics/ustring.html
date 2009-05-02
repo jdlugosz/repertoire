@@ -1,0 +1,378 @@
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=windows-1252">
+<META NAME="description"
+ CONTENT="User's Guide for the ustring class, part of John Dlugosz's Repertoire Project.">
+<META NAME="keywords"
+ CONTENT="Repertoire documentation user's guide ustring Classics">
+<TITLE>ustring complete documentation</TITLE>
+<LINK REL=STYLESHEET HREF="../info.css" TYPE="text/css">
+</HEAD>
+
+<BODY>
+<!-- Standard banner at top of Reper file -->
+<P CLASS="banner">
+This document is one section of The Repertoire Reference, found at
+<A HREF="http://www.dlugosz.com/Repertoire/refman/mainframe.html" TARGET="_top">
+http://www.dlugosz.com/Repertoire/refman/mainframe.html</A>.<BR>
+Copyright 1998 by <A HREF="mailto:john@dlugosz.com">John M. Dlugosz</A>.
+</P>
+<A NAME="toptop">
+<!-- end of standard banner -->
+<H1>ustring</H1>
+The <code>ustring</code> class is a <i>universal string</i>.  It serves to stand in for either a
+wide or narrow string, and to translate between string types.</P>
+
+<P>Read about:</P>
+
+<!-- CONTENTS --!>
+	<UL>
+		<LI><A HREF="#1">Concept</A>
+		<UL>
+			<LI><A HREF="#2">Wide or Narrow</A>
+			<LI>Wide/Narrow Conversions
+			<LI><A HREF="#3">Multiple String Class Conversions</A>
+		</UL>
+		<LI><A HREF="#5">Using the ustring class</A>
+		<UL>
+			<LI><A HREF="#6">Passing Parameters</A>
+			<LI><A HREF="#7">Returning Values</A>
+			<LI><A HREF="#conversion">Converting Strings Explicitly &mdash; string_cast</A>
+		</UL>
+		<LI><A HREF="#CString_support">MFC's CString Support</A>
+		<UL>
+			<LI>Notes on Microsoft's Class
+			<LI><A HREF="#use_CString">Using CString with ustring</A>
+			<LI>How it Works
+		</UL>
+		<LI><A HREF="#4">Adding Support for Additional String Classes</A>
+		<UL>
+			<LI><A HREF="#awareness">Creating the Awareness Object</A>
+			<LI><A HREF="#create_header">Create the Custom Header</A>
+		</UL>
+	</UL>
+<!-- END CONTENTS --!>
+
+<A NAME="1"><H2>Concept</H2></A>
+A ustring object acts as a flexible cubbyhole.  You can easily stick some kind of string in,
+and later, get some kind of string out.  If the type asked for is different from what's in there,
+it is automatically converted.</P>
+
+<A NAME="2"><H3>Wide or Narrow</H3></A>
+The ustring's primary role is to be either wide or narrow.  This cuts down the number of
+functions needed when both 8-bit character and Unicode support is desired.</P>
+
+<P>When a function takes a paramter of type <code>ustring</code>, the caller may pass either 
+a <code>string</code> or a <code>wstring</code>.  Either is accepted without complaint.
+Meanwhile, the function may decide to do different things based on whether the incoming 
+string is wide or narrow; or, it could just get a wide string and have any narrow string 
+converted.</P>
+
+<h4>example &mdash; before ustring</h4>
+<pre>
+void foo (string);  //narrow form of function
+void foo (wstring);  //wide form of function
+</pre>
+<h4>with ustring</h4>
+<pre>
+void foo (ustring);  //only one form
+</pre>
+
+Within the function, you can have separate code for each case, or have the input
+automatically converted.
+Use the <code>is_wide</code> function to detect whether a wide or narrow string is present.</P>
+
+<pre>
+void foo (ustring x)
+ {
+ if (x.is_wide()) {
+    wstring s= x;  //get the string out
+    //...
+    }
+ else {  //must be narrow
+    string s= x;  //get the string out
+    //... simpler processing for 8-bit characters
+    }
+ }
+</pre>
+<B>-- or -- </B>
+<pre>
+void foo (ustring x)
+ {
+ wstring s= x;  //get wide out, convert if needed.
+ //... wide case subsumes narrow; works for all.
+ }
+</pre>
+
+<H3>Wide/Narrow Conversions</H3>
+Using this class as a go-between is the preferred way to "blindly" &mdash; that is, without special processing instructions &mdash;
+convert between 8-bit and 16-bit character sets.  It uses the Win32 functions MultiByteToWideChar and WideCharToMultiByte
+to do its work, so it should handle the situation, including multi-byte characters, on any nationalized version of Win32.</P>
+
+<A NAME="3"><H3>Multiple String Class Conversions</H3></A>
+
+<P>In addition, this class may be used to transparantly convert between different brands of string class, making it
+the Babel-fish of string representations.  This will let you use your string class of choice and still
+easily use the Classics library.  In addition, if you have different string classes in different libraries in your program,
+this feature can transparently communicate between them for you.</P>
+
+<P>For example, you could put an MFC <code>CString</code> in, and get a <code>classics::wstring</code> out,
+so you could trivially pass CString's to foo in the above example.  Likewise on return values &mdash; you could
+get a Rogue Wave string out, for example, regardless of what the function actually returned to you.</P>
+
+<P>In order to provide transparent conversion, letting you put your type into a ustring and get your type out,
+you need to <A HREF="#create_header">create a header</A> and include it in the files that need this capability.</P>
+
+<P>Meanwhile, other code that was compiled with no knowledge of your type will accept such ustrings
+and want to get their own types out.  This is handled with an <A HREF="#awareness">interface module</A> you provide,
+which explains how to read and write data from and to your type, and will be used polymorphically by any <code>ustring</code>
+instance that finds itself holding one of your strings.</P>
+
+<A NAME="5"><H2>Using the ustring class</H2></A>
+
+<P>The <code>ustring</code> class is designed to facilitate the exchange of parameters only.  It desn't "do" anything
+that you expect of a string object.  The desired functionality belongs to a real string class, and the problem is that
+there are many such string classes, each of which do different things.  The <code>ustring</code> object allows
+you to pass or return any kind of string object you choose, but is not itself a usable string.</P>
+
+<A NAME="6"><H3>Passing Parameters</H3></A>
+
+<P>The recommended way to write a function to take string arguments is:
+<PRE>
+void foo (const ustring& us)
+ {
+ preferred_string_type s= us;  //extract the information
+ process (s);  //use s throughout, never touching us again.
+ }
+</PRE>
+
+<UL>
+	<LI>Declare the parameter of type ustring</P>
+		<P>The preferred method is to use a <code>const ustring&</code>.  This will cause a ustring to be
+			created if you call foo with a concrete string type, but will not duplicate the ustring (and the underlying
+			concrete string) if you pass an existing ustring instead.</P>
+	<LI>Extract a concrete string</P>
+		<P>Declare a string variable locally and initialize it with the parameter.  The ustring will spit out the
+			correct type.  If you extract the same type that was passed, no extra work is done, as the ustring
+			just unwraps the original value.  If you extract a different type, an object of that type is created.</P>
+</UL>
+
+<A NAME="7"><H3>Returning Values</H3></A>
+
+<P>To return a string value, declare the function to return a ustring.
+
+<PRE>
+ustring bar (int index)
+ {
+ CString s;
+ // ... do stuff with s involving dialog boxes or whatever ...
+ return s;
+ }
+</PRE>
+
+Within the function, use whatever concrete string type you choose.  Sometimes a particular string class is especially
+convienient for a particular function, as with this example that wants to use a <code>CString</code> because it makes other
+MFC calls.</P>
+
+<P>In any case, write the function normally, as if your desired string class were the only one in the world.  Then, when
+you return the string (of whatever actual string type you worked with), it will be wrapped in the ustring for
+exporting back to the caller.  The caller can write <code> std::wstring result=bar(5);</code> without caring that
+the function uses Microsoft's MFC strings.</P>
+
+<P>Originally, the <code>ustring</code> class did not allow instances to be copied.  This meant that the simple
+case of 
+<PRE>
+ustring bardone()  { return bar(-1); }
+</PRE>
+could not be written, because the return value from bar needs to be copied again.  Now, such code is legal because
+<code>ustring</code> has a copy constructor that clones the wrapped string.  This is not too terribly ineficient, as it
+only adds a layer of indirection around the copy constructor for the underlying concrete string (which ought to be using
+some kind of reference counting).  But it is even more efficient if you have no need to cascade ustring calls like this.</P>
+
+<P>That is, only use <code>ustring</code>s to form your public interface, and don't pass them around within your
+own implementation.  Within your implementation, use your chosen string type throughout.
+
+<PRE>
+CString bar_internal (int);
+inline ustring bar (int x)  { return bar_internal(x); }
+inline ustring bardone()  { return bar_internal(-1); }
+</PRE>
+
+Although generally a good idea to use your preferred string class consistantly throughout your implementation (rendering
+cascading <code>ustring</code> calls unnecessary), this is not always the natural solution.  For example, you may 
+be using <code>std::string</code> throughout, but some functions want to use <code>CString</code> instead, for 
+interfacing with MFC classes.  Second, for non-trivial operations the extra overhead is not an issue.</P>
+
+<P>So, you <I>can</I> copy a ustring value if you need to, but if used as designed there is rarely the need.</P>
+
+<A NAME="conversion"><H3>Converting Strings Explicitly &mdash; string_cast</H2></A>
+
+<P>So far in this section, we have seen strings converted as a way of marshalling the data between functions
+that may have been written using different string classes.</P>
+
+<P>As we saw in the introduction, the <code>ustring</code> class does more than this.  It can also convert
+between 8-bit and 16-bit character representations, or between ANSI and OEM 8-bit character sets.  Sometimes
+you want to trigger this behavior explicitly.</P>
+
+<P>Obviously, you can do it like this:
+<pre>
+	ustring temp= s;
+	wstring result= temp;
+</pre>
+
+or even
+
+<pre>
+	wstring result= ustring(s);
+</pre>
+
+but a cleaner method is to use the <code>string_cast</code>.
+
+<pre>
+	wstring result= string_cast&lt;wstring&gt; (s);
+</pre>
+
+The <code>string_cast&lt;T&gt;(s)</code> template will convert the argument <code>s</code> (which must be
+of a "string type") to <code>T</code>, using the same mechanism that <code>ustring</code> uses to convert between types.
+This avoids the need to create an intermediate ustring wrapper around <code>s</code> first.
+
+<A NAME="CString_support"><H2>MFC's CString Support</H2>
+
+<P>Among other things, the <code>ustring</code> component converts to and from the MFC <code>CString</code>
+class, as found in AFX.H and used extensivly with the Microsoft Foundation Classes.</P>
+
+<A NAME="CString_notes"><H3>Notes on Microsoft's Class</H3></A>
+
+<P>There is a race condition associated with the "lock" concept.  Given two <code>CString</code>s <code>s1</code> and <code>s2</code>,
+one thread can call <code>s1=s2;</code> while another thread calls <code>s2.LockBuffer();</code>.  The implementation
+does not guarantee that <code>s2</code> will be locked before it's bound into <code>s1</code> (so the assignment sees
+<code>s2</code> as locked), or that <code>s2</code> will be locked after it's bound into <code>s1</code> (so
+ <code>LockBuffer</code> sees that the reference count is greater than 1).  Instead, you
+could wind up with an illegal state where <code>s2</code> is locked but still sharing a reference with <code>s1</code>.
+This will turn into a
+stray pointer bug when either <code>s1</code> or <code>s2</code> replaces its reference or is destructed.</P>
+
+<P>There are race conditions in general when writing to a <code>CString</code>.
+Because the implementation refers to the referenced data well <I>after</I> releasing its ownership (by decrementing
+the reference count), it's possible that all other references could be released, in other threads, in the mean time.  Then
+the first thread will have a stray pointer.  For example, <code>s1=s2;</code> so they share the same reference-counted
+character data; then one thread executes <code>s1.SetAt(index,ch);</code> while another thread executes
+<code>s2=s3;</code>, arguably a totally unrelated operation.  But it's possible for the <code>SetAt</code> call to lose the contents
+of <code>s1</code> before it finishes making its unique copy for the &ldquo;copy on write&rdquo; operation.  This bug is
+general throughout the code.</P>
+
+<P>Although <code>InterlockedIncrement</code> and <code>InterlockedDecrement</code> is used for the
+reference count itself, it is by no means safe to manipulate the same reference-counted object in two threads at
+the same time.  Since different <code>CString</code> objects may refer to the same underlying data, it is generally 
+unsafe to use the <code>CString</code> class from more than one thread.  Microsoft's use of atomic counters for the 
+reference count gives a false impression that the class is thread-safe</P>
+
+<P><code>CString</code>s don't work with standard output.  For some reason, there is no <code>operator&lt;&lt;</code>
+defined for it.   If you write:
+<pre>
+CString message= _T("hello world!");
+std::cout &lt;&lt; message;
+</pre>
+You will get no compiler error, but a very strange result.  It displays a large numeric value (an address?) in hex
+rather than the contents of the string!</P>
+
+<P>In order to display the <code>CString</code>, you can write:
+<pre>
+std::cout &lt;&lt;  LPCTSTR(message);
+</pre>
+instead, which uses the operator <code>TCHAR</code> conversion to display the underlying <code>char*</code> data.
+However, the use of the "T" generic types is misleading here, because it doesn't work if compiled under Unicode.  The line above
+prints an address, not the string, if <code>TCHAR</code> is a <code>wchar_t</code>.  This is not because the standard
+library correctly does not have an output operator for a nul-terminated <code>wchar_t</code> on a narrow stream, but 
+rather because it <I>does</I> have a non-standard output operator for this case which doesn't work.  Presumably it
+has something to do with the fact that <code>wchar_t</code> isn't a distinct type like it's supposed to be.</P>
+
+<P>In the testing program <code>ustring_test_CString.cxx</code> this is worked-around by defining
+a proper output operator for <code>CString</code> as part of the program.</P>
+
+<A NAME="use_CString"><H3>Using CString with ustring</H3></A>
+
+<P>In order to use <code>CString</code> with the ustring conversion system, simply include <code>AFX.H</code> (or something
+else that pulls it in), which contains the class definition for <code>class ::CString</code>, before 
+including <code>classics\ustring.h</code>
+(or anything else that pulls it in).</P>
+
+<P>Note that <code>CString</code> deals either with wide or narrow characters depending on conditinoal compilation
+within the <code>AFX.H</code> header file.  You can't have both wide and narrow <code>CString</code>s in the same program
+as you can with other string classes.  The <code>ustring.h</code> header file notes the current option and treats <code>CString</code>
+as wide or narrow, as indicated.</P>
+
+<P>For examples, see the unit test program <code>classics\ustring_CString_test.cxx</code>.</P>
+
+<H3>How it Works</H3>
+ 
+<P>The <code>classics.dll</code> is not dependant on the MFC dlls.  That would have been undesirable, not only because such
+a dependancy is unwelcome in the general case, but the conditional compilation nature of <code>CString</code> means
+that there are <I>different</I> dll's depending on whether you compile MFC for wide or narrow strings, and
+you can't link to both of them.  Not only would Classics also have to come in two flavors as well, but then it would
+reference a specific version of MFC rather than being compatible with any version.</P>
+
+<P>So, Classics contains a small file that essentially clones Microsoft's <code>CString</code> class.  It knows the structure
+layout and the manner in which the reference counting works and the manner in which data is maintained within
+the string.  The <code>ustring::awareness</code> object (which is the only code that knows about specific string types) for
+<code>CString</code> then uses this code instead of code found in <code>MFCS42u.dll</code> (or whereever).</P>
+
+<P>As far as the <code>ustring.h</code> class is concerned, it uses the <code>MFC_CString&lt;T&gt;</code> parameterized type (unlike 
+Microsoft's, it allows wide and narrow objects to co-exist) and doesn't care that such has objects that are identical
+with <code>::CString</code>'s on a binary level.</P>
+
+<P>Meanwhile, if <code>AFX.H</code> has been included (therefore, <code>CString</code> is defined), a couple of inline functions are
+conditionally compiled-in to ustring.h.  These (one for setting, one for getting) simply cast the <code>CString</code> object
+into the internal type, or vice versa, and generate no actual code.</P>
+
+<P>The result is transparent <code>CString</code> support on demand, with all support code located inside the <code>classics.dll</code>
+rather than expanded into the calling program (via inline functions or templates).</P>
+
+
+
+<A NAME="4"><H2>Adding Support for Additional String Classes</H2></A>
+
+<P>The <code>ustring</code> class is extensible, in that you can add support for additional string types.
+To do this, you supply an overloaded <code>get_string_awareness</code> function defined for your
+type.</P>
+
+<A NAME="awareness"><H3>Creating the Awareness Object</H3></A>
+
+<P>In order to inform the <code>ustring</code> component about your type (say, <code>SillyString</code>),
+you declare an overloaded form of the <code>get_string_awareness</code> function.  This
+overloaded form will be found when the <code>get_as</code> or <code>set_as</code> template is invoked, so the library
+will receive the correct <code>awareness</code> object.</P>
+
+<pre>
+const ustring::awareness_t* get_string_awareness (const SillyString*);
+</pre>
+
+<P>So just what is an <code>awareness</code> object?  That's an adaptor or interface of sorts that
+tells the ustring how to manipulate the thing its wrapping.  You must derive from the abstract base class
+<code>ustring::awareness_t</code>, and provide definitions for several pure virtual functions that
+describe how to manipulate the string.</P>
+
+<P>Implementing the concrete awareness class is simple.  In general, you cast the <code>void*st</code> argument (the 
+"black box" being held by the ustring wrapper) into the actual string class, in this example a <code>SillyString*</code> and
+then do the corresponding operation on that object.  For example,</P>
+
+<PRE>
+class SillyString_awareness : public ustring::awareness_t {
+   int length (const void* st) const
+    {
+    const SillyString* s= static_cast&lt;const SillyString*&gt;(st);
+    	//first cast st to my actual type
+    return s->elcount();
+    	//then perform the operation.
+    }
+</PRE>
+
+<P>This section is not yet finished.</P>
+
+<A NAME="create_header"><H3>Create the Custom Header</H3>
+
+<P>This section has not yet been written.</P>
+
+</BODY>
+</HTML>
+

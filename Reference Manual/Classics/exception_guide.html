@@ -1,0 +1,380 @@
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=windows-1252">
+<TITLE>exception user’s guide</TITLE>
+<LINK REL=STYLESHEET HREF="../info.css" TYPE="text/css">
+</HEAD>
+
+<BODY>
+<H1>exception user’s guide</H1>
+<!-- Standard banner at top of Reper file -->
+<P CLASS="banner">
+This document is one section of The Repertoire Reference, found at
+<A HREF="http://www.dlugosz.com/Repertoire/refman/mainframe.html" TARGET="_top">
+http://www.dlugosz.com/Repertoire/refman/mainframe.html</A>.<BR>
+Copyright 2004 by <A HREF="mailto:john@dlugosz.com">John M. Dlugosz</A>.
+</P>
+<A NAME="toptop">
+<!-- end of standard banner -->
+
+<UL>
+Read about:</P>
+<LI><A HREF="#1">Concept</A>
+<LI><A HREF="#2">Basic Usage</A>
+<LI><A HREF="#3">Detailed Structure</A>
+<LI><A HREF="#4">Showing the Exception</A>
+<LI><A HREF="#5">Extracting Information</A>
+<LI><A HREF="#6">Auto-logging Additional Values</A>
+	<UL>
+	<LI><A HREF="#6.1">The Problem with Encapsulation</A>
+	<LI><A HREF="#6.2">The Setup Hook</A>
+	<LI><A HREF="#6.3">Dynamic Scoped Callbacks</A>
+</UL>
+
+
+
+
+
+<A NAME="1"><H2>Concept</H2></A>
+
+<P>The <code>classics::exception</code> class provides a way to signal errors and preserve useful logging
+information concerning the nature of the error.</P>
+
+<P>This class embodies an error handling system that’s built around these two design principles:
+<UL>
+	<LI>Detailed information (file names, values in a calculation, etc.) should be presented as part
+	of the error message.  That is, don’t just say “Error opening file”, say <i>which</i> file could
+	not be opened.</P>
+	<LI>Both high-level and low-level information is useful to understanding the error.  For example,
+	an error that “swap2.tmp could not be opened” doesn’t tell the user anything.  What is that file
+	for, and why is the program trying to open it?  Propagating up, higher level information tells you
+	what the program was doing that caused this problem.  E.g. formatting data for a print preview.
+</UL>
+
+<A NAME="2"><H2>Basic Usage</H2></A>
+<P><A NAME="example_1">Here is how the exception class is meant to be used.</A></P>
+
+<P>When an error occurs, create an exception object.  The constructor takes general demographic
+information.  Then add formatted text into the error object detailing the situation.  Finally, throw the
+error object.</P>
+
+<pre>
+void* data_t::access (int index)
+ {
+ if (index &gt;= Count || index &lt; 0) {
+    <B>classics::exception X ("Classics", "Subscript Error", __FILE__, __LINE__);
+    wFmt(X) &lt;&lt; L"The subscript " &lt;&lt; index &lt;&lt; L" is not &gt;=0, &lt;" &lt;&lt; Count &lt;&lt; endl;
+    throw X;</B>
+    }
+ return (index*Elsize) + static_cast&lt;byte*&gt;(Data);
+ }
+<!-- original text:
+void* data_t::access (int index)
+ {
+ if (index >= Count || index < 0) {
+    classics::exception X ("Classics", "Subscript Error", __FILE__, __LINE__);
+    wFmt(X) << L"The subscript " << index << L" is not >=0, <" << Count << endl;
+    throw X;
+    }
+ return (index*Elsize) + static_cast<byte*>(Data);
+ }
+-->
+</pre>
+
+First construct the error object:
+<pre>
+    classics::exception X ("Classics", "Subscript Error", __FILE__, __LINE__);
+</pre>
+The first argument is the “module”.  This identifies which software component or subsystem is reporting this
+error.  I note here which library (Classics, RatWin, Tomahawk, Conquer) is involved.</P>
+
+<P>The second argument is the title of the error.  This should be a short name.</P>
+
+<P>The last two arguments specify the location of the error.  Here, the standard pseudo-macros are used
+to note the actual file name and line number.</P>
+
+<P>The second line is a bit more complicated.
+<pre>
+    wFmt(X)
+    	&lt;&lt; L"The subscript "
+    	&lt;&lt; index
+    	&lt;&lt; L" is not &gt;=0, &lt;"
+    	&lt;&lt; Count
+    	&lt;&lt; endl;
+<!-- original text:
+    wFmt(X)
+    	<< L"The subscript "
+    	<< index
+    	<< L" is not >=0, <"
+    	<< Count
+    	<< endl;
+-->
+</pre>
+
+The first part, <code>wFmt(X)</code>, starts things off.  This creates a temporary formatting object, as explained under
+string formatting.</P>
+
+<P>Various values and modifiers can be sent to the formatting object using the familiar &lt;&lt; syntax.  In particular,
+the example uses <code>endl</code> to terminate the information.  However, line breaks in the formatted text is
+just part of the formatted text, and is not necessary to the internal representation of the exception object.</P>
+
+<P>Note that text literals are prefixed with the <code>L</code> symbol.  This is because <code>wFmt</code> is a <i>wide</i>
+formatting stream, and can take Unicode strings.  Although designed to accept plain string literals as well,
+the compiler had some problems with it.  As shipped (public build 5 compiled under VC5), plain character literals will not give any warnings but will
+be treated no differently than a <code>void*</code> or object pointer&mdash; it will print the hex value of the address, not the contents
+of the string.</P>
+
+<P>A derived class exists specifically for Win32 errors.  The <code>classics::win_exception</code> can be constructed
+with an error code number, and it will automatically add the text corresponding to that error.  Easier yet, you can
+leave off the value and the constructor will call Win32’s <code>GetLastError</code> itself.</p>
+
+<P>Eventually, you need to catch the error.  When you do, the member <code>value()</code> will return a <code>ustring</code>
+containing all the error information.  This information is in a <A HREF="exception.html#value">delimited report</A>,
+so you can parse out the various fields to produce a nice display.  The raw string is sort of readable, as it contains
+all the information you put into the object plus control-code delimiters.</P>
+
+<P>A step beyond <code>value()</code>, which just gets the string, is a registered function to display the
+error for the user.  The <code>show()</code> function will do this.  So, upon catching an exception, you just
+have to call <code>show</code>.
+<pre>
+	try {
+	   ...
+	   }
+	catch (classics::exception&amp; X) {
+	   X.show();
+	   }
+<!-- original text:
+	try {
+	   ...
+	   }
+	catch (classics::exception& X) {
+	   X.show();
+	   }
+-->
+</pre>
+
+<A NAME="3"><H2>Detailed Structure</H2></A>
+
+The second design goal states that both high-level and low-level information
+should be presented.  Generally, as stack unwinding takes place, error information
+can be refined.  For example, the point where the error actually occurred will tell
+you about some low-level detail, such as “File foo.tmp cannot be opened”.  What does
+that mean to the user?  Not much.  What is this file, and why was the program trying
+to open it?  So, a higher-level part of the program catches the error and adds
+more information, say “A temporary file for record swapping could not be created.”.
+This is better, but still doesn’t tell the user what he needs to know.  But,
+again more information is added by a higher-level part of the program as stack
+unwinding takes place, saying “Error sorting the database”.</P>
+
+<P>Unlike other error systems where low level errors are replaced by higher level
+errors, all the information is preserved.  The exception in this example will contain
+three <I>stanzas</I>, each a complete error record.  The user can see what operation
+failed, what low-level detail was the actual cause of the problem, and everything
+in between, allowing him to understand the connection between the high-level operation
+and the nuts and bolts of the actual failure.</P>
+
+<P>Each stanza is a complete error record, containing both structured values and
+unstructured text.  The structured values are like a program’s environment block,
+containing a list of named strings.  Every stanza will contain the module,
+name, file, and line information (provided by the constructor or <code>operator()</code>)
+as structured values.  The unstructured text is just plain text, and can contain
+any information you desire.  Generally this will be details about the operation
+that failed.</P>
+
+<P>In the <A HREF="#example_1">example</A> in the Concept section, the resulting
+stanza will look something like this:
+
+<UL>
+	<LI>Structured Information
+		<UL>
+			<LI><code>module=Classics</code>
+			<LI><code>name=Subscript Error</code>
+			<LI><code>file=example.cpp</code>
+			<LI><code>line=147</code>
+		</UL>
+	<LI>Free Text
+		<UL>
+			<code>The subscript 27 is not &gt;=0, &lt; 20.</code>
+		</UL>
+</UL>
+
+The free-formatted text, any text, may be added using the <code>+=</code> operator or
+the <code>wFmt</code> feature as seen in the example.  Additional named values can
+be added using <A HREF="exception.html#add_key"><code>add_key</code></A>, as in
+
+<pre>
+X.add_key (L"Thread ID", ThreadID);
+X.add_key (L"foozle", as_wstring(foozle));
+</pre>
+
+<P>The value should be a simple value of some kind, not an elaborate
+formatted string.  The <code>add_key</code> function has two overloaded
+forms:  one takes a <code>ustring</code>, the other an <code>int</code>.
+For anything else, use <code>as_wstring</code><A 
+HREF="#footnote1" TARGET="footer"><SUP><FONT SIZE=-2>1</FONT></SUP></A> to produce a string value.
+
+<A NAME="4"><H2>Showing the Exception</H2></A>
+
+<P>A fundimental thing you'll want to do with an exception object is present it to the user for 
+viewing.  To do this, simply call the <A 
+HREF="exception.html#show"><code>show</code></A> member of the exception object.</P>
+
+<pre>
+catch (classics::exception&amp; X)
+   {
+   X.show();
+   }
+</pre>
+
+<P>So just what does <code>show</code> do?  That really depends on the nature of the program. 
+A command-line utility needs to write to the standard error stream, and a GUI-based program should
+display the information in a manner consistant with the user interface of the program.</P>
+
+<P>In order to decouple the exceptions from the program containing them, this mechanism needs to be 
+definable elsewhere.  A simple way is used here:  The <code>show_function</code> static member 
+points to the function which displays the error.  By default, this will send output to the standard error 
+stream.  The main program can repoint it to use any desired mechanism.</P>
+
+<A NAME="5"><H2>Extracting Information</H2></A>
+
+The information in the exception is a formatted string.  You could parse this 
+up into individual fields as documented under <A 
+HREF="exception.html#value"><code>value</code></A>, but this is a 
+pain.  Naturally, code is already supplied to do this, both in the <code>exception</code>
+itself and packaged as class <code>exception::iterator</code>.</P>
+
+<P>You will want to extract information either because you are writing a “show” 
+function, or because code wants to inspect (and react to) values found in the
+exception.  For example,
+
+<pre>
+catch (classics::exception&amp; X)
+   {
+   string errval= X.get_value ("GetLastError");
+   // ...
+   }
+</pre>
+
+If the thrower included a named value as such:
+<pre>
+X.add_value ("GetLastError", ::GetLastError());  //Win32 error code
+</pre>
+
+(which the <code>win_exception</code> derived class does automatically), then the catcher 
+can obtain this value as shown here.  Note that <code>get_value</code> always returns a 
+string, and it's up to the caller to deal with it as such, or turn it into a 
+number.  Also, the caller will need to cope with the possibility of an empty 
+return string, or with multiple values concatenated together (see the 
+reference for details).</P>
+
+<P>For something that’s more elaborate, as well as more efficient when more 
+than one value is needed, the <code>iterator</code> can chop up the exception 
+into individual stanzas and then return information on each stanza without 
+having to re-parse each time.
+
+<A NAME="6"><H2>Auto-logging Additional Values</H2></A>
+
+<H3 ID="6.1">The Problem with Encapsulation</H3>
+
+The <i>throw</i> point can place any information it wants into the exception object.  
+Various intermediate points can catch the exception, add additional 
+information, and re-throw it.  Presumably, this allows complete information to 
+be present in the resulting caught object.</P>
+
+<P>Well, it doesn’t.  Consider values that are useful to your program, but are 
+unknown to the low-level code doing the throwing.  This would be cumbersome to 
+add intermediate catches simply to report these values, but it doesn’t always 
+work either!  Consider what happens if something is handled below the level at 
+which the information is known.</P>
+
+<P>For an example, consider putting the “document name” in each exception, 
+since the program will have multiple documents open at one time.  However, 
+lower level code doesn’t know or care how it was invoked, or which document it’s 
+being called to work on.  So how does this information get into the exception 
+object?</P>
+
+<pre>
+void deeper()
+ {
+ exception X ("demo", "This is a planned failure", __FILE__, __LINE__);
+ <B>throw X</B>;
+ }
+
+void deep()
+ {
+ try {
+    deeper();
+    }
+ <B>catch</B> (exception&amp; X) {
+    X.show();
+    // exception handled here.
+    }
+ }
+
+void toplevel()
+ {
+ string docname="foobar.txt";
+ //...
+ try {
+    deep();
+    }
+ catch (exception&amp; X) {
+    X.add_value ("document name", docname);
+    throw;
+    }
+ }
+</pre>
+
+The catch in <code>toplevel</code> knows the information, but the exception is handled 
+before the stack unwinds to this point.  So, when <code>show()</code> is called, the user 
+does not get to see this information.</P>
+
+<H3>Getting Outer-Scope Information</H3>
+
+<P>To address this issue, the <code>exception</code> class includes features that allow
+unknown things to be logged at the point the exception is created.</P>
+
+<H4 ID="6.2">The Setup Hook</H4>
+
+<P>The simpler of the two mechanisms is the setup hook.</P>
+<P>The setup hook allows the application to change the construction work of <I>all</I> exceptions, even
+those created by lower-level code, code in DLL’s that have already been compiled, etc.  Details are
+described in the documentation for <A HREF="exception.html#setup_hook"><code>setup_hook</code></A>.
+
+
+<H4 ID="6.3">Dynamic Scoped Callbacks</H4>
+
+ 
+<P>When an exception is created, all existing callbacks are called.  The callbacks 
+add this information to the exception object.  A helper class 
+<A HREF="exception_register_callback.html" class="code">exception::register_callback</A> will register the callback when 
+constructed and revoke it when destructed.</P>
+
+<pre>
+void toplevel()
+ {
+ string docname="foobar.txt";
+ exception_value_logger&lt;string&gt; logger ("document name", docname);
+ <B>exception::register_callback</B> xx1 (logger);
+ //...
+ deep();
+ }
+</pre>
+
+Now any time an exception object is constructed, <code>logger</code> will be triggered, and 
+it adds the desired information.  Just declare an 
+<A HREF="exception_register_callback.html" class="code">exception::register_callback</A> 
+object in the same scope as the variable to be watched, and the rest is 
+automatic.
+
+
+
+<HR SIZE=20 COLOR="black">
+<H2>Footnotes</H2>
+<A NAME="footnote1"><B>Note 1:</B></A>
+Either <code>as_string</code> or <code>as_wstring</code> will do, but <code>as_wstring</code> is more efficient 
+because the internal implementation uses wide strings.</P>
+
+</BODY>
+</HTML>
+

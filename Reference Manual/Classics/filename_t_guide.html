@@ -1,0 +1,131 @@
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=windows-1252">
+<TITLE>filename_t User's Guide</TITLE>
+<LINK REL=STYLESHEET HREF="../info.css" TYPE="text/css">
+</HEAD>
+
+<BODY>
+<H1>filename_t Users Guide</H1>
+<P>The <code>filename_t</code> is a class to manipulate file names.</P>
+
+<H2>Overview</H2>
+
+<P>A file name is typically manipulated in certain ways, unlike a typical
+string.  Strings will have characters inserted or removed in arbitrary
+position.  File names, on the other hand, are treated in a more
+structured manner:  you will back up to a parent directory, change
+the extension, replace <code>".."</code> and <code>"."</code> parts, and so on.</P>
+
+<P>This class faciliates this by treating a file name as a high-level object.</P>
+
+Read about:</P>
+<!-- CONTENTS --!>
+<!-- END CONTENTS --!>
+
+<A NAME="1"><H2>Parts of a File Name</H2></A>
+
+<P>The file name's string is broken down into <I>parts</I>.</P>
+
+<P>Conceptually, a file name is not a string of characters but is a
+list of parts.  For example, "C:\foo\bar\baz.txt" is made up of
+four parts:, "C:", "foo", "bar", and "baz.txt".  Backing up to the
+parent directory is simply a matter of removing the last path part.</P>
+
+<P>This class recognises three different kinds of parts.  The <B>prefix</B>
+part comes first.  It can be the drive letter ("D:"), share name ("\\Server"), or 
+network service ("http:").</P>
+
+<P>The <B>path</B> parts are the various subdirectories.</P>
+
+<P>The <B>name</B> part is the actual name, and follows the path parts
+if the filename names a file rather than a subdirectory.  "D:\foo\bar.txt" has
+a name part of "bar.txt", but "D:\foo\" has no name part.</P>
+
+<P>In addition, the class supports the concept of multiple name parts.
+For example, "D:\foo\*.exe;*.dll;*.ocx" has three name parts.</P>
+
+
+
+
+<A NAME="3"><H2>The filesystem_t class</H2></A>
+
+<P>The <code>filename_t</code> class uses a helper class to supply details of the parsing
+and some control over the file system (e.g. the <code>exists()</code> function).</P>
+
+<P>The concrete class derived from <code>filesystem_t</code> contains the code to
+split up a string into the various parts.  Since each <code>filename_t</code>
+object contains its own <code>filesystem_t</code>, each instance can
+handle any kind of "name" independently of the others.</P>
+
+<P>The PC Filesystem parser handles file names where the parts are
+separated by backslashes, and takes care of drive letters and UNC names.</P>
+
+<P>The URL Filesystem parser, on the other hand, separates parts
+with forward slashes, and handles the <code>"http://"</code> prefix which is slightly
+different than a drive letter syntax.</P>
+
+<P>In addition, the <code>filesystem_t</code> object is responsible for things
+such as checking to see if a file exists and fully-qualifying a file name.</P>
+
+
+<A NAME="groups"><H2>Members By Category</H2></A>
+
+<A NAME="2"><H3>Getting and Setting Parts</H3></A>
+
+Much of what you want to do with a file name involves getting and
+setting <A HREF="#1">parts</A>.
+
+<P><A class="code" style=font-weight:bold HREF="filename_t.html#text">text</A>
+&mdash;Gets the whole thing as a string.  To set the whole thing, use assignment.</P>
+
+<P><A class="code" style=font-weight:bold HREF="filename_t.html#prefix">prefix</A>,
+<A class="code" style=font-weight:bold HREF="filename_t.html#set_prefix">set_prefix</A>
+&mdash;Gets or sets the prefix part.</P>
+
+<P><A class="code" style=font-weight:bold HREF="filename_t.html#path">path</A>,
+<A class="code" style=font-weight:bold HREF="filename_t.html#set_path">set_path</A>,
+<A class="code" style=font-weight:bold HREF="filename_t.html#path_range">path_range</A>,
+<A class="code" style=font-weight:bold HREF="filename_t.html#path_count">path_count</A>,
+<A class="code" style=font-weight:bold HREF="filename_t.html#set_path_range">set_path_range</A>
+&mdash;Gets or sets the path parts.</P>
+
+<P><A class="code" style=font-weight:bold HREF="filename_t.html#name">name</A>,
+<A class="code" style=font-weight:bold HREF="filename_t.html#set_name">set_name</A>,
+<A class="code" style=font-weight:bold HREF="filename_t.html#name_count">name_count</A>,
+<A class="code" style=font-weight:bold HREF="filename_t.html#remove_name">remove_name</A>
+&mdash;Gets or sets the name parts.</P>
+
+<A NAME="4"><H3>Higher Level Manipulation</H3></A>
+
+<P>Beyond the simple getting and setting of parts, there are functions
+for higher-level manipulation of file names.</P>
+
+<P><A class="code" style=font-weight:bold HREF="filename_t.html#common_root">common_root</A>
+&mdash;"D:\foo\bar.txt" and "D:\foo\subdir\baz.html"
+have a common root of "D:\foo\".</P>
+
+<P><A class="code" style=font-weight:bold HREF="filename_t.html#concat">concat</A>
+&mdash;This is a fancy "change directory" feature.  Concat'ing a relative path
+onto an existing path will apply that subdirectory; see the reference for
+other cases.</P>
+
+<A NAME="5"><H3>File System Aware Operations</H3></A>
+
+<P><A class="code" style=font-weight:bold HREF="filename_t.html#fully_qualify">fully_qualify</A>
+&mdash;This takes a relative or otherwise abbreviated path name and
+produces the fully-qualified name for the file.</P>
+
+<P><A class="code" style=font-weight:bold HREF="filename_t.html#exists">exists</A>
+&mdash;This tests for the existance of the file or directory.</P>
+
+<P><A class="code" style=font-weight:bold HREF="filename_t.html#assure_path_exists">assure_path_exists</A>
+&mdash;This creates multiple tiers of a subdirectory, if necessary, to
+assure that the path part of this filename exists.</P>
+
+<A NAME="6"><H2>Multiple Name Parts</H2></A>
+Multiple names are not fully implemented.
+
+</BODY>
+
+</HTML>

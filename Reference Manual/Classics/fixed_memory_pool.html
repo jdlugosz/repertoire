@@ -1,0 +1,272 @@
+<HTML>
+  
+  <HEAD>
+    <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=windows-1252">
+    <TITLE>fixed_memory_pool complete documentation</TITLE>
+    <LINK REL="STYLESHEET" HREF="../info.css" TYPE="text/css">
+  </HEAD>
+  
+  <BODY>
+<!-- Standard banner at top of Reper file -->
+<P CLASS="banner">This document is one section of The Repertoire Reference, found at
+      <A HREF="http://www.dlugosz.com/Repertoire/refman/mainframe.html" TARGET="_top">http://www.dlugosz.com/Repertoire/refman/mainframe.html</A>.<BR>
+       Copyright 1998 by <A HREF="mailto:john@dlugosz.com">John M. Dlugosz</A>.
+    </P> 
+<A NAME="toptop"></A>
+<!-- end of standard banner -->
+    
+    
+<H1>static_fixed_memory_pool and ts_static_fixed_memory_pool</H1>
+
+<P>The <CODE>static_fixed_memory_pool</CODE> manages an <A HREF="#performance">efficient</A> heap of
+fixed-size objects. Since all instances of a class are the same size, this
+is ideal for implementing a class-specific <CODE>operator new</CODE> and
+<CODE>operator delete</CODE>.</P>
+
+<!-- CONTENTS -->
+	<UL>
+		<LI><A HREF="#1">General</A>
+		<LI><A HREF="#2">Using as a class-specific memory manager</A>
+		<UL>
+			<LI>Implement operator new and operator delete
+			<LI>A canned Solution
+		</UL>
+		<LI><A HREF="#3">Testing and Debugging</A>
+		<LI><A HREF="#performance">Performance</A>
+	</UL>
+<!-- END CONTENTS -->
+    
+<A NAME="1"><H2>General</H2></A>
+    
+    <P>The <CODE>static_fixed_memory_pool</CODE> class is not thread-safe (it
+      has <A HREF="../threadcat.html">I-OTT</A> semantics), because a class
+      that is itself OTT or higher may draw upon it, and thread safety is
+      unnecessary in this situation. The purpose of this class is to be fast,
+      and the presence of a critical section slows it down enormously because
+      it's so simple to begin with.</P>
+    
+    <P>The <CODE>ts_static_fixed_memory_pool</CODE> is a thread-safe version.
+      Use this to allow safe free-threaded access to the heap.</P>
+    
+    <P>These classes are specially designed for use as class-specific memory
+      managers, especially for primitive types used deep inside the system (such
+      as the smart pointer's internals). To this end, it <I>must</I> be usable
+      at any time, even before Classics' static variables have constructed, even
+      before Classics' DllMain has been called.</P>
+    
+    <P>Because it will appear as a static member of such a class, it can't be
+      set up using a constructor because that would mean the heap can't be used
+      before its own static constructor is called. So there is no constructor at
+      all, and the implementation relies on all-zero initialization of static
+      objects at image load time. That is why it's named <CODE><B>static</B>_fixed_memory_pool</CODE>,
+      to emphasize that it's designed for use as a static member.</P>
+    
+    <P>In addition, the class provides some minimal support for auditing and
+      debugging memory leaks, without adding significantly to the overhead or
+      requiring a special debug version.</P>
+    
+    <P>As mentioned above, there is no constructor. An instance must be
+      declared as a static variable or static member, or explicitly filled with
+      zeros, in order to work properly.</P>
+    
+    <P>To allocate memory, call <B><CODE>void* alloc(int size)</CODE></B>.
+      The <CODE>size</CODE> parameter is only significant the first time alloc
+      is called! This finishes up the self-initialization of the heap,
+      programming it with the size of the object it will be managing. Subsequent
+      calls must use the same size.</P>
+    
+    <P>To free memory, call <B><CODE>void free(void*)</CODE></B>.</P>
+    
+    <P>In addition, there is a <B><CODE>void clean()</CODE></B> function that
+      tries to release unneeded memory back to the system. The ability to
+      support this kind of incremental cleaning is fundamental to the design. To
+      understand the need, consider an example: you have a peak load of a
+      million nodes, but then traffic slows down and you only need a thousand.
+      But there are still 900,000 unused nodes on its internal free list. Most
+      fixed-size heaps (including that of STL) have no provision to release this
+      memory until <I>all</I> nodes are freed. But in this case, a large number
+      of nodes (though not all the unused nodes) can be released back to the
+      system.</P>
+    
+<A NAME="2"><H2>Using as a class-specific memory manager</H2></A>
+    
+<P> The <CODE>static_fixed_memory_pool</CODE> (and <CODE>ts_static_fixed_memory_pool</CODE>)
+      class is specifically meant to be used to implement a class-specific
+      allocator. </P>
+    
+    <H3>Implement operator new and operator delete</H3>
+    
+<P>You can use it directly, implementing a class's <CODE>operator new</CODE> and
+<CODE>operator delete</CODE> to use the a fixed memory pool. Since it was
+designed for this use in mind, it is rather simple:</P>
+
+<PRE>
+class C {
+public:
+   static ts_static_fixed_memory_pool <B>pool</B>;
+   static void* <B>operator new</B> (size_t size) { return pool.alloc (size); }
+   static void <B>operator delete</B> (void* p)  { pool.free(p); }
+   //...etc.
+</PRE>
+    
+<P>The basic principle is to implement <CODE>operator new</CODE> and
+<CODE>operator delete</CODE> to simply call the <CODE>alloc</CODE> and
+<CODE>free</CODE> functions of a <CODE>static_fixed_memory_pool</CODE>
+object.</P>
+    
+<P>Typically, the <CODE>static_fixed_memory_pool</CODE> object will be
+intended for use with this one class alone, so that can be declared as a
+static member of the class, too (remember to define it in a .CPP file
+somewhere). However, you could have more than one class share the same
+<CODE>static_fixed_memory_pool</CODE> object, as long as they are all the
+same size.</P>
+    
+<H3>A canned Solution</H3>
+    
+<P>It would seem that adding three members to a class, especially when
+exactly the same text is used every time, is something that can be
+provided as a unit. There are actually some technical difficultites in
+doing this, but a mix-in class <CODE>pool_mixin</CODE> (and <CODE>ts_pool_mixin</CODE>
+for the thread-safe version) is provided for this purpose.</P>
+    
+<P>Ideally, the class simply contains the same three members discussed
+above. To use it, make it a base class and all three members get added to
+your class.</P>
+    
+<P>That's the theory anyway. The technical problem is that if it were done this way,
+all classes using the mix-in would share the same static data
+member. That will not work. Instead, each class needs its own <CODE>fixed_memory_pool</CODE>,
+which means it must declare its own static data member. To get around
+this, each class can mix-in a <I>different</I> base class. This is easily
+done with a template. This example usage can be found in
+<code>memory_pool_benchmark.cxx</code>:</P>
+
+<PRE>
+class C2 : public <B>classics::pool_mixin</B>&lt;C2&gt; {
+   const void* addr;
+   int value;
+public:
+   C2 (int x) : addr(this), value(x) {}
+   };
+</PRE>
+
+<P>The template argument given to <code>pool_mixin</code> doesn't do anything.  It's just there
+to allow the use of a template to generate as many unique base classes as may be needed.  Each
+different value for the template parameter produces a different specialization of <code>pool_mixin</code>, and
+therefore a different static data member.</P>
+
+<P>Use the class itself as the template parameter, and you know it will be different in every class.</P>
+
+<P>As seen in the memory_pool_benchmark.cxx example program, this is easy to use and works
+properly in an application program.  However, there is a serious restriction on its use due to the way
+templates work in the compiler.</P>
+
+<P>The template's members are instantiated in each translation unit (.CPP file) in which they are needed.
+The linker then eliminates duplicates.  When defining a normal static member, you declare it in the
+header file inside the class, but still have to define it in one .CPP file.  For the classes generated by
+the templates, there is no "one place" where the static member is defined.</P>
+
+<P>In a single program, this is not a problem, since all you care is that one exists somewhere.  But
+a program with DLL's is actually linked as several independent execution image files.  Each DLL will
+contain its own copy of the static member.  Doing it manually, you can define it in one DLL and import
+it into all the others.  For the classes generated by the template, you get a copy in each DLL and in
+the main EXE.  So, if <code>operator new</code> is invoked in one DLL (or the main EXE) and 
+<code>operator delete</code> is invoked in a different one, things won't work right.</P>
+
+<P>The bottom line:  Use this mix-in in a code that will go into the EXE only; that is, when writing a program.
+Think carefully before using it when writing a DLL.  Since the use of the mix-in only saves four simple lines
+of code, it's not worth coming up with a better and more complex solution.</P>
+    
+<A NAME="3"><H2>Testing and Debugging</H2></A>
+    
+    <P>We all know that sometimes using the &quot;debug version&quot; makes the
+      problem go away, and Classics follows the philosophy of &quot;The first
+      rule of testing is build something testable.&quot; </P>
+    
+    <P>In order to test this class, a debugging hook is provided. The member
+      <CODE>callback</CODE> points to a function which will be called at
+      various strategic points in the class's execution. This provides a way to
+      monitor the class's behavior, without causing a significant amount of
+      additional overhead when the hook is not needed.</P>
+    
+    <P>An example can be found in <CODE>handle_UT.cxx</CODE>. The line <BR>
+    <CODE>classics::lifetime::pool.callback=
+      callback;</CODE><BR>
+      if un-commented, will enable callbacks to this function:</P>
+
+<PRE>
+void callback (int mode, void* p)
+ {
+ static bool internal= false;
+ static int counter= 0;
+ counter++;
+ switch (mode) {
+    case 1:
+       if (!internal)  cout &lt;&lt; &quot;mem &quot; &lt;&lt; p &lt;&lt; &quot; alloc [&quot; &lt;&lt; counter &lt;&lt; &quot;]\n&quot;;
+       break;
+    case 2:
+       if (!internal)  cout &lt;&lt; &quot;mem &quot; &lt;&lt; p &lt;&lt; &quot; free  [&quot; &lt;&lt; counter &lt;&lt; &quot;]\n&quot;;
+       break;
+    case 3:
+       internal= true;
+       break;
+    case 4:
+       internal= false;
+       break;
+    }
+ }
+</PRE>
+    
+    <P>Calls with code values of 1 and 2 indicate allocations and frees,
+      respectively, as you can see from the implementation of <CODE>fixed_memory_pool::alloc</CODE>
+      and <CODE>fixed_memory_pool::free</CODE>. Values of 3 and 4 are more
+      difficult to understand. If you study the implementation of <CODE>fixed_memory_pool::newchunk</CODE>,
+      you can see that these calls bracket the calling of <CODE>alloc</CODE> or
+      <CODE>free</CODE> that is not a direct result of the user's request. In
+      the sample reporting code above, they turn reporting off and back on
+      again.</P>
+
+<A NAME="performance"><H2>Performance</H2></A>
+
+<P>Why bother using a custom allocator in a class?  Run <code>memory_pool_benchmark.cxx</code> and
+you'll find out that the fixed memory pool is <I>much</I> faster than the standard new/delete code.  On my
+machine, I get:</P>
+
+<TABLE BORDER>
+<TR>
+	<TH>version<TH>time<TH>adj. time<TH>relative speed
+<TR>
+	<TD>stub (no allocation)
+	<TD>40
+	<TD>0
+<TR>
+	<TD>regular new/delete
+	<TD>2733
+	<TD>2693
+	<TD>defined as 1
+<TR>
+	<TD>fixed pool
+	<TD>260
+	<TD>220
+	<TD>12 ¼ ×
+<TR>
+	<TD>thread-safe fixed pool
+	<TD>1090
+	<TD>1050
+	<TD>2 ½ ×
+</TABLE>
+
+<P>This benchmark is rather generous toward the performance of the regular memory manager.  Because
+nearly a million calls were made to allocate and free the same sized block, the heap became filled
+with blocks of that size, so one was easily found.  Under a mixed load, the general-purpose allocator
+is slower.</P>
+
+<P>So, if you use a fixed block pool to implement a custom allocator for a class, you can expect it
+to allocate/free 2 to 3 times faster.  Furthermore, future improvements may significantly increase its speed.  If
+you don't need thread safety, skipping the very expensive mutual-exclusion code gives you a wopping
+12 times speedup.</P>
+
+
+
+  </BODY>
+</HTML>

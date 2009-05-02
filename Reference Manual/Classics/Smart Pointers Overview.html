@@ -1,0 +1,277 @@
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=windows-1252">
+<META NAME="Generator" CONTENT="Microsoft Word 97">
+<TITLE>Title</TITLE>
+<META NAME="description"
+ CONTENT="An introduction to the concepts used to design a technically advanced smart pointer class in C++.">
+<META NAME="keywords"
+ CONTENT="smart pointers introduction Classics">
+<LINK REL=STYLESHEET HREF="../info.css" TYPE="text/css">
+</HEAD>
+<BODY>
+<!-- Standard banner at top of Reper file -->
+<P CLASS="banner">
+This document is one section of The Repertoire Reference, found at
+<A HREF="http://www.dlugosz.com/Repertoire/refman/mainframe.html" TARGET="_top">
+http://www.dlugosz.com/Repertoire/refman/mainframe.html</A>.<BR>
+Copyright 1998 by <A HREF="mailto:john@dlugosz.com">John M. Dlugosz</A>.
+</P>
+<A NAME="toptop">
+<!-- end of standard banner -->
+
+<H1>Smart Pointers Overview</H1>
+</B></FONT><FONT FACE="Arial"><P ALIGN="RIGHT">An evolutionary approach to a classic C++ idea</P>
+</FONT><B><FONT FACE="Arial" SIZE=2><P ALIGN="RIGHT">by John M. Dlugosz</P>
+</B></FONT>
+
+<P>My interest in smart pointers grew out of my interest in multithreading.  When data is being passed between threads, such as in the case of parameters to an asynchronous function, there is a serious ownership issue.</P>
+<P>But, even in more mundane programming, the problem arises.  Strings are a case in point:  in the old days of C, returning a string from a function was a royal pain.  There were numerous approaches to this, such as returning a dynamically allocated string that must then be freed by the caller, returning a static buffer that gets reused with each call, or passing a destination buffer and length as parameters.  With discipline from the programmers involved, and with a little experience of getting burned a few times, it generally worked.  But, it’s a constant drag on the programmer’s attention that ought to be better spent on other things.</P>
+<P>With a modern string class, we have the power we see in most other high-level languages, where returning a string from a function is just as simple as returning an integer.  You just return the thing, no muss, no fuss.</P>
+<P>So, reference counting via smart pointers is the way to go in C++.  There are many widespread uses of this device, once a reusable smart pointer component is available.  The challenge is to use modern C++ (in particular, templates) to produce a <I>serious</I> smart pointer class that stands up to some rather challenging design requirements.</P>
+
+<H2>Reference Counting vs. Garbage Collection</H2>
+
+<DIR>
+<DIR>
+<I><P>One day a student came to Moon and said: &quot;I understand how to make a better garbage collector.  We must keep a reference count of the pointers to each cons.&quot;</P>
+<P>Moon patiently told the student the following story:</P>
+<P>&quot;One day a student came to Moon and said: ‘I understand how to make a better garbage collector…</P>
+</I><P>—An AI Koan, courtesy of <I>The New Hacker’s Dictionary</I> a.k.a. The Jargon File.</P>
+</DIR>
+</DIR>
+
+<P>Reference counting has a problem with recursive or circular references.  As the Koan from an ancient LISP culture shows, the problem has long been understood.  Garbage collection is not subject to this particular problem, so fans of garbage collection in languages tend to ridicule the proponents of reference counting.</P>
+<P>But, garbage collection is not at all the same thing.  C++ has a very distinctive feature that sets it apart from other contemporary object-oriented languages: value semantics.  In Smalltalk, LISP, Object Pascal, and Java, for example, objects have reference semantics.  Assigning one variable to another is a pointer operation, not an operation on the whole object.</P>
+<P>In contrast, the assignment operator in C++ operates on the whole object, and pointers, if desired, are treated separately.  This general idea gave us constructors and destructors, and led to the wonderful concept of resource acquisition as initialization.  This is one of the great strengths of the C++ philosophy, and we should embrace it rather than try to circumvent it.</P>
+<P>The meaning of garbage collection in C++ is to be a simulation of infinite memory.  If the system can ascertain that a particular object will never be used again, it can swap it out to <CODE>dev\nul</code> for all anyone cares.  Point is, the destructor is not called.</P>
+<P>Reference counting, on the other hand, is a system of knowing exactly when the last use of an object is extinguished, and calling the destructor at that precise point in the execution.</P>
+<P>Picture a class that represents a window on the screen.  When the program is done using that window, why does it remain on the screen?  Because the garbage collector hasn’t noticed yet.  For the concept of resource acquisition as initialization, we must have timely destruction.  Objects are not just memory to be scavenged when we run low—objects in C++ are files, windows, communication channels, and other things with real effects due to destruction.</P>
+<P>Destruction when the last user is finished is like a room where the last one out turns off the lights.  The responsibility is shared among all users of the object.  Putting this logic in the pointer itself is a very O-O concept, because the object is taking care of itself.  It's like the light switch knowing when the last person left the room, and turning itself off.</P>
+
+<H2>The End of Innocence</H2>
+
+<P>A serious reference counting pointer in C++ needs to overcome this exact problem.  The good news is, I’ve solved it.  My smart pointer system handles circular references.</P>
+<P>That’s a doozie, but not the only problem.  You can have multiple pointers to the same object in C++, where the values of the pointers don’t match.</P>
+
+<PRE>class A { /* … */ };
+class B1 : public A { /* … */ };
+class B2 : public A { /* … */ };
+class C : public B1, public B2 { /* … */ };
+
+C object;
+B1* p1= &amp;object;
+B2* p2= &amp;object;
+</PRE>
+
+<P>Here, p1 and p2 point to the same object, but can’t be the same address.  With smart pointers in the same situation, you find that they are of different types, and hold different values, yet must realize that they have a common lifetime and hence cooperate with ownership in exactly the same manner as two smart pointers of the same type and same pointer value.</P>
+<P>If that’s not enough, consider const pointers.  Or rather, pointers to constants.  Point is, <code>const</code> can be used in two places within a pointer definition, with different meanings.</P>
+
+<PRE>
+const char* s1;
+char* const s2;
+</PRE>
+
+<P>The smart pointers need to have this same concept, with compile-time checking of constness in both cases.</P>
+<P>If that’s not enough, there are two kinds of behavior that are often associated with smart pointers.  One behavior is aliasing, where two smart pointers reference the same object and a change in one is seen by the other.  On the other hand, you may prefer copy-on-write behavior, which allows efficient passing and returning of large values, and full value semantics.  This is what you expect of a string class.  Naturally, we want both types of behavior.</P>
+<P>As a minor issue, but one that showed up during my experiments, the smart pointer should support the NULL value.</P>
+<P>Next, the smart pointer should be able to accommodate data types that were never designed with smart pointers in mind.  In particular, classes from other libraries should be handled by these smart pointers.</P>
+<P>Oh, and remember the original need I mentioned for smart pointers?  They must be thread safe.</P>
+
+<H2>The Tour Starts Here</H2>
+<P>This article explores the design of a smart pointer system that satisfies the above requirements.  Future articles will explore individual issues and their impact on the implementation in more depth.  But you don’t have to wait: complete source code is available from my web site.</P>
+
+<H2>What Do Horses and Cows Have To Do With It?</H2>
+<P>There are three different kinds of smart pointers collectively called <I>handles</I>, that fundamentally behave in the way you expect a smart pointer should.  Specifically, they all have an <code>operator-&gt;</code>
+that provides access to the underlying object.</P>
+
+<PRE>
+handle&lt;C&gt; h (new C);
+<STRIKE>handle&lt;C&gt; h= new C;</STRIKE> //can’t use ‘=’ form.
+C* p= new C;
+h-&gt;foo();  //access through handle
+p-&gt;foo();  //access through pointer
+</PRE>
+
+<P>Note: the examples use the parenthesis form of initialization (formally called direct initialization) rather than the ‘=’ form (copy initialization) because the <code>explicit</code> keyword on the constructor requires this.  You could write the regular pointer with direct initialization too; e.g. <code>C*p(new C);</code> but most people don’t write it that way.</P>
+<P>As you can see, <code>handle</code> is a template which allows you to specify the type of the smart pointer.  There are actually three such templates: <code><B>handle</B></code>,
+<code><B>const_handle</B></code>, and <code><B>cow</B></code>.</P>
+<P>The <code>const_handle</code> is just like a <code>handle</code>, but provides read-only access.  Consider the analogous case with regular pointers:</P>
+
+<PRE>
+const C* p2= new C;
+const_handle&lt;C&gt; h2 (new C);
+<STRIKE>p2-&gt;set_value (10);
+</STRIKE>x= p2-&gt;get_value();
+<STRIKE>h2-&gt;set_value (10);
+</STRIKE>x= h2-&gt;get_value();
+
+p2= p;  //OK.  Adds const.
+h2= h;  //OK.
+
+<STRIKE>p= p2;</STRIKE>  //compile-time error—
+<STRIKE>h= h2;</STRIKE>  //attempt to remove const.
+</PRE>
+
+<P>The smart pointer behaves analogously to the regular pointer.  Specifically,
+<code>operator-&gt;</code> on the <code>const_handle</code> returns a <code>const</code> pointer, while 
+<code>operator-&gt;</code> on the regular <code>handle</code> returns an unqualified pointer.  Meanwhile, you may implicitly convert a
+<code>const_handle</code> to the same kind of <code>handle</code>, but not vice-versa.  This is done by using inheritance.</P>
+
+<PRE>
+template &lt;typename T&gt;
+class const_handle {
+public:
+   const T* operator-&gt;() const;
+   };
+
+template &lt;typename T&gt;
+class handle : public const_handle&lt;T&gt; {
+public:
+   T* operator-&gt;() const;
+   };
+</PRE>
+
+<P>A regular handle can do anything a <code>const_handle</code> can, and then some.  So making it a derived class is a perfectly sensible thing to do.  The less-restricted form of 
+<code>operator-&gt;</code> hides the one in the base class.</P>
+<P>Notice that both versions of <code>operator-&gt;</code> are <code>const</code> functions.  Why isn’t the derived one written</P>
+
+<PRE>
+   T* operator-&gt;() <STRIKE>const</STRIKE>;
+</PRE>
+
+instead?  Because pointers have two kinds of <code>const</code> attached to them.  The constness of the thing being controlled by the pointer is distinct from the pointer itself.  The dereference operation is a 
+<code>const</code> function because dereferencing doesn’t change the value of the pointer.  The <code>const</code>
+on member functions of the smart pointer are used to distinguish this other dimension of constness, as follows:</P>
+<PRE>
+
+C* p= new C;&#9;//full access
+const C* p2= new C;&#9;//const object
+C* const p3= new C;&#9;//const pointer
+const C* const p4= new C;&#9;//const in both places
+
+handle&lt;C&gt; h (new C);&#9;//full access
+const_handle&lt;C&gt; h2 (new C);&#9;//const object
+const handle&lt;C&gt; h3 (new C);&#9;//const pointer
+const const_handle&lt;C&gt; h4 (new C);&#9;//const in both places
+</PRE>
+
+<P>Note: the same applies to <code>volatile</code>, but my handle classes don’t model this.</P>
+<P>So, the difference between <code>const_handle</code> and <code>handle</code> is clear enough.  So what of 
+<code>cow</code>?</P>
+<P>The requirements stated a need for both alias and copy-on-write functionality.  If you use <code>operator-&gt;
+</code> on a <code>handle</code>, you get the object, which may be pointed to by other handles.  It doesn’t matter to handle.  The 
+<code>operator-&gt;</code> just returns the controlled object, and doesn’t care whether other pointers are also pointing to it.  This is the simplest and most straightforward implementation, and corresponds to the alias requirement.  This is also how regular pointers work.</P>
+<P>The other behavior is copy-on-write.  In this case, an <code>operator-&gt;</code> would check to see if there were other references, and if so, perform a copy first.  The 
+<code>operator-&gt;</code> always returns a unique value, never a shared value.  A different implementation of 
+<code>operator-&gt;</code> calls for another class.  The template <code>cow</code> is also derived from 
+<code>const_handle</code>, and works the same as <code>handle</code>, except for the copy-on-write checking.</P>
+<P>There is no distinction between the two behaviors if the object is not written to, so only a single kind of 
+<code>const_handle</code> exists.  Notice that any use of <code>operator-&gt;</code> on the 
+<code>cow</code> handle will cause lazy-copying to be triggered—it can’t tell if you are calling a 
+<code>const</code> member or not, so it assumes the worst.  Because of this, it is more efficient to use the 
+<code>const_handle</code> when you are not going to actually change the object.  Remember, you can pass a 
+<code>cow&lt;T&gt;</code> to any function taking a <code>const_handle&lt;T&gt;</code> parameter.</P>
+
+<H2>What You Don’t Own You Can Borrow.</H2>
+
+<P>I’m tinkering with an experimental Win32 programming framework called Tomahawk.  One of the design goals is to totally eliminate all ownership issues.  I hate the way MFC and OWL both make you <I>new</I> various objects, and don’t make it clear when ownership is held by some enclosing object and when it isn’t.  Most people just give up and never <I>delete</I> any framework object.  This prevents duplicate frees, but causes memory and resource leaks, too.  Clearly, smart pointers provide the answer.</P>
+<P>I decided that all relationships between objects in Tomahawk, including such things as child windows, GDI objects, and system resources would be done through reference-counting, and most (if not all) functions work with value semantics and lazy copying (like the way a string class works).  In short, no ownership problems, ever.</P>
+<P>There were minor usability issues that I quickly faced, and tuned the smart pointer design appropriately.  A major problem remained, though.  The dreaded circular reference problem.  Now, thanks to foreshadowing, you know I solved this problem, and is in fact the reason I’m writing this article.  But when I first started, I felt like I was pinned against a stone wall, trapped between contradicting design goals.</P>
+<P>The problem is that of child windows.  More generally, it applies to any set of windows that send messages to each other, but I studied the problem specifically with the case of child windows.  The parent window points to the child, and the child needs a pointer back to the parent.  Yes, I tried doing without one or the other as actual pointers, using child ID numbers only or some such.  But it was inefficient and didn’t generalize.  And, there was still a problem with multithreaded programs.</P>
+<P>My attempts to keep track of the parent window using other means and special considerations eventually generalized to the concept of the <code>baro</code> handle.  
+<code>baro</code> stands for <U>ba</U>ck-<U>r</U>eference <U>o</U>bject.</P>
+<P>Here’s how the idea works.  A normal smart pointer does two things: It provides access to another object, and it also controls the lifetime of that object.  But, circular references cause problems, because two objects that refer to each other also own each other.  That’s not what we’re trying to model, though.  The framework owns both windows, and the parent owns the child, but the child doesn’t own the parent.  But, the child needs to refer to the parent.</P>
+<P>Most people who use smart pointers switch back to regular dumb pointers when they need to refer to the object without participating in that object’s lifetime.  But that leads to dangling pointers.  Suppose the parent window were destroyed by GUI interaction, but the child window, on its own thread, was in the middle of processing a message and, before it knows its being destroyed too, tries to refer to the parent.  Woops.</P>
+<P>The solution is not to use dumb pointers, but to use a different kind of smart pointer.</P>
+<P>A <code>baro</code> works with the smart-pointer system so is aware of the object’s lifetime, but does not own the object.  That is, outstanding 
+<code>baro</code> handles to an object don’t prevent the object from destructing.  When all <code>cow</code>s, 
+<code>handle</code>s, and <code>const_handle</code>s to the object disappear, the object is destroyed.  The 
+<code>baro</code> handles don’t count.</P>
+<P>You might imagine that a <code>baro</code> implements yet another form of <code>operator-&gt;</code>
+that checks for the continued existence of the object before returning.  But that’s not the best solution, because of the threading issues.  What if you call 
+<code>foo</code> through a <code>baro</code> handle, and before <code>foo</code> returns, another thread drops the last regular 
+<code>handle</code>, destroying the object?  In short, a <code>baro</code> doesn’t own the object, but when the object is actually in use, the object <I>does</I> need to be owned, until the call returns.</P>
+<P>Instead, a <code>baro</code> doesn’t have an <code>operator-&gt;</code> at all!  You cannot dereference a 
+<code>baro</code>.  What you can do is construct a <code>handle</code>, <code>const_handle</code>, or 
+<code>cow</code> using a <code>baro</code> handle.  The <code>handle</code> refers to the same object as the 
+<code>baro</code>, assuming there was one, and hence gives you ownership.  You then use the object through the 
+<code>handle</code>, and when you’re done, you let that <code>handle</code> go out of scope.</P>
+
+<PRE>
+baro&lt;C&gt; borrower (new C);
+//... later
+{
+handle&lt;C&gt; hh (borrower);
+hh-&gt;foo();
+// destroy hh at end of the block.
+}
+</PRE>
+
+<P>The error checking takes place during the construction of a <code>handle</code> from a <code>baro</code>, and this 
+constructor throws an exception if the object no longer exists.  Once the <code>handle</code> is constructed, the code can be sure of the object’s continued existence.  Is that elegant or what?</P>
+<P>So back to our pathological window example:  The parent owns the child, but the child only borrows the parent.  The parent is destroyed when you click in the [x] in the corner of the window, but the child doesn’t know that yet because of the inherent synchronization problems of multithreaded programs.  Instead, when the child needs to send a message to the parent, it uses code like in the above sample.  Its parent pointer is a 
+<code>baro</code>, and upon trying to create a useable <code>handle</code> from it, finds out in no uncertain terms that the parent no longer exists.</P>
+<P>The dangling pointer is <I>always</I> caught at run-time.  There are no more stray pointer writes or other mysterious cancers in the code.  This is useful in C++ thanks to exceptions, and much more efficient than tracking and nulling all outstanding references when an object is destroyed.</P>
+<P>There is also a <code>const_baro</code> template, which only allows the creation of a <code>const_handle</code>.  A regular
+<code>baro</code> can seed any kind of <code>handle</code>.  This makes a total of five related smart pointers in this system.</P>
+
+<H2>Casting and Converting</H2>
+
+<P>Pointers can be converted to base class pointers, and can even be downcasted again, if you dare.</P>
+<P>I need to pass a <code>handle&lt;Derived&gt;</code> to a function that takes a <code>handle&lt;Base&gt;</code>.  That’s rather simple actually, thanks to template member functions.  The 
+<code>std::auto_ptr</code> in the ANSI/ISO standard library does exactly that.  Unfortunately, the Microsoft compiler doesn’t implement template member functions.</P>
+<P>I came up with two work-around’s.  First, I made a handle to a derived type another class, rather than a simple 
+<code>handle&lt;Derived&gt;</code>.  This used a template to create a class derived from <code>handle&lt;Derived&gt;</code>
+(what I really wanted) that also includes an implicit conversion function to <code>handle&lt;Base&gt;</code> as one of its members.  Yuck, but it works fine.</P>
+<P>A solution that doesn’t intrude on the declaration of the needed handle types also led to the general suite of handle casts.</P>
+<P>Look at the correspondence between handles and built-in pointers using this system:</P>
+
+<PRE>
+handle&lt;Derived&gt; hder;
+handle&lt;Base&gt; hbase;
+Derived * der;
+Base * base;
+
+der= static_cast&lt;Derived*&gt; (base);  //unsafe down-cast
+hder= static_handle_cast&lt;handle&lt;Derived&gt; &gt; (hbase);
+
+der= dynamic_cast&lt;Derived*&gt; (base);  //safe
+hder= dynamic_handle_cast&lt;handle&lt;Derived&gt; &gt; (hbase);
+</PRE>
+
+<P>Basically, there are <code>handle_cast</code> forms that correspond to the keyword-style casting operators, with the same meanings.  The thing in the angle brackets can be any of the five handle types on any object type, and works if the 
+<code>const</code> rules of handles are satisfied and if the corresponding pointer cast works on the referenced object.</P>
+<P>To get around the lack of implicit conversions (a flaw in the compiler, not in my design), I added an 
+<code>implicit_handle_cast</code> form that only performs casts that should have been done implicitly.  It won’t do anything dangerous—only allows me to convert derived-to-base.</P>
+<P>Because pointers and handles can be converted, it’s possible for two handles of different types to point to the same object.  In the above example, both 
+<code>hder</code> and <code>hbase</code> point to the same object, and the lifetime issues need to deal with this.</P>
+
+<H2>Lost &amp; Found</H2>
+
+<P>It’s possible, of course, to construct a smart pointer from a regular pointer.  But, if that object is already &quot;in the system&quot;, then it should understand that there are other smart pointers to this object already, and co-operate with them.</P>
+<P>For example, we wish everyone would write using smart pointers alone:</P>
+
+<PRE>
+handle&lt;C&gt; original (new C);
+handle&lt;C&gt; copy;
+copy= original;
+</PRE>
+
+<P>but what sometimes happens is this:</P>
+
+<PRE>
+handle&lt;C&gt; original (new C);
+C* regular= original.operator-&gt;();
+handle&lt;C&gt; copy (regular);
+</PRE>
+
+<P>In the latter case, where the regular pointer is extracted from the smart pointer and then another smart pointer is constructed, it should have the same result as the first case, where one smart pointer is constructed directly from another.  Naturally, this needs to handle derived-to-base pointer issues at the same time.  If the reference count is part of the object, this lost &amp; found effect is no big deal.  But when handling objects that were not designed for reference counting, and in coping with the derived/base pointer issues, we need to make sure the design covers this point.</P>
+
+<H2>Conclusion</H2>
+
+<P>In order for smart pointers in C++ to solve specific issues of lifetime and ownership, they need to cope with the exact situations that make ownership issues so difficult.  A serious smart pointer design must deal with a number of important issues.  But the resulting component is wonderful to have.</P>
+
+</BODY>
+</HTML>
+

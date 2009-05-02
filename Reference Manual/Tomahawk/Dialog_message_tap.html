@@ -1,0 +1,100 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"  "http://www.w3.org/TR/html4/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=windows-1252">
+<TITLE>Dialog_message_tap complete documentation</TITLE>
+<LINK REL=STYLESHEET HREF="../info.css" TYPE="text/css">
+</HEAD>
+
+<BODY>
+<IFRAME id="page_banner" src="../page_banner.html" scrolling="no"></IFRAME>
+<A NAME="toptop"></A>
+
+<H1 id="overview">Dialog_message_tap</H1>
+<P>This class modifies the regular <A HREF="message_tap_index.html" TARGET="index" class="code">message_tap</A> to make it suitable for dialog boxes which
+use Windows' dialog box mechanism.  See the <A HREF="Dialog_message_tap_guide.html#toptop">User's Guide</A>
+for more discussion.</P>
+
+<HR SIZE=10 class="sep1">
+<!-- WWWW		wwww		wwww		wwww		wwww		wwww -->
+
+<H2 id="constructor"><SPAN class="signame">Dialog_message_tap</span>()</H2>
+<P class="mematt">constructor, public</P>
+<P>The constructor is unsurprising.</P>
+
+<HR SIZE=10 class="sep1">
+
+<H2 id="destructor"><SPAN class="signame">~Dialog_message_tap</span>()</H2>
+<P class="mematt">destructor, public</P>
+<P>The destructor is unsurprising.</P>
+
+<HR SIZE=10 class="sep1">
+
+<H2 id="CreatePropertySheetPage">HPROPSHEETPAGE <SPAN class="signame">CreatePropertySheetPage</span> (PROPSHEETPAGE&lt;char>&)</H2>
+<H2>HPROPSHEETPAGE <SPAN class="signame">CreatePropertySheetPage</span> (PROPSHEETPAGE&lt;wchar_t>&)</H2>
+<P>This calls the Win32 primitive <code>CreatePropertySheetPage</code>, wrapping it as necessary to use the 
+<A HREF="message_tap_index.html" TARGET="index" class="code">message_tap</A>.</P>
+<P>The <code>DlgProc</code> member of the <code>PROPSHEETPAGE</code> structure is supplied 
+by this call, so for error checking purposes it makes sure that it's 0 initially.</P>
+<P>Likewise, the <code>lParam</code> member of the <code>PROPSHEETPAGE</code> structure is used 
+internally, so must be 0 when you make this call.  You don't need this "extra information", since you can use any 
+member data of this object.</P>
+<P>Currently, this class calls the -A or -W form of the Win32 primitive <code>CreatePropertySheetPage</code> based on 
+the use of a narrow or wide parameter, but does not make any distinction within the callbacks.  
+Presumably (but not explored yet), this simply means that your implementation of <code>handle_message</code> 
+should know what to expect (wide or narrow parameters) based on which call you made to create it.</P>
+
+<HR SIZE=10 class="sep1">
+
+<H2 id="end_dialog">void <SPAN class="signame">EndDialog</span> (int result=0)</H2>
+<P class="mematt">public</P>
+<P>Calls the Win32 primitive <code>EndDialog</code></P>
+<P>Throws an exception if not issued on a modal dialog box.</P>
+
+<HR SIZE=10 class="sep1">
+
+<H2 id="is_modal">bool <SPAN class="signame">is_modal</span> ()</H2>
+<P class="mematt">public</P>
+<P>Because this object can be used for both modeless and modal dialog 
+boxes, common code might need to be sensitive to the difference.  This function
+returns this state, as set appropreatly by the choice of calling 
+<code>ModelessDialogBox</code>, <code>ModalDialogBox</code>, or <code>CreatePropertySheetPage</code>.</P>
+
+<HR SIZE=10 class="sep1">
+
+<H2 id="ModalDialogBox">HWND <SPAN class="signame">ModalDialogBox</span> (
+   HINSTANCE&nbsp;module_for_resource, 
+   NumOrName&lt;char>&nbsp;resource, 
+   HWND&nbsp;parent=0)</H2>
+<P class="mematt">public</P>
+<P>This calls the Win32 primitive <code>DialogBox</code>, wrapping it as necessary to use the <A HREF="message_tap_index.html" TARGET="index" class="code">message_tap</A>.</P>
+<P>Upon returning, <I>this</I> <A HREF="message_tap_index.html" TARGET="index" class="code">message_tap</A> is reset so it may be used again on another  window.</P>
+<P>Note that it <I>still</I> uses smart pointers, and this object must be dynamically 
+allocated and accessed through handles.  If you don't keep (another) handle 
+to it, it will vanish when this function returns as the window's reference to 
+this object is dropped when the window is destroyed.</P>
+
+<HR SIZE=10 class="sep1">
+
+<H2 id="ModelessDialogBox">HWND <SPAN class="signame">ModelessDialogBox</span> (
+   HINSTANCE&nbsp;module_for_resource, 
+   NumOrName&lt;char>&nbsp;resource, 
+   HWND&nbsp;parent=0)</H2>
+<P class="mematt">public</P>
+<P>This calls the Win32 primitive <code>CreateDialog</code>, wrapping it as necessary to use the 
+<A HREF="message_tap_index.html" TARGET="index" class="code">message_tap</A>.</P>
+
+<HR SIZE=10 class="sep1">
+
+<H2 id="pre_translate_message">int <SPAN class="signame">pre_translate_message</span> (const MSG&amp;&nbsp;msg)</H2>
+<P class="mematt">public, <A HREF="message_tap.html#pre_translate_message">override</A></P>
+<P>This overrides the base class to provide the functionality as needed 
+ for a dialog box: it calls the Win32 primitive <code>IsDialog</code>.</P>
+
+
+<HR SIZE=10 class="sep1">
+
+<IFRAME id="page_footer" src="../page_footer.html"></IFRAME>
+</BODY>
+</HTML>
+

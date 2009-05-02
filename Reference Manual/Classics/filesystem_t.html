@@ -1,0 +1,128 @@
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=windows-1252">
+<TITLE>filesystem_t class reference</TITLE>
+<LINK REL=STYLESHEET HREF="../info.css" TYPE="text/css">
+</HEAD>
+
+<BODY>
+<!-- Standard banner at top of Reper file -->
+<P CLASS="banner">
+This document is one section of The Repertoire Reference, found at
+<A HREF="http://www.dlugosz.com/Repertoire/refman/mainframe.html" TARGET="_top">
+http://www.dlugosz.com/Repertoire/refman/mainframe.html</A>.<BR>
+Copyright 2004 by <A HREF="mailto:john&#64;dlugosz.com">John M. Dlugosz</A>.
+</P>
+<A NAME="toptop">
+<!-- end of standard banner -->
+
+<H1>filesystem_t class reference</H1>
+This covers the abstract <code>filesystem_t</code> class, plus the supplied concrete classes.</P>
+
+<A NAME="pcfs_wn"><H3>Character Set in the PC Filesystem</H3></A>
+<P>In the <code>PC_filesystem_t</code> concrete class, the Unicode version of the Win32 primitives will be used if
+at run-time they are found to be supported.  Otherwise the ANSI versions will be used.
+<BR><I>Note: this feature has not been implemented yet.  For now, the ANSI forms are always used.</I>
+</P>
+
+
+<HR SIZE=10 COLOR=black>
+<!-- WWWW		wwww		wwww		wwww		wwww		wwww -->
+
+
+
+<A NAME="assure_path_exists"><H2>virtual void assure_path_exists (filename_t) =0</H2></A>
+<P CLASS=mematt>public</P>
+<P>This function creates subdirectories, if necessary, so that the path specified exists.  The file
+name part, if present, is ignored.</P>
+<P>If the path did not already exist or could not be created, an exception is thrown detailing the nature of the error.
+In the event of an error, the path may have been partially created.</P>
+<HR SIZE=10 COLOR=black>
+<!-- WWWW		wwww		wwww		wwww		wwww		wwww -->
+
+<A NAME="dotname"><H2>virtual int dotname (const ustring&)</H2></A>
+<P CLASS=mematt>public</P>
+<P>This recognises the "dotnames" that may be used as parts of a path.</P>
+<P>If the argument is not a special name, return -1.</P>
+<P>If the argument is a special name, return the number of parts to be removed.  That is,
+"." returns 0, ".." returns 1, "..." returns 2, etc.  This function exists here so you can override
+it to change (or even disable) the recognition of these special names.</P>
+<HR SIZE=10 COLOR=black>
+<!-- WWWW		wwww		wwww		wwww		wwww		wwww -->
+
+
+<A NAME="exists"><H2>virtual bool exists (const filename_t&) const =0</H2></A>
+<P CLASS=mematt> public</P>
+<P>This returns <code>true</code> if the specified filename exists.  It does distinguish between
+files and directories, so if a directory exists with the name you asked for as a file, or vice-versa,
+the function returns <code>false</code>.</P>
+<P>In the <code>PC_filesystem_t</code> concrete class, it uses the Win32 function <code>FindFirstFile</code> to
+check for the file's (or directory's) existance, and then checks the attribute bits to make sure
+it's the right kind of thing.  The usual mechanism is used for <A HREF="#pcfs_wn">ANSI vs. Unicode</A> names.</P>
+<P>In the <code>URL_filesystem_t</code> ... <I>TBA</I>.
+<HR SIZE=10 COLOR=black>
+<!-- WWWW		wwww		wwww		wwww		wwww		wwww -->
+
+
+<A NAME="fully_qualify"><H2>virtual filename_t fully_qualify (const filename_t&) =0</H2></A>
+<P CLASS=mematt>public</P>
+<P>This returns the fully-qualified form of the input name.  That is, it merges the "current" working
+directory information with the contents of the specified name.</P>
+<P>In the <code>PC_filesystem_t</code> concrete class, it uses the Win32 function <code>GetFullPathName</code>
+to do this work.</P>
+<P>There is a bug in <code>GetFullPathName</code> as tested under Windows NT 4.0 SP3.  It does not give the
+correct (or even meaningful) result when qualifing relative paths on drives other than the default
+drive when the logged path on the drive in question is not the root.  This will be handled by
+this function directly in a later update.</P>
+<P>For removable media, <code>GetFullPathName</code> will hit the disk when called.  This results in
+a long timeout and an error for removed disks.</P>
+<P>To interactivly test this function, use the <code>filename_t_test.cxx</code> program with an 
+argument of <code>Q</code> followed by the argument to the <code>fully_qualify</code> function. 
+ The result will be sent to standard output.</P>
+
+<P>Sample command prompt:
+<pre>
+[e:\dev\progress\compile.vc5\bin_release]<B>filename_t_test.exe Q "foo\bar"</B>
+E:\dev\progress\compile.vc5\bin_Release\foo\bar
+
+[e:\dev\progress\compile.vc5\bin_release]<SPAN STYLE="text-decoration:blink">_</SPAN>
+</pre>
+<P>The usual mechanism is used for <A HREF="#pcfs_wn">ANSI vs. Unicode</A> names.</P>
+<P>In the <code>URL_filesystem_t</code> ... <I>TBA</I>.
+
+<HR SIZE=10 COLOR=black>
+<!-- WWWW		wwww		wwww		wwww		wwww		wwww -->
+
+<A NAME="stringcompare"><H2>virtual int stringcompare (const ustring& left, const ustring& right) const</H2></A>
+<P CLASS=mematt> public</P>
+<P>This compares two strings according to the rules used by the file system.  Of particular note are
+characters that are treated as being the same thing, such as with the case-insensitive PC file system (<code>"A" == "a"</code>), or
+escape codes in URLs (<code>"%41"=="A"</code>).</P>
+<P>In the <code>PC_filesystem_t</code> concrete class, it uses the Win32 function <code>LCMapString</code>
+to do this work.  This function seems to be the only place in the Win32 documentation that indicates that
+case-insensitive matching is different for file names than for normal strings which should use the current locale.
+The simpler <code>CompareString</code> function does not have a flag for this, so it cannot be
+used here.  More information on this issue will be added as it becomes known.</P>
+<P>The return value is negative, zero, or positive to indicate whether <code>left</code> is less than,
+equal to, or greater than <code>right</code>, respectivly.  This is the same kind of result that you
+know from the standard C function <code>strcmp</code>.
+<P><I>note: could add another function to return a sort key</I></P>
+<HR SIZE=10 COLOR=black>
+<!-- WWWW		wwww		wwww		wwww		wwww		wwww -->
+
+<A NAME="stringmatch"><H2>virtual bool stringmatch (const ustring& left, const ustring& right) const</H2></A>
+<P CLASS=mematt> public</P>
+<P>This function is semantically equivilent to (<code>0==stringcompare(left,right)</code>),
+but potentially more efficient as the code can be simpler.</P>
+<HR SIZE=10 COLOR=black>
+<!-- WWWW		wwww		wwww		wwww		wwww		wwww -->
+
+
+<H2>signatures not yet documented</H2>
+<pre>
+   virtual filesystem_t* clone() const =0;
+   virtual index_t* parse (wstring) const =0;
+   virtual void create (const filename_t&) const {}
+   wstring seperator() const { return Seperator; }
+   CLASSICS_EXPORT virtual filename_t directory (const ustring&);
+</pre>

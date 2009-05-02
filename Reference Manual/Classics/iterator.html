@@ -1,0 +1,89 @@
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=windows-1252">
+<TITLE>iterator class reference</TITLE>
+<LINK REL=STYLESHEET HREF="../info.css" TYPE="text/css">
+</HEAD>
+
+<BODY>
+<H1>iterator class reference</H1>
+This class provides an efficient way to iterate over all elements in a vararray.  See the discussion
+of <A HREF="vararray_guide.html#7">Iterators</A> in the vararray User's Guide.
+
+</P>
+<HR SIZE=10 COLOR=black>
+
+<!-- WWWW		wwww		wwww		wwww		wwww		wwww -->
+
+<A NAME="constructor"><H2>iterator (vararray&lt;T&gt;& list)</H2></A><BR>
+<H2>const_iterator (vararray&lt;T&gt;& list)</H2>
+<P ALIGN="right"><FONT SIZE="-1">constructor, public</FONT></P>
+The constructor creates an iterator bound to the specified vararray.  Initially, the state of the iterator
+is to refer to the first element.
+
+<HR SIZE=3 COLOR=black>
+
+<H2>iterator (vararray&lt;T&gt;& list, make_alias_t)</H2>
+<P ALIGN="right"><FONT SIZE="-1">constructor, public</FONT></P>
+If the optional parameter (with the constant value <code>alias</code>) is supplied, than the list being iterated
+will reflect changes made through the iterator, and vice-versa.
+
+<HR SIZE=10 COLOR=black>
+
+<!-- WWWW		wwww		wwww		wwww		wwww		wwww -->
+
+
+<A NAME="operator arrow"><H2>T* operator-&gt; () const</H2></A>
+<P ALIGN="right"><FONT SIZE="-1">public</FONT></P>
+The arrow operator is used to treat the iterator object as a smart pointer to the "current" element.
+<HR SIZE=10 COLOR=black>
+
+<!-- WWWW		wwww		wwww		wwww		wwww		wwww -->
+
+
+<A NAME="operator star"><H2>T& operator* () const</H2></A>
+<P ALIGN="right"><FONT SIZE="-1">public</FONT></P>
+Use the * operator rather than the arrow operator when you need to refer to the entire current element, as opposed
+to individual members of the current element.
+<HR SIZE=10 COLOR=black>
+
+<!-- WWWW		wwww		wwww		wwww		wwww		wwww -->
+
+
+<A NAME="operator bool"><H2>operator bool() const</H2></A>
+<P ALIGN="right"><FONT SIZE="-1">public</FONT></P>
+This operator returns <code>true</code> when the iterator refers to a valid position within the vararray.  It
+returns <code>false</code> after all elements have been visited.
+<HR SIZE=10 COLOR=black>
+
+<!-- WWWW		wwww		wwww		wwww		wwww		wwww -->
+
+
+<A NAME="operator increment"><H2>bool operator++ ()</H2></A>
+<P ALIGN="right"><FONT SIZE="-1">public</FONT></P>
+The pre-increment operator advances the iterator to the next element.  If there is no next element,
+then the iterator refers to a null element (so subsequent use of -&gt; or * will give an addressing exception).
+<HR SIZE=10 COLOR=black>
+
+<!-- WWWW		wwww		wwww		wwww		wwww		wwww -->
+
+
+<A NAME="index"><H2>int index() const</H2></A>
+<P ALIGN="right"><FONT SIZE="-1">public</FONT></P>
+This function returns the state of the iterator as the current array index.  This gives you the value
+you would have used had you subscripted the array instead of using an iterator.
+<HR SIZE=10 COLOR=black>
+
+<!-- WWWW		wwww		wwww		wwww		wwww		wwww -->
+
+
+<!-- Stock footer-->
+<FONT size="-2">Page content copyright 1998 by John M. Dlugosz.
+Home:<A HREF="http://www.dlugosz.com">http://www.dlugosz.com</A>,
+email:<A HREF="mailto:john@dlugosz.com">mailto:john@dlugosz.com</A>
+</FONT>
+<!-- End footer-->
+
+</BODY>
+
+</HTML>

@@ -1,0 +1,79 @@
+H1 {
+   font-family: Verdana, Tahoma, sans-serif;
+   text-align:center; text-decoration: underline;
+   }
+H2 { font-family: "Lucida Sans", "Lucida Sans Unicode", sans-serif; text-indent:-1in; margin-left:1in }
+
+H2 B { background-color:#FFEBCD /*blanchedalmond*/ }
+
+PRE { font-family: "Lucida Sans Typewriter", monospace }
+
+.code,CODE {
+	font-family: "Lucida Sans", "Lucida Sans Unicode", sans-serif;
+	font-size: 0.9em;
+	}
+
+PRE.code {
+	background-color: #EEE;
+	foreground-color: #000;
+	border-style: solid;
+	padding: 0.5em;
+	}
+
+PRE I {
+	color: #006;
+	}
+
+/* BODY { font-family: "GeoSlab703 Lt BT" } */
+BODY { font-family: "Georgia", serif }
+
+.mematt {  /* MEMber ATTributes */
+   font-size: smaller;
+   text-align:right
+   }
+
+A:link, A:visited { text-decoration: none }
+A:hover[TARGET=index]{
+	background-color: green;
+	color: #fff;
+	}
+A:hover { text-decoration: underline }
+
+.banner {
+   background-color: #ffffdd;
+   font-weight:bold;
+   padding:1em;
+   border-style:solid;
+   margin: 0;
+   }
+
+.footnoter {
+	vertical-align: super;
+	font-size: smaller
+	}
+
+HR.sep1 {
+	border:none;
+	background-color: black
+	}
+
+.signame {
+	background-color: #ffffdd;
+	}
+
+IFRAME {
+	border: none;
+	width: 100%;
+	}
+
+IFRAME#page_footer {
+	margin-bottom: 0;
+	margin-top: 0;
+	padding-bottom: 0;
+	}
+
+IFRAME#page_banner {
+	margin: 0;
+	padding: 0;
+	}
+	

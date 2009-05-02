@@ -1,0 +1,93 @@
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=windows-1252">
+<TITLE>Registry Features User's Guide</TITLE>
+<LINK REL=STYLESHEET HREF="../info.css" TYPE="text/css">
+</HEAD>
+
+<BODY>
+<!-- Standard banner at top of Reper file -->
+<P CLASS="banner">This document is one section of The Repertoire Reference, found at
+      <A HREF="http://www.dlugosz.com/Repertoire/refman/mainframe.html" TARGET="_top">http://www.dlugosz.com/Repertoire/refman/mainframe.html</A>.<BR>
+       Copyright 1998 by <A HREF="mailto:john@dlugosz.com">John M. Dlugosz</A>.
+    </P> 
+<A NAME="toptop"></A>
+<!-- end of standard banner -->
+<H1>Registry Features User's Guide</H1>
+
+<P>This describes the classes and miscellaneous features of the system registry support in Classics.</P> 
+
+<!-- CONTENTS -->
+	<UL>
+		<LI><A HREF="#1">General</A>
+		<LI><A HREF="#2">More Robust Primitives</A>
+		<LI><A HREF="#3">registry_key class</A>
+		<LI><A HREF="#4">predefined keys</A>
+		<LI><A HREF="#5">enumerating keys and values</A>
+		<LI><A HREF="#6">higher level functions</A>
+	</UL>
+<!-- END CONTENTS -->
+
+<A NAME="1"><H2>General</H2></A>
+
+<P>The Win32 API offers a number of functions for manipulating the registry.  For an improved object-oriented
+C++-centric way to access the registry, nothing comes to mind.  So this effort concentrates on making the
+existing primitves properly robust, and uses classes where such use is obvious and not contrived.</P>
+
+<P>Beyond better-wrapped primitives for accessing the registry, the real benefit comes from higher level functions.
+[more later...]</P>
+
+<A NAME="2"><H2>More Robust Primitives</H2></A>
+
+<P>The Classics registry primitives address issues with the Win32 API concerning error checking and Unicode/ANSI
+transparancy.</P>
+
+<P>For some strange reason, the <code>RegXxx</code> primitives in the Win32 API return an error code directly as the function
+result, which is different from normal Win32 API policy which is to return a Boolean success (1) or failure (0) and
+in the latter case set the error code to be retreived using <code>GetLastError</code>.</P>
+
+<P>The Classics functions uniformly use exceptions to indicate unexpected failures.  In the case of the registry
+functions, the return value is used to return something useful, and errors are indicated by throwing a highly detailed
+exception object, as usual.</P>
+
+<P>This difference in the error handling of the registry Win32 functions is something that appears to have gone
+unnoticed by other programmers and Microsoft, too.  In addition, it was clearly not tested properly.  Specifically,
+a problem shows up with the Unicode forms of the functions under Win95.  If the Unicode form is called, the
+correct behavior would be to return <code>ERROR_CALL_NOT_IMPLEMENTED</code> (whose value happens to be 120).
+Instead, the functions return <code>ERROR_SUCCESS</code>, indicating normal completion, but don't actually do anything and return
+bogus results such as invalid <code>HKEY</code>s.</P>
+
+<P>This problem seems to be caused by the implementation of the function returning <code>FALSE</code> to indicate an error and
+setting the 120 code into the <code>GetLastError</code> area.  Since <code>ERROR_SUCCESS</code> also happens to be zero, you have the
+appearance of a successful function.  Since the registry functions don't normally modify the <code>GetLastError</code> value (that is,
+they don't clear it out on success), a work around is to explicitly clear it before making the call, and then if a zero
+is received as a return value, check <code>GetLastError</code>.  If set, the zero must have been <code>FALSE</code>, otherwise it can be assumed
+to be <code>ERROR_SUCCESS</code>.</P>
+
+<P>This problem appears to only effect the Unicode not-implemented stubs, so the extra logic is only needed when
+deciding whether Unicode forms of the functions are available.  As the distinction between Unicode and ANSI is taken
+care of automatically by Classics, this code is used internally the first time a registry function is called in order to
+determine the availability of Unicode support, and after that more efficient code is used.</P>
+
+<P>Another discrepency, though less of a problem, exists in the documentation.  The Platform SDK documents the
+legal characters in a registry Key name to consist of "printable ANSI characters" in the range of <code>'\x20'</code> through
+<code>'\x7e'</code> inclusive, except for space, <code>'*'</code>, <code>'?'</code>, and backslash.  If true, it means that there is no real distinction between
+ANSI and Unicode for key names, since key names are restricted to using 92 possible characters.  However, inspecting
+the registry it is instantly clear that Microsoft doesn't read their own documentation, as there are lots of keys present
+such as "Control Panel" and "Internet Explorer", not to mention the key named "*" under <code>HKEY_CLASSES_ROOT</code>.</P>
+
+<P>Experiments indicate that as far as actual implementation goes, anything is accepted including the proscribed
+characters listed in the documentation.  So the Classics functions do not do any additional error checking, and are
+written to allow any Unicode strings.  In addition, the <code>registry_UT.cxx</code> program includes tests to see what is actually
+allowed (what works) on the current system.</P>
+
+<A NAME="3"><H2>registry_key class</H2></A>
+
+<A NAME="4"><H2>predefined keys</H2></A>
+	
+<A NAME="5"><H2>enumerating keys and values</H2></A>
+
+<A NAME="6"><H2>higher level functions</H2></A>
+
+</BODY>
+

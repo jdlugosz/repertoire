@@ -1,0 +1,360 @@
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=windows-1252">
+<TITLE>RatWin library Introduction</TITLE>
+<LINK REL=STYLESHEET HREF="../info.css" TYPE="text/css">
+</HEAD>
+
+<BODY>
+<!-- Standard banner at top of Reper file -->
+<P CLASS="banner">
+This document is one section of The Repertoire Reference, found at
+<A HREF="http://www.dlugosz.com/Repertoire/refman/mainframe.html" TARGET="_top">
+http://www.dlugosz.com/Repertoire/refman/mainframe.html</A>.<BR>
+Copyright 1998 by <A HREF="mailto:john@dlugosz.com">John M. Dlugosz</A>.
+</P>
+<A NAME="toptop">
+<!-- end of standard banner -->
+
+<H1>the <I>RatWin</I> library</H1>
+
+<H2>Contents</H2>
+
+<!-- CONTENTS -->
+	<UL>
+		<LI><A HREF="#1">Distribution and Licensing</A>
+		<LI><A HREF="#2">General Concept</A>
+		<UL>
+			<LI><A HREF="#12">Dependancies with Other Libraries and DLLs</A>
+			<LI><A HREF="#4">Theory of Implementation</A>
+			<LI><A HREF="#5">Extending RatWin</A>
+		</UL>
+		<LI><A HREF="#6">User's Guide</A>
+		<UL>
+			<LI><A HREF="#types">Types</A>
+			<UL>
+				<LI><A HREF="#8">Fundimental Types (pointers, words, etc.)</A>
+				<LI><A HREF="#9">Enumeration Constants and Flags</A>
+				<LI><A HREF="#10">Structures and Classes</A>
+				<LI><A HREF="#7">HANDLE and other Hxxx Types</A>
+			</UL>
+			<LI>Functions
+			<LI><A HREF="#11">Namespace and Fragmentation Mania!</A>
+			<LI>Organization
+		</UL>
+		<LI><A HREF="#3">Compatability with WINDOWS.H</A>
+		<UL>
+			<LI>Binary Compatibility
+			<LI>General Source Compatibility
+			<LI><A HREF="#maxcompat">Maximizing Source Compatibility</A>
+		</UL>
+	</UL>
+
+<!-- END CONTENTS -->
+
+<A NAME="1"><H2>Distribution and Licensing</H2></A>
+
+<P>RatWin is copyright 1996&ndash;2004 by John M. Dlugosz.  Use freely in code with attribution.</P>
+
+<P>The RatWin project is available free of charge.  Even if the Repertoire Project as a whole has
+a fee in the future, the RatWin component will always be free.</P>
+
+<P>The official source for RatWin is <A HREF="http://www.dlugosz.com/Repertoire/Download.html">
+http://www.dlugosz.com/Repertoire/Download.html</A>.
+
+<A NAME="2"><H2>General Concept</H2></A>
+
+<P>RatWin is a set of <B>Rat</B>ionalized <B>Win</B>dows header files.</P>
+
+<P>In a nutshell, I don't like having a monolithic header file.  It drags in a ridiculous amount of stuff I don't need, 
+compiles slowly, and overuses macros.  I've been bitten by macros a time or two.  The "NO" symbols for leaving stuff 
+out is silly.  Instead of a page or two of #define's before including &lt;windows.h&gt; to leave stuff out, 
+I should say things to bring stuff in.  Furthermore, &lt;windows.h&gt; doesn't always compile if you define a bunch of 
+NO symbols!  To top it off, the stuff shows a C heritage which is less than ideal for C++.</P>
+
+<P>My concept is to repackage the include files.  It uses namespaces, so you must explicitly ask for the symbols 
+you want.  It uses lots of small header files that are independent of each other, so you can include just 
+what you need.  It has strict type checking that makes the &lt;windows.h&gt; <code>STRICT</code> mode look untyped by 
+comparison.  And best of all, no macros!  The only use of #define is for the include-file interlock symbol to 
+prevent multiple inclusions.</P>
+
+<P><B>The charter is to repackage the existing API, not design a new API.</B>
+ So, the function names and other symbol names are unchanged, even though a lot of the prefixes are unnecessary 
+thanks to the better scoping being employed.  Some of the functions have overloaded forms, default 
+arguments, or missing arguments, use strong types, add const, and change pointers to references.  But there 
+are no big semantic changes.</P>
+
+<A NAME="12"><H3>Dependancies with Other Libraries and DLLs</H3></A>
+
+<P>The RatWin headers use some headers from Classics.  However, its use of Classics is compile-time
+only.  That is, it may use types and inline functions, from the headers, but cannot use anything
+that requires linking with Classics.</P>
+
+<P>Using RatWin will not produce dependancies against any DLL or library other than
+the Win32 System DLLs.</P>
+
+<P><I>Note: there seems to be a use of classics::string, which is contrary to this
+design requirement and will be eliminated.</I></P>
+
+<P>Most of the features in the RatWin headers are simply types and inline functions to call
+Win32 system functions.  So, including the RatWin headers will not necessarily require the
+RatWin.DLL file to be linked in as well.</P>
+
+<P>Some features are implemented in compiled code, not entirely in the header, and if such a
+feature is used then it becomes necessary to link with RatWin.lib and supply RatWin.dll at run-time.
+This DLL is very small (20K).  The RatWin.dll includes:
+<UL>
+	<LI>Wrappers that were chosen to not be inline, because
+	<UL>	<LI>they call non-inline things themselves, so avoiding non-inline code on a matter of principle is no longer a consideration;
+			<LI>so many parameters are supplied by the wrapper that the code savings is significant;
+			<LI>or there is significant added value so the function is not trivial.
+	</UL>
+	<LI>The <code>get_instance()</code> function, which caches the result of <code>GetModuleHandle</code>.
+	<LI>A built-in minimal WinProc which adds <code>WM_QUIT</code> handling to the <code>DefWinProc</code>.
+	<LI>A constructor for <code>window_class</code>, derived from <code>WNDCLASS</code>, which
+		populates all the members to useful default values including correct color and cursor.
+</UL>
+
+
+<A NAME="4"><H3>Theory of Implementation</H2></A>
+
+<P>Right now I'm using "cloaked" declarations to import the actual functions.  They are cloaked because at 
+least one argument is of a special type that will never actually be used anywhere.  This way you 
+will never match it when resolving overloading.  Meanwhile, the C++ style functions call these global 
+ones, using typecasts and inline code.  I'll change this as soon as I learn enough about DLL's to devise a 
+better way.  In the meantime, I'm sidestepping the limitations of this technique.</P>
+
+
+<A NAME="5"><H3>Extending RatWin</H2></A>
+
+<P>I don't want to do (possibly automated) large-scale conversions of &lt;windows.h&gt; items.  
+Instead, I want to do just what I need, so everything in there has been tested and used in a real situation.  
+This applies not only to insuring correct translations, but tests the usability and packaging concepts.  
+As it grows, I will certainly alter the organization.</P>
+
+<P>Contributions are welcome.  If you fix things or add more items, use a <code>/*changed*/</code>
+ or<code> /*added*/</code> &hellip; <code>/*end added*/</code> 
+comment so I can spot it to integrate into the next version.</P>
+
+<A NAME="6"><H2>User's Guide</H2></A>
+
+<A NAME="types"><H3>Types</H3></A>
+
+<A NAME="8"><H4>Fundimental Types (pointers, words, etc.)</H4></A>
+
+<P>In general, normal C++ types are used throughout RatWin.  Instead of hiding a parameter's
+type under multiple layers of typedefs and macros, the actual C++ type is used.  So you won't see
+Any use of <code>DWORD</code> or <code>VOID</code>.  Instead, you'll see native C++ types 
+such as <code>long</code>, <code>int</code>, and <code>void</code>.  The
+only aliasing of primitive types are the following found in <code>classics\common.h</code>:
+
+<pre>
+typedef unsigned long ulong;
+typedef unsigned short ushort;
+typedef unsigned char byte;
+</pre>
+
+<P>Pointer types are not typedefed to their own names.  That is, a pointer to a <code>FOO</code> is not <code>PFOO</code>, but
+is properly spelled as <code>FOO*</code>.</P>
+
+<P>Most of the time, however, references are used instead of pointers.  Just about everyplace that the
+traditional WINDOWS.H file uses a pointer for a parameter, RatWin uses a reference instead.</P>
+
+<P>If you really want to use <code>WORD</code> and other common WINDOWS.H types, you can include
+the file <code>"ratwin\winnames.h"</code>.  This declares these names in the <code>winnames</code> namespace.  You
+can then dump these into the global namespace with a <I>using</I> directive.</P>
+
+<pre>
+#include "ratwin\winnames.h"
+using namespace ratwin::winnames;
+
+//now this works:
+DWORD x= 5;
+</pre>
+
+<A NAME="9"><H4>Enumeration Constants and Flags</H4></A>
+
+<P>The traditional WINDOWS.H file uses lots and lots of #define constants.  In C++, this is properly
+done with constants and enumerated types.  In general, RatWin uses a named enumeration
+to group a set of related flags.</P>
+
+<P>When flags are mutually exclusive, or if there are 3 or fewer flags so it becomes feasable
+to enumerate every legal combination, the API function is strongly typed to accept that
+enumeration type.</P>
+
+<P>In other cases, where the user is expected to combine flags using logical OR, the API signature is not
+strongly typed because combining two enumeration constants with an | operator in C++ produces
+an int for a result.  C++ does not avail itself toward easy type checking in this case.</P>
+
+<P>What to do about this is still under deliberation.  It seems natural to use a
+<A HREF="../class_summary.html#flagword">flagword</A> from Classics, which is feasable because,
+as a template, the implementation is entirely in a header file and will not cause a dependancy on
+another DLL.  This has not yet been done, though.  In the future, you can expect strong type
+checking on all flags parameters as well.</P>
+
+<A NAME="10"><H4>Structures and Classes</H4></A>
+
+<P>The various structures from the Win32 API are provided under the same name.  Sometimes,
+member functions are added.  But these types still qualify as <A HREF="#fn1" TARGET="footer">PODS</A>
+and may use aggregate initializers.</P>
+
+<P>Adding a constructor is commonly done, but this is done in a derived class.  For example,
+struct <code>WNDCLASS</code> is a PODS , and can be used with 
+<A HREF="#fn2" TARGET="footer">aggregate initializers</A>
+or left uninitialized, as in traditional Windows programming.  But class <code>window_class : public WNDCLASS {</code>
+&hellip; takes this structure and adds a proper constructor.  You can use <code>window_class</code> in new
+code and take advantage of the constructor to fill in all the fields correctly with reasonable
+values, or you can still use <code>WNDCLASS</code> to bypass the calling of a constructor.</P>
+
+<P>The names of the data members of the structures varies.  Most use the same names as the traditional
+WINDOWS.H declarations, but I've experimented with "reformed" simple names as well as ways to
+provide both traditional and reformed names at the same time.</P>
+
+<A NAME="7"><H4>HANDLE and other Hxxx Types</H4></A>
+
+<P>For "Isa" relationships among the Hxxxx types, I use inheritance.  So, everything "is&nbsp;a" HANDLE.  This will actually 
+use multiple inheritance when I get to that point, since the relationship is complex.  The inability to 
+model this complex type system in C is probably why the existing "STRICT" mode punts at so many points.</P>
+
+<P>A full hiarachy of HANDLE types and compiler-awareness of the "isa" relationships between
+them will be fleshed out in an upcoming version.</P>
+
+<H3>Functions</H3>
+
+<P>In general, a function does the same thing as the function with the same name in the Win32 API.  After
+all, this is just a C++ header file to get to the entry points in the various system DLLs, not a whole
+library in itself.  So, the functions have the same names and take the same parameters in the same order.</P>
+
+<P>Rather than macros to select a -A or -W form of a function, overloading is used.  You can call
+TextOut, for example, passing it a <code>char*</code> or passing it a <code>wchar_t*</code>.  Either way, the
+correct form is automatically used and there is no need for conditional compilation.</P>
+
+<P>Note that not all functions are declared.  The "add it as you need it" growth of RatWin ensures that
+everything in there is tested, and it stays small because functions nobody ever uses are not included.  If
+you find that, for example, <code>FooBar(char*)</code> is present but <code>FooBar(wchar_t*)</code> is missing,
+<A HREF="#5">add it</A>!</P>
+
+<P>Some functions take parameters that can be a string <I>or</I> a number; or a menu handle <I>or</I> a child ID.
+For functions that have one or two such parameters, it's practical to provide overloaded signatures that
+provide strong type checking of all legal parameter types and require no casting on the part of the caller.
+For functions that take more than two such flexible parameters, another way is needed.  The new way is to
+use an internal type for the parameter that represents the set of legal choices (e.g. <code>char*</code> or <code>int</code>) and
+has constructors to provide implicit conversions from those types.</P>
+
+<A NAME="11"><H3>Namespace and Fragmentation Mania!</H3></A>
+
+<H3>Organization</H3>
+
+<A NAME="3"><H2>Compatability with WINDOWS.H</H2></A>
+
+<H3>Binary Compatibility</H3>
+
+<P>Code compiled using RatWin is fully compatible with code compiled using <code>WINDOWS.H</code>.  That is,
+handles obtained using RatWin may be passed to functions declared in <code>WINDOWS.H</code>, or
+vice versa; structures filled in by RatWin are identical to those used by <code>WINDOWS.H</code>, etc.</P>
+
+<P>After all, RatWin is just a set of C++ header files providing access to the code
+that already exists in the system DLLs.  It doesn't provide significant code itself.  The system
+doesn't care what header the C++ compiler used to gain an understanding of the contents
+of the system DLLs; however it was accomplished, the DLL entry point needs to be called
+correctly.</P>
+
+<P>You may have some OBJ files compiled with RatWin and link these with other OBJ files compiled
+using <code>WINDOWS.H</code>, without conflict.</P>
+
+<H3>General Source Compatibility</H3>
+
+<P>Unfortunatly, this compatability does not extend to the source level.  Although RatWin tries to put
+everything inside a namespace and keep the global scope unpolluted, the <A HREF="#4">"cloaking" technology</A>
+used to implement the headers in a portable manner requires that signatures declaring the various system
+functions indeed be present at global scope. </P>
+
+<P>Because C++ doesn't allow overloading functions with "C" linkage, this naturally
+conflicts with the contents of <code>WINDOWS.H</code>.  In short, both <code>WINDOWS.H</code> and RatWin headers
+declare (for example) a function called <code>CreateWindow</code>.  This is a conflict.</P>
+
+<P>If RatWin is re-implemented to use 
+<A HREF="#fn3" TARGET="footer">forwarding COFF records</A> instead of cloaked global
+declarations, this conflict will go away.  For now, you have a general problem in that
+<code>WINDOWS.H</code> and RatWin cannot be #included in the same translation unit.</P>
+
+<P>The solution is to separate RatWin-based code and<code> WINDOWS.H</code>-based code
+into different translation units.  For code that is modular, cohesive, and uncoupled,
+this is not a big problem.  For spegehetti code that calls anything from anywhere,
+it can be a difficulty.</P>
+
+<P>Note that this declaration-compatibility issue is not just for RatWin.  Microsoft's own
+DDK headers are also incompatible with <code>WINDOWS.H</code> !  A reusable module that
+itself used <code>WINDOWS.H</code> could not be reused for a device driver project.  However,
+a resusable component written using the RatWin <code><I>=struct</I></code> files described below
+could be reused for a DDK-based project or anywhere else.</P>
+
+<P>Proper use of RatWin allows you to write reusable components
+that's actually more compatible than <code>WINDOWS.H</code>.</P>
+
+<A NAME="maxcompat"><H3>Maximizing Source Compatibility</H3></A>
+
+<P>To prevent being part of the problem, header files can be designed
+so they are not coupled to either <code>WINDOWS.H</code> or the problem parts of RatWin.</P>
+
+<P>RatWin only has a source-compatability problem with global
+function declarations of actual API functions.  Code in a header does
+not need to refer to global functions, if functions that do such calling
+are placed in .CPP files and not in the header.  What headers
+need are type definitions, and these cause no problems with
+compatibility.  RatWin puts all its types inside a namespace, so
+it can have all the types it wants without polluting the global scope.</P>
+
+<P>To this end, type definitions are separated out from API
+function declarations into different headers.  These headers
+have a <code><I>=struct</I></code> suffix on their names.</P>.
+
+<P>Suppose, if you were writing a header file <code>comm.h</code> that referred to
+sockets, and comm.h included <code>"ratwin\winsock2.h"</code>, then <code>comm.h</code> would be
+coupled with RatWin and incompatible with <code>WINDOWS.H</code>.  A user could
+not include <code>comm.h</code> and include <code>WINDOWS.H</code> in the same <code>.CPP</code> file.</P>
+
+<P>Likewise, if <code>comm.h</code> included <code>WINSOCK.H</code> to get what it
+needed, it would be coupled with <code>WINDOWS.H</code> and incompatible
+with RatWin.  A user could not include <code>comm.h</code> and RatWin headers in
+the same <code>.CPP</code> file</P>
+
+<P>The solution is to write comm.h so it gets what it needs
+by including<code> "ratwin\socket2=struct.h"</code>.  This header is very
+well behaved and does not affect the global scope, or
+anything other than the <code>::ratwin</code> namespace.</P>
+
+<P>Now, comm.h is compatible with <I>anything</I>.  A user
+may include <code>comm.h</code> and also include <code>WINDOWS.H</code>, or may
+also include RatWin headers, or the Windows DDK headers, or use any other include file set
+that provides access to the Win32 API.</P>
+
+
+<HR SIZE=10 COLOR=black>
+
+<H1>Footnotes and References</H1>
+
+<A NAME="fn2">
+<P><B>Aggregate Initializer</B> see ANSI C++ CD2 &sect;8.5.1.  It refers to using
+curly braces around a list of items for a structure or array,<BR>e.g. <code>S x= {1, 2, 3};</code>.
+</A>
+
+<A NAME="fn1">
+<P><B>PODS</B> stands for <I>Plan 'Ol Data Structure</I>, defined in ANSI C++ CD2 &sect; 9 footnote 2
+</A>
+
+<A NAME="fn3">
+<P><B>Forwarding COFF records &mdash; </B>If anybody knows how to create "forwarders" in a DLL, please let me know.  For example, Under
+Windows NT4, a program that imports <code>DeleteCriticalSection</code> from <code>KERNEL32.DLL</code>
+will actually get <code>RTLDeleteCriticalSection</code> from <code>NTDLL.DLL</code>.
+A record in this copy of <code>KERNEL32.DLL</code>
+(but not in Windows 95's implementation) somehow forwards the import to a different name in a
+different DLL, without inserting the run-time overhead of an extra wrapper.</P>
+
+</BODY>
+
+</HTML>
+
+
+
+

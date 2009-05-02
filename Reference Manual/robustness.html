@@ -1,0 +1,163 @@
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=windows-1252">
+<LINK REL=STYLESHEET HREF="info.css" TYPE="text/css">
+<TITLE>Robust Code and Testing</TITLE>
+<META NAME="description"
+ CONTENT="A treatment on code correctness and software testing.">
+<META NAME="keywords"
+ CONTENT="Repertoire documentation robustness testing reliability">
+</HEAD>
+
+<BODY>
+<!-- Standard banner at top of Reper file -->
+<P CLASS="banner">
+This document is one section of The Repertoire Reference, found at
+<A HREF="http://www.dlugosz.com/Repertoire/refman/mainframe.html" TARGET="_top">
+http://www.dlugosz.com/Repertoire/refman/mainframe.html</A>.<BR>
+Copyright 1998 by <A HREF="mailto:john@dlugosz.com">John M. Dlugosz</A>.
+</P>
+<A NAME="toptop">
+<!-- end of standard banner -->
+<H1>Robust Code and Testing</H1>
+
+<H2>What If They Built Bridges That Way?</H2>
+
+<P>One day I was working on a document and Microsoft Word suddenly decided to malfunction.
+It was not the first time.  Word has a reputation of scrambling documents, especially those that
+make use of object embedding.  Worse, it sometimes refuses to save files, complaining
+that it's out of disk space, no matter where you try and save it to, when lots of room
+is available.  Strangest of all is the way quitting and restarting the application will not
+clear up the bad behavior&mdash;instead, it takes a complete system reboot.</P>
+
+<P>The repeated failure of such a popular piece of software, with problems in one of its
+fundimental selling points, made me reflect on how consumers have come to accept
+such poor quality in what they buy and use.</P>
+
+<P>That made me think "What if they built bridges that way?", which has since turned
+into a catch phrase for the promotion of quality software.  Engineers have been building
+bridges for thousands of years.  In fact, some Roman bridges are thousands of years
+old and are still in use today.  In contrast, people have been writing software for only
+a few decades.  Nevertheless, an individual craftsman with just his own personal
+experience should know enough to do things right and avoid shoddy work.  That's
+what I'm after.</P>
+
+<H2>Take Inspiration</H2>
+
+<P>Donald E. Knuth is famous for <I>The Art of Computer Programming.</I>  Later, he
+came up with the 
+<SPAN STYLE="letter-spacing:-.1em">T<SPAN STYLE="vertical-align:sub">E</SPAN>X</SPAN>
+typesetting system and the Metafont scalable font system.  I've read that these programs
+are thought to be virtually bug-free, and that he offers a reward for anyone who finds
+a bug.  The reward <I>doubles</I> each time a bug is found, and was currently $20.48 for
+the next bug found.</P>
+
+<P>Now think about that&mdash;this bounty could grow to enormous amounts if more
+than a very small number of bugs was found.  If he started at 1 cent, that means 10
+bugs so far.  That can be taken as a reasonable number for a major software package,
+costing him just over twenty dollars in reward money.  Now 20 bugs would escellate that
+to over ten thousand dollars!</P>
+
+<P>I was unable to find the paragraph mentioning the bug bounty in the <I>The
+<SPAN STYLE="letter-spacing:-.1em">T<SPAN STYLE="vertical-align:sub">E</SPAN>X</SPAN>book</I>,
+so perhaps I misremember things.  Even so, the idea has served as inspiration to me
+for many years since I read it.  Here is a software author who firmly believes his work
+to be of high quality.  He fully expects it to function correctly, fail gracefully, and
+stand up to a community of power users who explore uses of his tool in ways he
+never deramed of when inventing it.</P>
+
+<P>Meanwhile, I did find the following paragraph in <I>The Art of Computer Programming</I>:
+<BLOCKQUOTE>
+By now [the second edition] I hope that all errors have disappeared from this book;
+but I will gladly pay a $2.00 reward to the first finder of each remaining error,
+whether it is technical, typographical, or historical.
+</BLOCKQUOTE>
+
+<P>This bold gesture is in stark contrast to modern "pulp" programming books which
+show many technical errors on a cold reading, indicating to me that nobody actually
+proofed it.  This book is filled with source code, mathematics, and references.  And
+the reader can go in <I>expecting</I> every statement to be utterly correct.  This also
+offers a study to see just how well-founded his confidance was, since that paragraph
+was published 25 years ago and we can see how many errors were in fact
+discovered during that time.  The <A HREF="http://www-cs-staff.stanford.edu/~knuth/taocp.html" TARGET="refer">errata</A>,
+listing changes between the 2nd and 3rd editions, is available for all to see.</P>
+
+<P>The <A HREF="http://www.wolfram.com/" TARGET="refer">Mathematica</A> software package claims (emphasis mine):
+<BLOCKQUOTE>
+<I>Mathematica</I> is one of the more complex software systems ever constructed. &hellip; Since the
+beginning of its development in 1986, the effort spent directly on creating the source code
+for <I>Mathematica</I> is a substantial fraction of a thousand man-years.  <B>In addition,
+a comparable or somewhat larger effort has been spent on testing and verification.</B>
+</BLOCKQUOTE>
+
+<P>Section 1.12.5 in The Mathematica Book describes their testing process.  This gave
+me high hopes in the overall quality of the software.</P>
+
+<P>Naturally I was rather disturbed when I managed to crash the Mathematica math
+kernel.  Had I stumbled on to a rare flaw that had gone undetected for many years?
+No, it's sad to say.  Apparently such bugs are common, and go unfixed with
+minimal advise ("don't do that!") from tech support.  So, while the testing
+virtually guarentees that the various mathematical algorithms return correct
+results, this validation does not extend to other areas of the system.</P>
+
+<P>On the other hand, the errata
+for <A HREF="http://www-cs-staff.stanford.edu/~knuth/cweb.html" TARGET="refer"><code>CWEB</code></A>,
+another Knuth project, is a success story (emphasis mine):
+<BLOCKQUOTE>
+Known errors in CWEB or its documentation have always been corrected 
+immediately in the online version. <B>No bugs in the programs have been found 
+since Version 3.4 was released in April 1995; no bugs in the documentation 
+have been found since June 1995.</B> Only minor corrections have been made since 
+the second printing of the book, and the authors do not intend to change CWEB 
+henceforth unless some devastating new bug is discovered. (Non-catastrophic 
+infelicities should therefore be considered permanent features of CWEB.) The 
+only changes made since July 1995 have been to improve or extend the 
+auxiliary files of examples and customization. For example, in November 1995 
+we added files for porting to QDOS/SMSQ systems. Also in May 1998 we changed 
+"is is" to "is" on page 4 line 33 of the manual. 
+</BLOCKQUOTE>
+
+<P>So, take inspiration in the fact that not all software is shoddy.  Some people
+do put quality into their work, and there is no reason why it can't be done.</P>
+
+<H2>Know What It's <I>Supposed</I> To Do</H2>
+
+<P>It's difficult to write robust code if you don't know what your components are
+supposed to do.  You can't plan for correct handling of unusual cases if you
+don't know what the subroutines being used will do with that value first!</P>
+
+<P>The documentation for a function needs to be complete, so it is clear what
+happens in all circumstances.  It must state what doesn't work, as well, so the
+caller knows where his responsibilites begin.</P>
+
+<H2>Unit Tests Are Important</H2>
+
+<P>For the kind of low-level code being presented in Classics, unit testing is an
+easy to use and extremely valuable tool for validating the code.</P>
+
+<P>Basically, try it!  Try calling each member function (or otherwise use the object)
+and verify that it functions correctly, in accordance with the documentation.  This
+includes boundary conditions and extreme input, so we know the component
+is robust as well as minimally accurate.  In addition, this checks the documentation
+since the test cases force you to consider what happens in all cases.</P>
+
+<P>In Classics, unit test code is presented in the same directory as the
+code being tested, with a <code>.cxx</code> extension.  Usually the program is
+automated, and will tell you of any failures when run.</P>
+
+<P>The very existance of such test programs makes it easy for a user to
+check something.  If a bug is suspected, or if the documentation isn't clear
+about a particular case, it's simple to add a test case to the <code>.cxx</code> file.</P>
+
+<H2>Regression Testing is Really Important</H2>
+
+<P>Besides knowing that a components works correctly, it's even more important to
+know that things don't change in the future.  Don't break something when
+fixing something else!  By keeping all the test code and re-running
+the test cases when a change is made, it's easy to find errors during development.
+Even better, the users will be confidant that the new features did not alter the
+behavior of the old, and their code won't break.</P>
+
+</BODY>
+</HTML>
+

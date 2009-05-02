@@ -1,0 +1,149 @@
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=windows-1252">
+<LINK REL=STYLESHEET HREF="info.css" TYPE="text/css">
+
+<TITLE>Repertoire Project Work Log</TITLE>
+</HEAD>
+<BODY>
+<A NAME="changes"><H1>Changes</H1></A>
+<H2>Changes since release PB6</H2>
+<UL>
+	<LI>added <code>directory_list</code> class.
+	<LI>Fix: <code>win_exception</code> class broke due to change in ustring.  char* no longer copyed, so format_message
+	   helper was returning a pointer to a local buffer.
+	 <LI><code>exception::iterator</code> detects error on unballanced delimiter.
+	 <LI>Fix: <code>file_factory</code> remove conflict with Windows.h.
+	 <LI>added more flags to <code>file_factory</code>.
+	 <LI>changed <code>PC_filesystem_t::exists()</code> to use <code>directory_list</code> instead of its own code to do the same thing.
+	 <LI>improved <code>PC_filesystem_t::move_file</code> to take flags
+	 <LI>Fix: <code>PC_filesystem_t::move_file_delayed</code> on Win9x was using short-name for destination; changed to
+	    use short-name for path but name as specified for the final part of the name.  Win9X needs short name paths here.  So
+	    why does it tolerate a fullname for the final part?  Could still be issues here.
+	 <LI>added "copy defered" and "exists" tests to filename_t_UT.cxx.
+	 <LI>added <code>get_nodelist</code> and <code>check_address</code> debugging function to <code>static_fixed_memory_pool</code>.
+	 <LI>added more troubleshooting to handle_UT.cxx (never found anything wrong, though).
+	 <LI>Fix: MFC CString clone had datalength one place where it meant alloclength.
+	 <LI>added classics class <code>mutex</code>.
+	 <LI>class <code>can_handle</code>: added destructor to zero out Lifetime pointer, to trap errors earlier.
+	 <LI>Fix: smart pointer system could mess up in some circular reference cases.  If deleting the last owner removed the last borrower
+	    during its constructor, it would access the lifetime object after it was destroyed.
+	 <LI>added much more to <code>profile_timer</code>.  Added wall-clock value, copying, and ability to monitor different threads.
+	 <LI>Fix: <code>registry_key::key_exists</code> had mixed up two handles, and didn't work.
+	 <LI><code>ustring</code> copy constructor and assignment added, by popular demand.
+	 <LI>the exact way the common shared "empty" instance of vararray<T> is handled was changed.  The compiler was found to not
+	    correctly deal with static data items inside template functions: the variable itself was right, but the first-time-only constructor
+	    lock was not!  So it would cause multiple constructions.  This was harmless in this case, but would leak that object.
+	 <LI>Added <code>obj_reference</code> class to <code>server_lifetime_manager_t</code>.
+	 <LI>Added ratwin_static.h.
+	 <LI>Added ratwin\macrocloak.perl, a technology to deal with WINDOWS.H macros.
+	 <LI>Added ratwin\NumOrName.h, a way to handle Win32 API function parameters that take strings, numbers, or enums.
+	 <LI>Added ratwin\INI_file.h, ratwin\LZexpand.h, ratwin\mailslot.h, ratwin\MessageBox.h, ratwin\shell.h, ratwin\sysinfo.h,
+	    ratwin\window=struct.h, ratwin\io\file=struct.h, ratwin\io\filemapping=struct.h
+	 <LI>Added ratwin\COM\BSTR=static.cpp, ratwin\COM\GUID=static.cpp, ratwin\COM\memory=static.cpp
+	    ratwin\COM\IEnumSTATSTG.h
+	 <LI>Added <code>auto_COM_ptr::operator void*()</code>.
+	 <LI>To make the smart pointer system more fault-tolerant against stray pointer bugs, hid the pointer in <code>can_handle</code> and
+	 added a diagnostic to <code>get_lifetime_object()</code> (which is no longer inline).
+	 <LI>Added some HANDLE subtypes to <code>ratwin::types</code>, and introduced a mechanism so that functions can take a strictly-typed
+	 sub-HANDLE, or a plain HANDLE, but not the <I>wrong</I> sub-HANDLE.
+	 <LI>moved BitBlt from ratwin\bitmap.h to ratwin\gdi.h
+	 <LI>Introduced RATWIN_NoGlobals preprocessor switch.
+	 <LI>added ratwin\color=struct.h.
+	 <LI>Introduced COLORREF type.
+	 <LI>Introduced ChildOrHMENU.h, for CreateWindow parameters.
+	 <LI>Added ratwin\controls\ImageList.h, Rebar.h, ToolBar.h
+	 <LI>Introduced classics\closure.h
+	 <LI>Introduce sMSG form of calls in ratwin, as an alternative to (window,message,wparam,lparam) tuples.
+	 <LI>Change ratwin::window_class into a template for CharT.
+	 <LI>Tomahawk Lives!  Renamed old directory and started a fresh one, for new development.
+	 <LI>Introduced "Release Tools\test_include.perl", to verify interoperability between Ratwin and WINDOWS.H
+</UL>
+
+<H2>Changes since release PB5</H2>
+<UL>
+	<LI><code>exception</code> class uniformly uses <code>ustring</code> instead of pointers.
+	<LI>added "setup hook" to <code>exception</code>
+	<LI>add <code>string::operator+=</code> for pointers (more efficient than converting pointer to <code>string</code> implicitly)
+	<LI>made <code>ustring</code> much more efficient for <code>char*</code> and <code>wchar_t*</code>.  This is a little messy, but is a
+	prelude to the next generation <code>ustring</code> class.  This was necessary to restore the level of performance
+	lost by making the <code>exception</code> class take <code>ustring</code>s, and the trend toward <code>ustrings</code> everywhere without
+	worrying about when raw pointers could be available.
+	<LI>introduced classics\utf-8 module.
+	<LI>Fix: classics::COM::factory had circular dependancy on RatWin.
+	<LI>Fix: classics::COM::server_lifetime_manager now doesn't force a minimum up time.
+	<LI>Fix: classics::exception::show_function wasn't exported from the DLL.
+	<LI>Fix: file_factory::Create works around a bug in Win9x, where CreateFile returns a 0 handle
+	on error instead of INVALID_HANDLE_VALUE, as documented.
+	<LI>add zero-argument constructor to classics::filename_t.
+	<LI>add members move_file_delayed, get_short_name to classics::PC_filesystem_t,
+	and timestamp to filename_t and base filesystem_t.
+	<LI>filename_t wrappers around filesystem_t features use const_object on the smart pointer
+	rather than the normal defreference, to prevent unneeded copy-on-write.
+	<LI>introduced classics::mutex.
+	<LI>add members to classics::registry_key : zero-argument constructor, assignment operator, 
+	value_exists, set_value taking an int, get_value, get_value_string, get_value_int.
+	<LI>improve error text for registry_key::create.
+	<LI>Fix: bug in classics::UCS2_to_UTF8, bad return code could corrupt the stack.
+	<LI>introduced "virtual key" features in classics::VK::*.  Header classics\virtual_key.h
+</UL>
+
+<H2>Changes since release PB4</H2>
+<UL>
+	<LI>Fix: <code>exception</code>'s <code>default_show_function</code> incorrectly contained a <code>static</code> modifier for a local variable.
+	   This caused problems when additional named items were present in exceptions to be displayed.
+	<LI>Fix: <code>win_exception</code> didn't format error string under Win95
+	<LI>Fix: atomic_counter.h needed <code>Xexchange</code> for <code>byte</code> and <code>char</code>.
+	<LI>Fix: <code>atomic_counter</code> of one byte had <code>add</code> instead of <code>xadd</code> instruction.
+	   It seemed to work just fine anyway...
+	<LI>string class constructors detect a <code>NULL</code> <code>char*</code>/<code>wchar_t*</code> pointer as an empty string.
+	   Specifically, it won't call <code>strlen</code>/<code>wcslen</code> on a <code>NULL</code> pointer.
+	<LI>Update <code>filename_t</code> class to automatically handle ANSI or Unicode
+	<LI>Introduce "classics\new.h" feature.
+	<LI>Introduce <code>PC_filesystem_t::move_file</code> function.
+	<LI>COM-related classes introduced: <code>factory</code>, <code>prothonotary</code>, and <code>server_lifetime_manager</code>.	
+	<LI>Introduce <code>registry_key</code> class.
+	<LI>Introduce 32-bit CRC functions.
+	<LI>Simple <code>file_factory</code> class taken from Tomahawk.
+</UL>
+
+<A NAME="todo"><H1>To-Do List</H1></A>
+
+<H2>Documentation</H2>
+
+<UL>
+	<LI>Cover directory arrangement.
+	<LI>Write licence document.
+	<LI>"larger set" and "toptop" in manual pages
+	<LI>class_summary.html use styles instead of TT
+</UL>
+
+<H2>Strings</H2>
+<UL>
+	<LI>ustring copy constructor not defined&mdash;update code to match revised documentation.
+	<LI>String formatting, wFmt.  Revisit code, document.
+	<LI>string marker doumentation
+	<LI>string_cast code
+	<LI>extensibility issues in ustring document
+	<LI>ustring next generation - separate conversion objects, handle OEM, etc.
+</UL>
+
+<H2>Exceptions</H2>
+<UL>
+	<LI>edit exception user's guide
+	<LI>explain why not logic_error etc. derived types
+	<LI>auto-logging info in exceptions
+	<LI>exception::iterator documentation
+	<LI>exception::register_callback code
+	<LI>exception_value_logger code
+	<LI>document/example how win_exception can be handy without throwing
+</UL>
+
+<H2>File Names (filename_t, filesystem_t, etc.)</H2>
+<UL>
+	<LI>Overcome limits and bugs with GetFullPathName function by writing my own code.
+</UL>
+
+</BODY>
+</HTML>
+

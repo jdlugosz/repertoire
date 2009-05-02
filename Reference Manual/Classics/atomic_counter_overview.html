@@ -1,0 +1,87 @@
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=windows-1252">
+<META NAME="description"
+ CONTENT="User's Guide for the atomic_counter class, part of John Dlugosz's Repertoire Project.">
+<META NAME="keywords"
+ CONTENT="Repertoire documentation user's guide atomic_counter Classics">
+<TITLE>atomic_counter Overview</TITLE>
+<LINK REL=STYLESHEET HREF="../info.css" TYPE="text/css">
+</HEAD>
+
+<BODY>
+<!-- Standard banner at top of Reper file -->
+<P CLASS="banner">
+This document is one section of The Repertoire Reference, found at
+<A HREF="http://www.dlugosz.com/Repertoire/refman/mainframe.html" TARGET="_top">
+http://www.dlugosz.com/Repertoire/refman/mainframe.html</A>.<BR>
+Copyright 1998 by <A HREF="mailto:john@dlugosz.com">John M. Dlugosz</A>.
+</P>
+<A NAME="toptop">
+<!-- end of standard banner -->
+<H1>atomic_counter</H1>
+
+<P>The <code>atomic_counter</code> template provides for incrementing and decrementing values
+in a thread-safe manner.</P>
+
+<P>More on the concepts involved and a detailed description of the implementation can be found
+in the August 1998 issue of <A HREF="http://www.pinpub.com/vcd/" TARGET="_blank" ><I>Visual C++ Developer</I></A>.
+A similar treatment appears as a <A HREF="atomic_counter_whitepaper.html#toptop">whitepaper</A> on this site.</P>
+
+The template allows you to declare a thread-safe value of any type.
+<pre>
+atomic_counter&lt;int&gt; x1;
+atomic_counter&lt;unsigned long&gt; x2;
+atomic_counter&lt;byte&gt; x3 = 5;
+<!-- original text:
+atomic_counter<int> x1;
+atomic_counter<unsigned long> x2;
+atomic_counter<byte> x3 = 5;
+-->
+</pre>
+
+A selection of read/modify/write operations are provided, including
+<UL>
+	<code>++</code> and <code>--</code> (prefix and postfix)</br>
+	<code>+=</code> and <code>-=</code>
+</UL>
+They allow modification of the value and testing of the value (either new or old, depending on the operator)
+in an unbroken operation, so other threads won't change things between the "read" and the "write", and
+the result is in sync with this particular operation even if other threads are changing the value too.</P>
+
+<P>A conversion operator allows the atomic_counter to be used as a plain value.</P>
+
+<P>The template is designed with a dual personality.  It may be used with <i>any</i> type, as long as these
+underlying operations are supported.  For example, a floating point type or a user-defined BCD class.  In the
+general case (which is <B>not implemented</b>), it uses a critical section to wrap the underlying operation
+in a straightforward manner.</P>
+
+<P>More interestingly, the template is explicitly specialized for the integral types in the following variations: signed
+or unsigned, 1, 2 or 4 bytes.  In these cases, the atomic_counter takes up the same amount of room as the
+underlying variable (so it fits into structures where a plain number was expected), and uses special functions
+to perform the operations.  This form is two to three times faster than the non-blocking case of using a
+Win32 Critical Section, and has the advantage of never having to block.</P>
+
+<P>This code uses the assembly language primitives that are the basis of all such atomic operations.  This is
+as efficient as you can get to accomplish this result, but be warned that it's not a cheap instruction.  Benchmarks
+show that it's orders of magnitude slower than normal non-synchronized arithmetic on integers (about 100 nanoseconds
+compared to 2 nanoseconds).  So, don't use atomic counters gratuitously.  They are cheaper than general
+purpose synchronization primitives, but if you have 3 or more atomic counters it would be more efficient to use
+a Critical Section instead.</p>
+
+<P>This class works for .NET "managed extensions" in VC++ version 7.1.  That is, the entire Repertoire library compiles "using the CLR",
+and this class is no exception.  However, it provides __fastcall in the normal case, which is not available in "managed" code.  So it
+swtiches to a normal function signature in this case.</P>
+
+<P>This class detects the case when there is only one CPU present, and disables the locking, speeding up the
+access.  This is done at run-time if it detects this case.  Basically, the atomic instructions are in fact single
+instructions, and any interrupt (or time-slice change) will not occur in the middle of it.  The read-modify-write
+instruction is all that is needed when there is only one CPU.  Only with multithreading under multiple CPUs is the
+bus-locking and pipeline-flushing necessary.  Note however that a bus-mastering device other than a CPU
+causes the same problem, so this class will not cooperate with non-CPU access to the memory location, when
+the single-CPU code is selected.</P>
+
+
+</BODY>
+</HTML>
+

@@ -1,0 +1,40 @@
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=windows-1252">
+<TITLE>APC_server complete documentation</TITLE>
+<LINK REL=STYLESHEET HREF="../info.css" TYPE="text/css">
+</HEAD>
+
+<BODY>
+<H1>APC_server</H1>
+
+It's fairly easy to start a thread, especially if you simplify the CreateThread function or
+encapsulate even more with the thread_launcher.  But what do you do with a thread once it's
+started?  If you want to send it commands, you have a generic server situation.  This class
+does all the work to make a simple server.</P>
+
+<UL>
+<LI>You create a server thread by declaring an APC_server.  The actual thread is created
+    by the constructor.
+<LI>You tell the server to do things by giving it a command object via its <code>send</code> member.
+<LI>You shut down the server by calling <code>quit</code> (which will return immediatly), or simply
+   by destructing the APC_server object (the destructor blocks until the server thread completes shutdown).
+</UL>
+
+<H2>Server Commands</H2>
+
+Dynamically allocate (i.e. use <code>new</code>) an object derived from <A HREF="abstract_command_object.html">abstract_command_object</A>.
+Pass this pointer to the <code>send</code> function.  The command object is queued and it's virtual operator() will
+be called eventually.  Then the server deletes the command object.</P>
+
+<P>The command queue is inherantly asynchronous.  If you want to get results back or wait for the command
+to complete, you have to provide for that as part of the command object.</P>
+
+<P>Since the command object is deleted by the server, you can't have it hold result data.  Instead,
+include a pointer to the result area in the command object.  You can also include an <A HREF="event_flag.html">event_flag</A>
+in the command object in order to wait for completion.</P>
+
+
+</BODY>
+</HTML>
+

@@ -1,0 +1,40 @@
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=windows-1252">
+<TITLE>profile_timer complete documentation</TITLE>
+<LINK REL=STYLESHEET HREF="../info.css" TYPE="text/css">
+</HEAD>
+
+<BODY>
+<H1>profile_timer</H1>
+This object provides for obtaining run-time information on the program, idealially suited
+for profiling code and running benchmarks.</P>
+
+The members to control the timer are:
+<UL>
+	<LI><code>start</code> -- starts the timer.
+	<LI><code>stop</code> -- stops the timer and makes results available.
+	<LI><code>snapshot</code> -- makes current time results available, but does not stop timing.
+	<LI><code>reset</code> -- resets the elapsed times to zero.  Does not clear a pending <code>start</code>.
+</UL>
+
+<P>The timing information is thread-specific, and in order to get meaningful results, <code>start</code> and
+the matching <code>stop</code> must be called from the same thread.</P>
+
+<P>The underlying mechanism is the Win32 call <code>GetThreadTimes</code>, which returns the
+amount of time spent actually exeuting this thread.  Time spent in other threads during time-slicing does
+not count, and time spent sleeping or blocked does not count.</P>
+
+To obtain results, call
+<UL>
+	<LI><code>get_user</code> -- time spent in user mode (normal code).
+	<LI><code>get_kernel</code> -- time spent in kernel mode (device drivers).
+</UL>
+
+The return value of these functions are in milliseconds, although internallay values are kept to higher
+precision.
+
+</BODY>
+</HTML>
+
+

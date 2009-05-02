@@ -1,0 +1,288 @@
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=windows-1252">
+<TITLE>flagword complete documentation</TITLE>
+<LINK REL=STYLESHEET HREF="../info.css" TYPE="text/css">
+</HEAD>
+
+<BODY>
+<H1>flagword</H1>
+The <code>flagword</code> parameterized class is used to pack a bunch of options into
+a single value.</P>
+
+<P>There are three ways to represent such a set of flags:  (a) as bits within some flavor of
+integer; (b) as a bit vector of arbitrary length; and (c) as a list or spare array.  This class
+implements type (a), which are quite common in the Win32 API, so existing needs easily meet
+the restrictions of this type (namely, flags are constants that are powers of two, and at most
+32 flags can be packed into one set), and it is trivial to extract the native format expected by
+the Win32 API calls.</P>
+
+<H2>Explaination by Example</H2>
+
+<P>Start with an enumerated type specifying flags that are powers of two.
+<PRE>
+enum color { red=1, yellow=2, blue=4, green=8, purple=16, orange=32, brown=64, black=128 };
+</PRE>
+The idea is that you can logically OR multiple flags together to create a set of flags.  For example,
+<code>red|green|black</code>will have a unique bit combination that distinguishes it from any
+other set of colors.  The problem is that OR-ing the flags together will produce a result of
+type <code>int</code>, not of type <code>color</code>.  This compromises the compile-time
+type checking of the system.
+<PRE>
+void selection (int mycolors);
+</PRE>
+You can't declare the function to take a <code>color</code>, because then you could not
+call the function with the result of the logical-OR.  You could define your own <code>operator|</code>
+to operate on this type, but you would have to do so for every such type.  This is a real possibility, though.</P>
+
+<P>The <code>flagword</code> class creates a type-checked way of handling these flags, along with many
+other features.
+<PRE>
+typedef classics::flagword&lt;color&gt; colorflags;
+<!-- original text:
+typedef classics::flagword<color> colorflags;
+-->
+</PRE>
+Now you can declare the function as
+<PRE>
+void selection (colorflags mycolors);
+</PRE>
+and the compiler will perform strong type checking on this argument, and it is clear to the
+reader that a set of colors, not (just) a single color, is expected.</P>
+
+<P>You can pass a single color enumeration constant to the function because there is an
+implicit converstion from <code>color</code> to <code>colorflags</code>.
+
+<PRE>
+selection (blue);
+</PRE>
+
+For passing multiple flags, it's a little harder than the ideal (an operator| taking color for both
+arguments and returning a flagword, generated automatically when the template is instantiated) because
+the operator| would exist in the classics namespace and not be found when applying the operator between
+two arguments of types that are in a different namespace.  To make matters worse, the compiler chokes
+when you try a using declaration or the qualified function name (classics::operator|) syntax.</P>
+
+<P>So, the operator| is provided for colorflags only, not for the underlying color enumeration.  You can
+add the function manually if you want, but in general all the operations are provided for flagword types
+and rely on conversion from the underlying enumeration type in mixed expressions</P>
+
+<P>So, if you're not totally lost by this point, the way to join multiple flags together is to
+cast one of them manually.</P>
+
+<PRE>
+selection (colorflags(red)|green|black);
+</PRE>
+
+Alternativly, you could use a variable of type colorflags.
+
+<PRE>
+colorflags my_choice= red;
+my_choice |= green;
+selection (my_choice|black);
+</PRE>
+
+As you see from the example and the list below, the flagword is fully expressive.  But you don't know the half of it yet.
+
+<H2>Logical Flag Operations</H2>
+
+<TABLE>
+<TR>
+	<TD><code>|</code>, <code>|=</code>
+	<TD>logical bit-wise OR.
+<TR>
+	<TD><code>&amp;</code>, <code>&amp;=</code>
+	<TD>logical bit-wise AND.
+<TR>
+	<TD><code>^</code>, <code>^=</code>
+	<TD><I>meaning not yet defined</I>
+<TR>
+	<TD>prefix <code>~</code>
+	<TD>Reverse all bits
+</TABLE>
+
+<H2>True Negative Flags</H2>
+
+In a traditional int packed with flags, the presence of a bit means that the flag is set.  Does
+the absence of a bit mean that the flag is definitly unset, or simply unspecified?  A number of
+data structures in the Win32 API run into this issue, and solve it by using a pair of words:  One
+states which flags are meaningful, and the other gives the meanings for those selected flags.  The
+flagword class models this behavior directly, and in fact implements it in this way so it's trivial
+to extract the raw data for use in Win32 API functions or other legacy code.</P>
+
+<P>The constructor can take two arguments.  The first is the bit image for the data; which flags are
+set.  The second is the bit image for the validity mask; which flags are meaningful in the first argument.
+
+<PRE>
+colorflags my_choice (red|blue, red|yellow|blue|green);
+draw_list (my_choice);
+</PRE>
+
+The hypothetical draw_list function could display something like this:
+<FORM>
+<UD>
+	<DD><INPUT TYPE="checkbox" NAME="choice" CHECKED>red
+	<DD><INPUT TYPE="checkbox" NAME="choice">yellow
+	<DD><INPUT TYPE="checkbox" NAME="choice" CHECKED>blue
+	<DD><INPUT TYPE="checkbox" NAME="choice">green
+</UL>
+
+That is, the <code>draw_list</code> function can tell that <code>my_choice</code> contains two flags
+that are ON out of four that we care about, and the others are unspecified.  It knows that <code>yellow</code>
+is OFF, as opposed to <code>orange</code> which is not specified at all.</P>
+
+<P>When you test for flags, you can specify whether you want to know if the flag is set or not (neither
+yellow nor orange is set), or whether a flag is explicitly negative (yellow is, orange isn't).  You don't
+need to put up with the complexity if you don't need it.  Converting an enumeration constant into
+a flagword gives a set with one bit set and all other bits off and invalid.</P>
+
+
+<H2>Tri-state Logic</H2>
+
+Internally, the flagword is represented as a word of flags and a second word specifying which
+flags are valid.  An alternate way of thinking about it is to use three-state logic.</P>
+
+<P>Unlike the Boolean states we are used to, tri-value flags have three states: <code>true</code>,
+<code>false</code>, and <code>unspecified</code>.  Treating the third state as an unknown (could be true
+or false, I don't know), you have a natural definition of what AND and OR mean.  It's clear
+that <code>unspecified|true</code> produces a result of <code>true</code>, because it doesn't matter
+what the unknown value turns out to be.  In cases where you can't tell, the result becomes unknown too.</P>
+
+The <code>operator|</code> and <code>operator&</code> functions on flagwords use this logic.  You can see that it degenerates to the
+ordinary Boolean logic when unknown states are not being used.</P>
+
+<IMG SRC="flagword_or.gif">
+
+<P><B>A:</B>	if either argument is true, the result must be true.<BR>
+<B>B:</B>	if both arguments are false, the result is definitly false.<BR>
+<B>C:</B>	can't tell.</P>
+<B>result Mask=</B> (D1&M1)|(D2&M2)|(M1&M2)<BR>
+<B>result Data=</B> (D1|D2)
+</P>
+<P><B>Key:</B> D1,M1 are data and mask words for left argument; D2,M2 are data and mask
+words for right argument; Dr,Mr are data and mask words for result.  An x bit means "don't care".</P>
+
+<IMG SRC="flagword_and.gif">
+
+<P><B>A:</B>	if either argument is false, output must be false and the other argument doesn't matter.<BR>
+<B>B:</B>	if (and only if) both arguments are true, output is true.<BR>
+<B>C:</B>	otherwise, result is unknown.</P>
+<B>result Mask=</B> (~D1&M1)|(~D2&M2)|(M1&M2)<BR>
+<B>result Data=</B> (D1&D2)
+</P>
+
+<H2>Combining Flags with +</H2>
+
+Besides the traditional logical operators of | and &amp;, other useful operations suggest themselves.  In fact,
+there are 19,683 possible trit-wise operators, which are a subset of the 4 billion possible data/mask pair operations.
+Naturally, I won't try to enumerate them or figure out what they are good for.  Instead, I'll add functions to
+the class whenever a need becomes apparent.</P>
+
+One important operation is to combine flags according to this rule:  For each valid flag in the right argument
+put (on or off) into the left argument; otherwise leave the flags in the left argument unchanged.  This has
+been defined as operator+, and the truth table is shown below.</P>
+
+<IMG SRC="flagword_add.gif">
+
+<P><B>A:</B>	if right argument is valid, take that.<BR>
+<B>B:</B>	otherwise, if left argument is valid, take that.<BR>
+<B>C:</B>	otherwise, result is unknown.
+</P>
+<B>result Mask=</B> M1|M2<BR>
+<B>result Dada=</B> (D2&M2)|(~M2&D1)</P>
+</P>
+Note that this function is not commutitive.  That is, <code>X+Y</code> is not the
+same as <code>Y+X</code>.  When "adding" flags, the right hand argument is "on top", and covers the information
+in the left argument.  The flags from the left argument only show through any gaps where the right
+argument has unspecified values.</P>
+
+<P>In fact, I originally had another operation slated for this class, to be used in applying default flags to
+a set of user-supplied flags.  The defaults should only affect flags that the user has <i>not</I> specified;
+any that the user set (true or false) are left alone.  When I started to draw up the truth table for this
+operation, I realized that it's exactly the same as + with the arguments reversed.</P>
+
+In the earlier examples, using + will have the same result as |.  This is by design, and a consequence
+of the way single value enumeration constants are converted to flagwords as well as in the logic of the tables.</P>
+
+<P>But, using + on actual flagwords (not just promoted enumeration constants) gives added power:  You can
+set and clear flags at the same time.  </P>
+
+<P>To make this clear, recall the example of the checkbox.  The variable <code>my_choice</code>
+has two bits set ON and two bits set OFF, and others that are unspecified.  If you combined
+flags with OR, the ON bits get set in the result and the OFF bits have no effect.  To turn off bits,
+you need to negate and use AND.  But when applying the user's configuration to a set of default
+values, you want to bring in the specified values, ON or OFF.</P>
+
+<PRE>
+colorflags my_choice (red|blue, red|yellow|blue|green);
+colorflags original (red|green|purple, /*out of*/ red|green|purple|black);
+colorflags combined= original + my_choice;
+</PRE>
+
+The ADD operation used to compute <code>combined</code> will start with the value of <code>original</code>
+(red on, green on, purple on, black off) and apply the valid values in <code>my_choice</code>: it will
+turn on red, turn on blue, turn off yellow, and turn off green.  The right-hand argument said nothing about
+black, so it's value is left unchanged.  This is distinguished from green, which is explicitly turned off.</P>
+
+<H2>Word Size</H2>
+The colorflags example used a single template parameter to flagword.  However, you can optionally use
+a second parameter to specify the underlying word type.  The idea is that you could make 16-bit flags if
+you needed the space (or to model legacy code that packed the data and mask into a single int), or use
+a <code>__int64</code> if you had more flags.  You could, however, use any type you like that supported the essential
+underlying bit operations.
+
+<H2>Flag Testing Functions</H2>
+
+Just providing flag manipulation is an interesting mathmatical design exersize, but it doesn't do
+us much good in a program unless there is also a way to test flags.</P>
+
+<P>Typically, once you care about invidial flags you care about each one individually,
+one at a time.  That is, flags are just a way to pack a bunch of Boolean variables into
+one small package.  When it comes to implementing the function that looks at the flags,
+it needs to check each flag as if it were an individual setting.  To that end, there are three
+single-flag testing functions.
+
+<UL>
+	<LI><code>is_on</code>
+	<LI><code>is_off</code>
+	<LI><code>is_valid</code>
+</UL>
+
+Each of these functions take a single enumeration constant as an argument.  For example, the
+draw_list function above might contain a statement similar to this:
+<PRE>
+if (selection.is_on(red)) { ...
+</PRE>
+Note that is_off is not the opposite of is_on.  Calling is_on returns true if and only if the flag
+is definitly set to on.  Calling is_off returns true if and only if the flag is definitly off.  If the
+flag is unspecified, then both functions would return false.</P>
+
+<P>If you care whether a flag is not on and don't care if it's because it was definitly set
+to off or simply never specified at all, use <code>!is_on(red)</code> instead of <code>is_off(red)</code>.
+If you are not dealing with unspecified states, then be sure to always use is_on and !is_on, never
+is_off.</P>
+
+<P>Besides testing flags individually, you may sometimes care about groups of related flags.
+The <code>match</code> function returns another flagword, not a simple Boolean value.  The
+result sets a flag if the arguments match, and clears it if they don't match.  The valid flags
+in the result are the same as the valid flags in the right hand argument.</P>
+
+<P>This allows you to test for positive and negative states at the same time.  For example,
+<PRE>
+colorflags m1 (red, /*out of*/ red|blue);  //red on, blue off
+colorflags result= selection.match(m1);
+  // do further processing on result...
+if (selection.match(m1)) {  //check result immediatly
+</PRE>
+
+<P>The call to <code>match</code> will produce a result with red ON if and only if
+the red flag in selection matches that in m1, and will set blue ON if they match
+with blue, and all other flags in the result are unspecified.</P>
+
+<P>Meanwhile, implicitly converting a flagword to bool will test whether all valid flags are ON.
+In context, this means a perfect match.  The <code>if</code> statement above will be taken
+only if selection has the red flag ON and the blue flag OFF.  Other flags in selection don't matter.</P>
+
+</BODY>
+</HTML>
+

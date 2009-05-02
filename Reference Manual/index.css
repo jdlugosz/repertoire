@@ -1,0 +1,42 @@
+
+H1 {
+   text-decoration: underline;
+   font-family: Verdana, Tahoma, sans-serif;
+   }
+
+H2 {
+   font-family: Verdana, Tahoma, sans-serif;
+   }
+
+P { white-space=nowrap }
+
+SMALL {
+	font-size: .5em;
+	}
+
+A:link, A:visited { text-decoration: none }
+A:active { text-decoration: underline }
+
+UL {
+	list-style-type: none;
+	padding-left: 0;
+	padding-right: 0;
+	font-family: "Lucida Sans", "Lucida Sans Unicode", sans-serif;
+	text-indent:-1em; margin-left:1em
+	}
+
+UL I {
+	font-family: "Georgia", serif;
+	font-style: italic;
+	}
+
+A:hover[TARGET=info]{
+	background-color: #369;
+	color: #fff;
+	}
+
+A:hover[TARGET=index]{
+	background-color: green;
+	color: #fff;
+	}
+

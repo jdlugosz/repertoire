@@ -1,0 +1,473 @@
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=windows-1252">
+<TITLE>filename_t class reference</TITLE>
+<LINK REL=STYLESHEET HREF="../info.css" TYPE="text/css">
+</HEAD>
+
+<BODY>
+<!-- Standard banner at top of Reper file -->
+<P CLASS="banner">
+This document is one section of The Repertoire Reference, found at
+<A HREF="http://www.dlugosz.com/Repertoire/refman/mainframe.html" TARGET="_top">
+http://www.dlugosz.com/Repertoire/refman/mainframe.html</A>.<BR>
+Copyright 1998 by <A HREF="mailto:john@dlugosz.com">John M. Dlugosz</A>.
+</P>
+<A NAME="toptop">
+<!-- end of standard banner -->
+
+<H1>filename_t class reference</H1>
+The description of filename_t goes here.</P>
+<HR SIZE=10 COLOR=black>
+<!-- WWWW		wwww		wwww		wwww		wwww		wwww -->
+
+
+<A NAME="constructor"><H2>filename_t (const ustring& s)</H2></A>
+<H2>filename_t (cow&lt;filesystem_t&gt;)</H2>
+<H2>filename_t (const ustring& s, cow&lt;filesystem_t&gt;)</H2>
+<P CLASS=mematt>constructor, public</P>
+<P>A <code>filename_t</code> object is created given a string, a
+<code>filesystem_t</code>, or both.</P>
+<P>The string is the file name, which is parsed into its parts. If omitted,
+the filename is empty.  Note that the string is taken as a file name unless
+it ends in a path separator character, in which case it's taken as a directory
+without a file name.  Use <code>directory</code> to produce a directory (not
+a file name) regardless of the presence of a trailing separator.</P>
+<P>For example, "F:\foo\bar" is a file named "bar" in a directory "foo".
+"F:\foo\bar\" is the subdirectory "bar".</P>
+<P>The <code>filesystem_t</code> specifies which file system is associated
+with this object.  If omitted, the value of default_filesystem is used.</P>
+<P CLASS=seealso><EM>See also:</EM> <code>operator=</code>, <code>directory</code></P>
+<HR SIZE=3 COLOR=black>
+<H2>filename_t (const filename_t& other)</H2>
+The copy constructor is unsurprising.
+<HR SIZE=10 COLOR=black>
+<!-- WWWW		wwww		wwww		wwww		wwww		wwww -->
+
+
+<A NAME="destructor"><H2>~filename_t()</H2></A>
+<P CLASS=mematt>destructor, public</P>
+The destructor is unsurprising.
+<HR SIZE=10 COLOR=black>
+<!-- WWWW		wwww		wwww		wwww		wwww		wwww -->
+
+
+
+<A NAME="operator="><H2>filename_t& operator= (const filename_t&)</H2></A>
+<P CLASS=mematt>public</P>
+<P>The copy assignment operator is unsurprising.
+<HR SIZE=3 COLOR=black>
+<H2>filename_t& operator= (const ustring& text)</H2>
+<P>This assignment operator specifies a new string that will be parsed
+into parts (see notes for the constructor), completely replacing the existing
+parts.</P>
+<HR SIZE=10 COLOR=black>
+<!-- WWWW		wwww		wwww		wwww		wwww		wwww -->
+
+
+<A NAME="absolute"><H2>bool absolute() const</H2></A>
+<P CLASS=mematt><A HREF="filename_t_guide.html#2">[group]</A> public</P>
+<P>This function returns <code>true</code> if there is at least one path part and the
+first path part is empty.  It's more efficient then doing the above checking using other
+public functions.</P>
+
+<P>An absolute path is represented with a blank part as the first part, which is a
+natural thing to do if you consider each part to be followed by a separator character (which
+is not included in the part).</P>
+
+<P>Here we see the structure of the relative <code>D:foo\subdir\x\bar.txt</code><BR> vs. the absolute
+<code>D:\foo\subdir\x\bar.txt</code>.<BR> Note that backslashes are separators, not part of the part, but
+are shown in the table to clearly illustrate the correspondence between the internal structure and how the
+string was parsed.  <B>Basically, each backslash indicates the end of a path part.</B></P>
+
+<TABLE BORDER=1 STYLE="padding:5" ALIGN=CENTER>
+	<TR>
+		<TH ROWSPAN=2>prefix
+		<TH COLSPAN=4 bgcolor=blanchedalmond>path
+		<TH ROWSPAN=2>name
+	<TR STYLE="background-color:blanchedalmond; font-size:xx-small; padding:0; text-align:center">
+		<TD>0
+		<TD>1
+		<TD>2
+		<TD>3
+	<TR>
+		<TD>D:
+		<TD bgcolor=blanchedalmond>foo <SPAN STYLE="color:darkgray">\</SPAN>
+		<TD bgcolor=blanchedalmond>subdir <SPAN STYLE="color:darkgray">\</SPAN>
+		<TD bgcolor=blanchedalmond>x <SPAN STYLE="color:darkgray">\</SPAN>
+		<TD>
+		<TD>bar.txt
+	<TR>
+		<TD>D:
+		<TD bgcolor=blanchedalmond> <SPAN STYLE="color:darkgray">\</SPAN>
+		<TD bgcolor=blanchedalmond>foo <SPAN STYLE="color:darkgray">\</SPAN>
+		<TD bgcolor=blanchedalmond>subdir <SPAN STYLE="color:darkgray">\</SPAN>
+		<TD bgcolor=blanchedalmond>x <SPAN STYLE="color:darkgray">\</SPAN>
+		<TD>bar.txt
+</TABLE>
+
+<HR SIZE=10 COLOR=black>
+<!-- WWWW		wwww		wwww		wwww		wwww		wwww -->
+
+
+<A NAME="add_path"><H2>filename_t <B> add_path</B> (const ustring&) const</H2></A>
+<H2>void <B>add_path_this</B> (const ustring&)</H2>
+<P CLASS=mematt><A HREF="filename_t_guide.html#2">[group]</A> public</P>
+This appends a single part to the path of this filename.  The string should not contain
+part delimiter characters (e.g. backslash for PC file system)&mdash;if it does, the results
+are unspecified.</P>
+<P><code>add_path</code> will return the result as a new object and does not affect the original, while
+<code>add_path_this</code> will modify the object in-place.  In general, <code>foo</code> is to <code>foo_this</code>
+as  <code>operator+</code> is to <code>operator+=</code>.</P>
+<pre>
+filename_t x= ustring("F:\\foo\\bar\\notes.txt");
+filename_t y= x.<B>add_path</B> ("baz");
+<I>// produces  F:\foo\bar\baz\notes.txt</I>
+x.<B>add_path_this</B> ("baz");
+<I>// same as  x=x.add_path("baz")</I>
+</pre>
+The contents of the string to be appended are taken literally.  That is, no special processing is
+done for <code>".."</code> directories.</P>
+<P CLASS=seealso><EM>See also:</EM> <A HREF="#cdd"><code>cdd</code></A>.
+<HR SIZE=10 COLOR=black>
+<!-- WWWW		wwww		wwww		wwww		wwww		wwww -->
+
+
+<A NAME="assure_path_exists"><H2>void assure_path_exists() const</H2></A>
+<P CLASS=mematt><A HREF="filename_t_guide.html#5">[group]</A> public</P>
+Equivilent to  <code><A HREF="#get_filesystem">get_filesystem</A>()&ndash;><A HREF="filesystem_t.html#assure_path_exists">assure_path_exists</A> (*this)</code>.
+<HR SIZE=10 COLOR=black>
+<!-- WWWW		wwww		wwww		wwww		wwww		wwww -->
+
+
+<A NAME="cdd"><H2>filename_t <B>cdd</B> (const filename_t& other)</H2></A>
+<H2>void <B>cdd_this</B> (const filename_t& other)</H2>
+<P CLASS=mematt><A HREF="filename_t_guide.html#4">[group]</A> public</P>
+This function is like a generalized "change directory" function.  This  <code>filename_t</code> is
+the starting point, and the <code>other</code> is the "change directory" command argument.</P>
+
+<P><code>cdd</code> will return the result as a new object and does not affect the original, while
+<code>cdd_this</code> will modify the object in-place.  In general, <code>foo</code> is to <code>foo_this</code>
+as  <code>operator+</code> is to <code>operator+=</code>.</P>
+<P>The behavior is similar to the <code>CDD</code> (change drive and directory) command
+in the <A HREF="http://www.jpsoft.com/4ntdes.htm" TARGET="outside">"4NT" command shell</A>,
+or<code> CD /D</code> in the version of the "CMD" shell that ships with NT4.0.</P>
+
+<P>If the argument contains a prefix part, then the prefix and path of other replace the prefix and part
+in this object.</P>
+
+<P>Otherwise the argument has no prefix.  If the argument has an absolute path (it begins with
+the empty part indicating a leading slash) then the argument's path replaces this path.  Otherwise (the argument
+has a relative path) the argument's path parts are appended to this path, with special logic
+for <A HREF="filesystem_t.html#dotname"><code>dotname</code></A> parts.</P>
+
+<P>When appending "dot" path parts, the path part <code>"."</code> (or however 
+these special names are spelled if you override <A HREF="filesystem_t.html#dotname"><code>dotname</code></A>)
+is ignored; <code>".."</code> removes a  part instead; <code>"..."</code> removes two parts; etc.  If there are not enough parts remaining to remove, 
+or if a part to be removed is itself a "dot" part, then the "dot" part is not treated specially but gets appended to this 
+path like any normal part name (see explaination in <A HREF="#remove_path"><code>remove_path</code></A>).</P>
+
+<P>Note that in no case is the name part of this object affected.</P>
+
+<P CLASS=seealso><EM>See also:</EM> <A HREF="#add_path"><code>add_path</code></A>,&nbsp;
+<A HREF="#remove_path"><code>remove_path</code></A></P>
+<P CLASS=seealso><EM>Draws behavior from:</EM> <code>this&ndash;><A HREF="#get_filesystem">get_filesystem</A>()&ndash;><A HREF="filesystem_t.html#dotname">dotname</A>()</code></P>
+<HR SIZE=10 COLOR=black>
+<!-- WWWW		wwww		wwww		wwww		wwww		wwww -->
+
+
+
+<A NAME="common_root"><H2>int common_root (const filename_t& other) const</H2></A>
+<P CLASS=mematt><A HREF="filename_t_guide.html#4">[group]</A> public</P>
+<P>This tells you how many nodes two paths have in common, starting from the top.  The prefix
+part and the filename part are not relevant.</P>
+<P>Starting at the beginning of each path, this function counts how many corresponding parts
+match exactly.</P>
+
+For example,<code> "D:\foo\y\bar.txt"</code> and <code>"C:\foo\subdir\x\baz.html"</code>
+have a common root of <code>"\foo\"</code>.  This function returns 2, indicating that the first two
+parts from either <code>filename_t</code> matches the other.  Here is how it is counted:</P>
+
+<TABLE BORDER=1 STYLE="padding:5" ALIGN=CENTER>
+	<TR>
+		<TH ROWSPAN=2>prefix
+		<TH COLSPAN=4 bgcolor=blanchedalmond>path
+		<TH ROWSPAN=2>name
+	<TR STYLE="background-color:blanchedalmond; font-size:xx-small; padding:0; text-align:center">
+		<TD>0
+		<TD>1
+		<TD>2
+		<TD>3 </TR>
+	<TR>
+		<TD>D:
+		<TD bgcolor=blanchedalmond>\
+		<TD bgcolor=blanchedalmond>foo\
+		<TD bgcolor=blanchedalmond>y\
+		<TD>
+		<TD>bar.txt
+	<TR>
+		<TD>C:
+		<TD bgcolor=blanchedalmond>\
+		<TD bgcolor=blanchedalmond>foo\
+		<TD bgcolor=blanchedalmond>subdir\
+		<TD bgcolor=blanchedalmond>x\
+		<TD>baz.html
+</TABLE>
+
+<P>Path part 0 and path part 1 are the same, so the function returns 2, meaning two matching parts.  The
+difference in the prefix is not a consideration.</P>
+<HR SIZE=10 COLOR=black>
+<!-- WWWW		wwww		wwww		wwww		wwww		wwww -->
+
+
+
+<A NAME="exists"><H2>bool exists() const</H2></A>
+<P CLASS=mematt><A HREF="filename_t_guide.html#5">[group]</A> public</P>
+Equivilent to  <code><A HREF="#get_filesystem">get_filesystem</A>()&ndash;><A HREF="filesystem_t.html#exists">exists</A> (*this)</code>.
+<HR SIZE=10 COLOR=black>
+<!-- WWWW		wwww		wwww		wwww		wwww		wwww -->
+
+
+<A NAME="fully_qualify"><H2>filename_t <B>fully_qualify</B>()</H2></A>
+<H2>void <B>fully_qualify_this</B>()</H2>
+<P CLASS=mematt><A HREF="filename_t_guide.html#5">[group]</A> public</P>
+Equivilent to  <code><A HREF="#get_filesystem">get_filesystem</A>()&ndash;><A HREF="filesystem_t.html#fully_qualify">fully_qualify</A> (*this)</code><BR>
+and <code>*this= <A HREF="#get_filesystem">get_filesystem</A>()&ndash;><A HREF="filesystem_t.html#fully_qualify">fully_qualify</A> (*this)</code>,
+respectivly.
+<HR SIZE=10 COLOR=black>
+<!-- WWWW		wwww		wwww		wwww		wwww		wwww -->
+
+
+<H2>cow&lt;filesystem_t&gt; <A NAME="get_filesystem">get_filesystem()</A></H2>
+<P CLASS=mematt><A HREF="filename_t_guide.html#2">[group]</A> public</P>
+<P>This returns the <code>filesystem_t</code> associated with this object, as specified originally in the <A HREF="#constructor">constructor</A>.
+<HR SIZE=10 COLOR=black>
+<!-- WWWW		wwww		wwww		wwww		wwww		wwww -->
+
+
+<A NAME="has_prefix"><H2> bool has_prefix() const</H2></A>
+<P CLASS=mematt><A HREF="filename_t_guide.html#2">[group]</A> public</P>
+<P>This returns <code>true</code> if the prefix part is not empty.</P>
+<P CLASS=seealso><EM>See also:</EM> <A HREF="#prefix"><code>prefix</code></A></P>
+<HR SIZE=10 COLOR=black>
+<!-- WWWW		wwww		wwww		wwww		wwww		wwww -->
+
+
+
+<A NAME="make_relative_to"><H2>filename_t <B>make_relative_to</B> (<BR>const&nbsp;filename_t&amp;&nbsp;root, bool&nbsp;usedots=false) const</H2></A>
+<H2>void <B>make_relative_to_this</B> (<BR>const&nbsp;filename_t&amp;&nbsp;root, bool&nbsp;usedots=false)</H2>
+<P CLASS=mematt><A HREF="filename_t_guide.html#2">[group]</A> public</P>
+<P>This makes a relative path so that the result applied to the <code>root</code> parameter
+is equal to the input value of <code>*this</code>.</P>
+<P><code>make_relative_to</code> will return the result as a new object and does not affect the original, while
+<code>make_relative_to_this</code> will modify the object in-place.  In general, <code>foo</code> is to <code>foo_this</code>
+as  <code>operator+</code> is to <code>operator+=</code>.</P>
+<P><I>Need more discussion, and docs for usedots</I></P>
+
+<HR SIZE=10 COLOR=black>
+<!-- WWWW		wwww		wwww		wwww		wwww		wwww -->
+
+
+
+<A NAME="name"><H2>ustring name() const</H2></A>
+<P CLASS=mematt><A HREF="filename_t_guide.html#2">[group]</A> public</P>
+<P>This returns the name proper (no path or prefix) of this object as a string.</P>
+<HR SIZE=10 COLOR=black>
+<!-- WWWW		wwww		wwww		wwww		wwww		wwww -->
+
+
+
+<A NAME="name_count"><H2>int name_count() const</H2></A>
+<P CLASS=mematt><A HREF="filename_t_guide.html#2">[group]</A> public</P>
+<P>This returns the number of name parts in this <code>filename_t</code>.  Normally this
+will be 1 to indicate that a name is present, or 0 to indicate that this is
+a directory only without a specific file name.</P>
+<P>This class supports <A HREF="filename_t_guide.html#6">multiple names</A>,
+so the value may be greater than 1.</P>
+<HR SIZE=10 COLOR=black>
+<!-- WWWW		wwww		wwww		wwww		wwww		wwww -->
+
+
+
+<A NAME="path"><H2>ustring path() const</H2></A>
+<P CLASS=mematt><A HREF="filename_t_guide.html#2">[group]</A> public</P>
+This returns the entire path, not including the prefix or the name.  The separator
+character used is taken from the attached filesystem, and no separator appears after
+the last part.  A separator appears before the first part to indicate an
+absolute path (see further explaination in the <A HREF="#absolute"><code>absolute</code></A>
+documentation).   For example, the <code>path()</code> of
+<code>"D:\foo\bar\baz.html" is "\foo\bar"</code>.</P>
+<P>See the examples in the <code>test2()</code> function in <code>filename_t_test.cxx</code>.</P>
+<HR SIZE=3 COLOR=black>
+
+<A NAME="path"><H2>ustring path (int index) const</H2></A>
+<P CLASS=mematt><A HREF="filename_t_guide.html#2">[group]</A> public</P>
+<P>This returns a single path part, with no delimiters around it.</P>
+<P>For an absolute path, as <code>"D:\foo\bar\baz.html"</code>, the index of 0 will
+be a blank entry.  For relative names, the first path part (<code>index==0</code>) will
+be the first named part.</P>
+<P class=seealso><EM>See also:</EM> <code>path_range</code></P>
+<HR SIZE=10 COLOR=black>
+<!-- WWWW		wwww		wwww		wwww		wwww		wwww -->
+
+
+
+<A NAME="path_count"><H2>int path_count() const</H2></A>
+<P CLASS=mematt><A HREF="filename_t_guide.html#2">[group]</A> public</P>
+<P>This returns the number of path parts.  Note that absolute paths are
+denoted by having an empty first element.  So <code>path_count()</code> of <code>"D:\foo\bar\baz.html"</code>
+is 3, while <code>path_count()</code> of <code>"D:foo\bar\baz.html"</code> is 2.  In other words, the
+empty node indicates "start from the top" and does take up a slot in the array.
+See the examples in the <code>test2()</code> function in <code>filename_t_test.cxx</code>.
+<HR SIZE=10 COLOR=black>
+<!-- WWWW		wwww		wwww		wwww		wwww		wwww -->
+
+
+
+<A NAME="path_range"><H2>ustring path_range (int n, int m) const</H2></A>
+<P CLASS=mematt><A HREF="filename_t_guide.html#2">[group]</A> public</P>
+While <code>path(int)</code> gets a single part, and <code>path()</code> gets all parts,
+this function is more general and
+can get any contiguous range of parts.  The parameter <code>n</code> is the
+first part returned, and <code>m</code> is the last part returned, inclusive.  The
+legal range is >=0 and &lt;<code>path_count()</code>.</P>
+<HR SIZE=10 COLOR=black>
+<!-- WWWW		wwww		wwww		wwww		wwww		wwww -->
+
+
+
+<A NAME="prefix"><H2>ustring prefix() const</H2></A>
+<P CLASS=mematt><A HREF="filename_t_guide.html#2">[group]</A> public</P>
+<P>This returns the prefix part of the file name.  For PC file system names this
+will be the drive letter or UNC server name.  For URL names it is the service.</P>
+
+<P>This function may return an empty string to indicate "no prefix".  The prefix count is
+always one, and the lack of a prefix on a file specification is indicated with an empty string here.</P>
+<P CLASS=seealso><EM>See also:</EM> <A HREF="#has_prefix"><code>has_prefix</code></A></P>
+<HR SIZE=10 COLOR=black>
+<!-- WWWW		wwww		wwww		wwww		wwww		wwww -->
+
+
+
+<A NAME="remove_name"><H2>filename_t <B>remove_name</B>()</H2></A>
+<H2>void <B>remove_name_this</B>()</H2>
+<P CLASS=mematt><A HREF="filename_t_guide.html#2">[group]</A> public</P>
+<P>This removes the name (or multiple names) from this object.  After calling it,
+<code>name_count()</code> on the result will return 0 and <code>name()</code> will return an
+empty string.</P>
+<P><code>remove_name</code> will return the result as a new object and does not affect the original, while
+<code>remove_name_this</code> will modify the object in-place.  In general, <code>foo</code> is to <code>foo_this</code></P>
+as  <code>operator+</code> is to <code>operator+=</code>.</P>
+<HR SIZE=10 COLOR=black>
+<!-- WWWW		wwww		wwww		wwww		wwww		wwww -->
+
+
+<A NAME="remove_path"><H2>filename_t <B>remove_path</B> (int count) const</H2></A>
+<H2>bool <B>remove_path_this</B> (int count, bool&nbsp;detect_dots)</H2>
+<P CLASS=mematt><A HREF="filename_t_guide.html#2">[group]</A> public</P>
+<P>This function attempts to remove <code>count</code> parts from the end of
+the path.  If there are not enough parts available, it returns <code>false</code> and no change is
+made.  On success, it returns <code>true</code>.</P>
+<P><code>remove_path</code> will return the result as a new object and does not affect the original, while
+<code>remove_path_this</code> will modify the object in-place.  In general, <code>foo</code> is to <code>foo_this</code>
+as  <code>operator+</code> is to <code>operator+=</code>.  In this case, the non-this form cannot
+return a status value, so is not really exactly the same.  Both forms are provided anyway for consistancy.</P>
+<P>In the <code>remove_path_this</code> function, if the <code>detect_dots</code> flag is specified, then special "dot" name parts
+cannot be removed and the function indicates this by returning <code>false</code>.
+Otherwise (<code>detect_dots</code> is <code>false</code> or not available) the dot names are not significant and
+any path is removed without looking at content.</P>
+<P CLASS=seealso><EM>Draws behavior from:</EM> <code>this&ndash;><A HREF="#get_filesystem">get_filesystem</A>()&ndash;><A HREF="filesystem_t.html#dotname">dotname</A>(int)</code></P>
+<HR SIZE=10 COLOR=black>
+<!-- WWWW		wwww		wwww		wwww		wwww		wwww -->
+
+
+
+<A NAME="set_name">
+<H2>filename_t <B>set_name</B> (const ustring&) const</H2></A>
+<H2>void <B>set_name_this</B> (const ustring& s)</H2>
+<P CLASS=mematt><A HREF="filename_t_guide.html#2">[group]</A> public</P>
+This sets the name part to the specified string.  If the string contains
+part delimiter characters (e.g. backslash for PC file system), the results
+are unspecified.</P>
+<P><code>set_name</code> will return the result as a new object and does not affect the original, while
+<code>set_name_this</code> will modify the object in-place.  In general, <code>foo</code> is to <code>foo_this</code></P>
+as  <code>operator+</code> is to <code>operator+=</code>.</P>
+<P>If the string is empty, the name is removed (<code>name_count()</code> will become 0).
+The string may contain name separator characters as defined in the
+filesystem helper object to set multiple names (e.g. <code>"*.exe;*.dll"</code>).</P>
+<HR SIZE=10 COLOR=black>
+<!-- WWWW		wwww		wwww		wwww		wwww		wwww -->
+
+
+
+<A NAME="set_path"><H2>filename_t <B>set_path</B> (const ustring& s) const</H2></A>
+<H2>void <B>set_path_this</B> (const ustring& s)</H2>
+<P CLASS=mematt><A HREF="filename_t_guide.html#2">[group]</A> public</P>
+This sets the name part to the specified string.  If the string contains
+part delimiter characters (e.g. backslash for PC file system), the new path
+will have multiple parts.</P>
+<P><code>set_path</code> will return the result as a new object and does not affect the original, while
+<code>set_path_this</code> will modify the object in-place.  In general, <code>foo</code> is to <code>foo_this</code></P>
+as  <code>operator+</code> is to <code>operator+=</code>.</P>
+<HR SIZE=10 COLOR=black>
+<!-- WWWW		wwww		wwww		wwww		wwww		wwww -->
+
+
+
+<A NAME="set_path_range"><H2>filename_t <B>set_path_range</B> (int n, int m, const&nbsp;ustring&amp;&nbsp;s) const</H2></A>
+<H2>void <B>set_path_range_this</B> (int n, int m, const&nbsp;ustring&amp;&nbsp;s)</H2>
+<P CLASS=mematt><A HREF="filename_t_guide.html#2">[group]</A> public</P>
+This replaces the path parts specified.  The parameters <code>n</code> and
+<code>m</code> are as used in <A HREF="#path_range"><code>path_range(n,m)</code></A>, 
+and the string is as used with <code>set_path</code>.
+<P><code>set_path_range</code> will return the result as a new object and does not affect the original, while
+<code>set_path_range_this</code> will modify the object in-place.  In general, <code>foo</code> is to <code>foo_this</code></P>
+as  <code>operator+</code> is to <code>operator+=</code>.</P>
+<HR SIZE=10 COLOR=black>
+<!-- WWWW		wwww		wwww		wwww		wwww		wwww -->
+
+
+
+<A NAME="set_prefix"><H2>filename_t <B>set_prefix</B> (const ustring& s) const</H2></A>
+<H2>void <B>set_prefix_this</B> (const ustring& s)</H2>
+<P CLASS=mematt><A HREF="filename_t_guide.html#2">[group]</A> public</P>
+This sets the prefix of the file name.</P>
+<P><code>set_prefix</code> will return the result as a new object and does not affect the original, while
+<code>set_prefix_this</code> will modify the object in-place.  In general, <code>foo</code> is to <code>foo_this</code></P>
+as  <code>operator+</code> is to <code>operator+=</code>.</P>
+<P>Currently, setting an invalid prefix doesn't cause any error, and the
+results are unspecified.  This needs to be improved to detect errors
+at the point the change is made.</P>
+<P CLASS=seealso><EM>See also:</EM> <A HREF="#prefix"><code>prefix</code></A></P>
+<HR SIZE=10 COLOR=black>
+<!-- WWWW		wwww		wwww		wwww		wwww		wwww -->
+
+
+
+
+<A NAME="text"><H2>ustring text() const</H2></A>
+<P CLASS=mematt><A HREF="filename_t_guide.html#2">[group]</A> public</P>
+<P>This returns the entire contents of the file name as a string.  The
+proper delimiters are inserted between the parts as described by the <code>filesystem_t</code>
+helper object.</P>
+<HR SIZE=10 COLOR=black>
+<!-- WWWW		wwww		wwww		wwww		wwww		wwww -->
+
+
+
+
+
+
+
+<!-- Stock footer-->
+<HR>
+<FONT size="-2">Page content copyright 1998 by John M. Dlugosz.
+Home:<A HREF="http://www.dlugosz.com">http://www.dlugosz.com</A>,
+email:<A HREF="mailto:john@dlugosz.com">mailto:john@dlugosz.com</A>
+</FONT>
+<!-- End footer-->
+
+</BODY>
+
+</HTML>
+

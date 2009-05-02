@@ -1,0 +1,129 @@
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=windows-1252">
+<LINK REL=STYLESHEET HREF="info.css" TYPE="text/css">
+<META NAME="description"
+ CONTENT="statement of software development issues and formal release process, part of John Dlugosz's Repertoire Project.">
+<META NAME="keywords"
+ CONTENT="Repertoire documentation formal process release Classics RatWin Tomahawk Conquer">
+<TITLE>Repertoire Project Formal Work Process</TITLE>
+</HEAD>
+
+<BODY>
+<!-- Standard banner at top of Reper file -->
+<P CLASS="banner">
+This document is one section of The Repertoire Reference, found at
+<A HREF="http://www.dlugosz.com/Repertoire/refman/mainframe.html" TARGET="_top">
+http://www.dlugosz.com/Repertoire/refman/mainframe.html</A>.<BR>
+Copyright 1998 by <A HREF="mailto:john@dlugosz.com">John M. Dlugosz</A>.
+</P>
+<A NAME="toptop">
+<!-- end of standard banner -->
+
+<H1>Release and Testing Process</H1>
+
+<P>As part of delivering a high quality product (and another way the Repertoire Project sets itself
+apart from other C++ libraries), a formal release process is followed.  This is designed to ensure
+that all the i's are dotted etc. when preparing a new public release.  You can be sure that
+all the little details were taken care of, all the code compiles, and all the code has been
+regression-tested against previous versions.</P>
+
+<P>Besides saving you, the library user, from certain kinds of upgrade headaches, simply having
+a documented process is an important step.  Because of this, the Repertoire Project libraries
+are more conducive to industries that follow quality standards in manufacturing.  In fact, as far as I
+know, this is the <I>first</I> general purpose publicly available software library to document the
+release process for its customers.</P>
+
+<P>So, you can judge for yourself whether it meets with your own standards, rather than
+hoping what you buy has some measure of quality.  You can also offer feedback and
+suggestions concerning the release process, so that it may continue better to serve the needs of
+the library user.</P>
+
+<P>Below is what was followed for release "public build 5".</P>
+
+<OL>
+	<LI>First, recompile everything to make reasonably sure the rest of this is not premature.</P>
+
+	<LI>Check out all files from source control.  Use a newly created working directory, not the
+	directory that had been used during development.  So, the <I>only</I> files present are those
+	that are properly under revision control.</P>
+
+	<LI>Update all files to indicate the current build information.  This process is completely
+	automated with the use of the <A HREF="release/version_stamp.perl"><code>version_stamp.perl</code></A> file.
+	The steps to perform are:</P>
+
+	<OL>
+		<LI>Update the comment block at the top of each source file.</P>
+		<LI>Create the new version check include files. (not yet available)</P>
+		<LI>Update the version ID include files. (not yet available)</P>
+		<LI>Update the revision info resource blocks. (not yet available)</P>
+		<LI>Update the project .dsp files to reflect the libraries' version number in their names. (process
+		each set of supported project files, currently VC5 and VC6)</P>
+	</OL>
+
+	<LI>Check the modified files back in.</P>
+
+	<LI>Create a new Source Safe project that's a copy of the current work, "pinning" all the files.
+	This new project is named after the release, and is Source Safe's way of "labeling" a build with
+	all the specific file version and directory content information.</P>
+
+	<LI>Compile all the libraries and test code, for each configuration. (VC5 and VC6).  Document
+	any warnings or special issues in the <code>release_xxx_log.txt</code> file.  Any minor problems
+	fixed at this point can be checked in and the "pin" promoted.  Any temporary fixes that are just
+	to get this version working can "branch" the shared file along this project.  Any major changes
+	require starting over.  After any such spot change, <I>always</I> use a global "get latest" to make sure
+	that the build directory stays in sync with the official labeled point in the source control.</P>
+
+	<LI>Run all the automated unit tests in the "release" builds of each configuration.  Document any warnings or
+	failures in the <code>release_xxx_log.txt</code> file.</P>
+
+	<LI>Delete the intermediate files</P>
+
+	<LI>Zip up the source code, readme files, DLLs, and unit tests.  Source, debug info, and binaries for
+	both vc5 and vc6 are in one zipfile, for simplicity.</P>
+
+	<LI>Place the ZIP files in the local Web Mirror area, in preparation for updating the server.  Also
+	update the Downloads page and the Footer to indicate these new files.</P>
+
+	<LI>Update the Web Server with the new and changed files.  Interested users will be using
+	existing web-change monitors to inform them that the new version is available.</P>
+
+	<LI>After a yet-to-be-determined period of time, assuming no problems have been found,
+	rename the "release candidate" files to the "release" files, and update the links and Footer notes.
+	If problems are found, re-prepare the "candidate" after fixing the problem.</P>
+
+	
+</OL>
+
+
+
+<H1>Documentation Release Process</H1>
+<P>In general, the documentation process is not as formal as the code release process.  There is
+no requirement to keep archives of "official" labeled versions, and minor updates and corrections
+can be made much more casually.</P>
+
+<P>This "release" process describes the creation of the downloadable complete documentation
+packet.  The main concern is making sure all the embedded dates and version numbers
+are changed.</P>
+
+<OL>
+	<LI>Put the correct date in the <code>footer.html</code> and <code>static.html</code> files.</P>
+	<LI>Zip up the downloadable copy by creating "refman\Repertoire Documentation.zip"
+		file from the contents of "refman\".  Don't include the old copy of the zip when
+		creating a zip from all files!  Delete the old zip file first, if it exists in the local mirror.</P>
+		<P>When creating the zip, make sure that path information is included and that
+		paths are relative to "refman\".</P>
+	<LI>Inspect the ZIP file </P>
+		<UL><LI>to make sure that all subdirectories are present, and the files have
+		the correct relative-name form.</P>
+			<LI>Compare the number of files present in the ZIP against directory list report of the "refman\" directory.</P>
+			<LI>Make sure the ZIP file was created in the "refman\" directory.</P>
+		</UL>
+	<LI>Update the Web Server, copying all files including updated documentation and the new ZIP file.</P>
+	<LI>Inspect the new on-line reference manual by browsing it.</P>
+	<LI>Navigate to the Download site and download the ZIP just created.</P>
+</OL>
+
+</BODY>
+</HTML>
+

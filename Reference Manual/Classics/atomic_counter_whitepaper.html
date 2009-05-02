@@ -1,0 +1,424 @@
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=windows-1252">
+<META NAME="description"
+ CONTENT="User's Guide for the atomic_counter class, part of John Dlugosz's Repertoire Project.">
+<META NAME="keywords"
+ CONTENT="Repertoire documentation user's guide atomic_counter Classics">
+<TITLE>atomic_counter Whitepaper</TITLE>
+<LINK REL=STYLESHEET HREF="../info.css" TYPE="text/css">
+</HEAD>
+
+<BODY>
+<!-- Standard banner at top of Reper file -->
+<P CLASS="banner">
+This document is one section of The Repertoire Reference, found at
+<A HREF="http://www.dlugosz.com/Repertoire/refman/mainframe.html" TARGET="_top">
+http://www.dlugosz.com/Repertoire/refman/mainframe.html</A>.<BR>
+Copyright 2001 by <A HREF="mailto:john@dlugosz.com">John M. Dlugosz</A>.
+</P>
+<A NAME="toptop">
+<!-- end of standard banner -->
+<H1>atomic_counter whitepaper</H1>
+<P>This started out as the same material as published in the August 1998 issues of <I>Visual C++ Developer</I>,
+and then is edited to integrate it into the rest of the documentation and evolves with updates to the
+material.</P>
+
+<P>When it comes to multi-threaded programs, one issue looms large: race conditions.  The operating system (Windows NT, or 
+Windows 95 / 98) provides primitives for <I>mutual exclusion</I> as a means to cope with these race 
+conditions.</P>
+
+<P>Mutual Exclusion means that if one thread is executing a particular block of 
+code, then no other thread is allowed to execute that same block.  There are 
+a variety of kernel objects for this, including the Mutex.</P>
+
+<P>But, Mutex's are slow.  They are pure overhead and don't contribute any real meaning to the 
+program, so making them expensive is just adding insult to injury.  Adding thread safety to the 
+reference counting in a string class, for example, slowed it down by a factor of three.</P>
+
+<P>Less general purpose, but designed specifically for these race conditions, Win32 provides a 
+<code>CRITICAL_SECTION</code> object.  This is basically a Mutex that cheats.  Without changing from user mode 
+to kernel mode, it can check for the (hopefully common) case of the object being un-owned, and 
+grab it.  It can also check for the case of recursive locking, where the same thread acquires the 
+object more than once.  In other cases, when one thread has to wait for another, a real Mutex is 
+used.  For a program with little or no contention, this produces a dramatic increase in speed.</P>
+
+<P>But this is still not the last word in eliminating race conditions.  To get any faster, we need 
+to get away from the idea of a protected region of code all together.</P>
+
+<H1>Digging Deeper</H1>
+
+<P>Just how does the <code>CRITICAL_SECTION</code> do its user-mode checking, anyway?  Somehow, it needs to 
+modify a flag and test it as a single unbroken operation.  This is an existence proof that there 
+is <I>a way</I> to do a read/modify/write operation in a thread-safe manner.</P>
+
+<P>In fact, if you peruse the Win32 API you will find a set of functions for this purpose:</P>
+
+<pre>
+InterlockedCompareExchange
+InterlockedDecrement
+InterlockedExchange
+InterlockedExchangeAdd
+InterlockedIncrement
+</pre>
+
+<P>But, I was surprised to find that the Microsoft compiler for x86 doesn't emit inline code for 
+these.  Although they could be optimized down to a single machine instruction, you instead call a 
+small function.  Furthermore, the <code>InterlockedExchange</code> is implemented so poorly that I had to get 
+a second opinion to even be sure it was correct.</P>
+
+<P>Before we slam the functions too badly, let's take a look at why they might be useful to us.  
+Suppose you were implementing a reference count in some object.  Some thread may increment the 
+value while another thread decrements the value, or two threads may increment it at the same time.  
+This is a classic read/modify/write operation, susceptible to serious race conditions.  But 
+instead of throwing a region of mutual exclusion around this simple operation (appalling because 
+the overhead outweighs the operation by a factor of a thousand&mdash;like shipping a single SIMM in 
+a foam block the size of boxcar), we could use the <code>Interlocked</code> instructions.</P>
+
+<P>Basically, the CPU has a primitive capability of doing an increment or decrement in a single 
+unbroken operation, or <I>atomically</I>.  You might suppose that a single <code>INC DWORD 
+PTR</code> instruction is 
+atomic in and of itself.  After all, an interrupt can't occur between the read and the write, 
+since interrupts are only serviced between instructions.</P>
+
+<P>That's true enough for a single CPU, but even with only one CPU (and no contention from other 
+devices like bus-mastering or memory-mapped I/O) it's not true if you want to see what the value is 
+at the same time you changed it.  That is, both testing the value and changing is not atomic.  
+However, there are some CPU instructions that provide this, such as XADD (exchange and add).</P>
+
+<P>In order to be truly safe, you must use a special feature of the CPU to make sure that the 
+instruction is indeed atomic.  On the x86 this is the bus lock, achieved with the LOCK prefix.  
+When applied to one of those single-instruction read/test/modify/write opcodes like XADD, it uses 
+hardware controls to make that atomicness hold true even with multiple CPUs (or other masters) in 
+the system.</P>
+
+<P>The <code>EnterCriticalSection</code> is in fact implemented by using one of these instructions.  It 
+atomically reads the old value and writes a "taken" flag to see if the critical section is 
+already taken.  If the old value is "not taken", then the code proceeds.  If the old value is 
+also "taken" then it has to wait, and writing the "taken" flag did not change anything so nothing 
+needs to be undone.</P>
+
+<P>For our reference count, a single atomic increment or decrement is all we need to accomplish our 
+final goal!  There is no need to go through the whole logic of <code>EnterCriticalSection</code> and then 
+<code>LeaveCriticalSection</code>.  Using atomic primitives is two to three times faster!  Even more important 
+to some uses, they never block.</P>
+
+<table>
+	<TR><TD>test<TD>Dual Pentium Pro
+	<TR>
+		<TD>regular memory variable:
+		<TD>31.25 nanoseconds
+	<TR>
+		<TD>hand-coded memory variable:
+		<TD>31.25 nanoseconds
+	<TR>
+		<TD>atomic counter:
+		<TD>178.1 nanoseconds
+	<TR>
+		<TD>critical section:
+		<TD>504.6 nanoseconds
+</table>
+		
+<P>These tests and more can be found in the <code>atomic_counter_benchmark.cxx</code> file, and you 
+can run it for yourself.</P>
+
+<H1>Taking the next step</H1>
+
+<P>So, we know that atomic primitives are nice to have around.  The selection of Win32 calls, however
+, are sadly incomplete and inherently inefficient, not to mention too primitive for C++.  We can 
+do a lot better, with just a little work.</P>
+
+<P>Instead of</P>
+<pre>y= InterlockedExchangeAdd (&x, 1);</pre>
+<P>I'd rather write the cleaner</P>
+<pre>y= x++;</pre>
+<p>This is just syntactic sugar, as <code>InterlockedExchangeAdd</code> of 1 is just an atomic post-increment.  
+But what about an atomic pre-increment?  There is no such function in the Win32 arsenal, so you 
+would have to use the post-increment and then repeat the operation on the returned "old" value to 
+find out what the new value was at that instant.</P>
+
+<pre>
+y=
+InterlockedExchangeAdd (&x, 1)
+	// increments x but returns old value
++1;	// re-compute to know what the new value of x is.
+</pre>
+
+<P>This is why I said that the functions are inherently inefficient.  As it turns out, the machine 
+primitive is a pre-increment!  A similar trick is done in reverse to un-do the operation on the 
+return value, as part of the implementation of <code>InterlockedExchangeAdd</code>.  So, to get a pre-
+increment we apply two more operations that cancel each other out.  Yuck.</P>
+
+<P>If there was both pre- and post-increment available, you could use whichever you really needed.  
+Which one was native under the hood would not matter, since in either case you do the minimum 
+work to get the result you actually wanted.</P>
+
+<P>Another shortcoming of the Interlocked suite of functions is the argument type.  They only work 
+on signed long values.  Actually, the code works on any 4-byte integral value, but only a 
+<code>long*</code> signature is provided so you have to cast to use it on <code>int</code>, 
+<code>unsigned</code>, <code>unsigned long</code>, or any pointer type.  And it cannot work at all on 
+<code>short</code>, <code>unsigned short</code>, <code>char</code>, or <code>unsigned char</code>.</P>
+
+<P>A proper C++ solution would be fully rich in terms of available types, and be type-safe without 
+casting.  The solution presented here is a template which does exactly this.</P>
+
+<P>The <code>atomic_counter</code> template lets you create a value that is manipulated atomically.  Being a 
+template, you can bestow this atomicness on anything you like.</P>
+
+<pre>
+atomic_counter&lt;int> c1;
+atomic_counter&lt;unsigned> c2;
+atomic_counter&lt;byte> c3;
+// … etc…
+</pre>
+
+<P>Once declared, you can use prefix or postfix increment or decrement, in addition to 
+<code>+=</code> and <code>-=</code> on the variables, and they behave atomically.
+
+Listing A shows a first cut at a template class definition, which you can see is pretty simple.
+
+<pre>
+template <typename T>
+class atomic_counter {
+protected:
+   T value;
+   // >> need a critical section, too.
+public:
+   operator T() const volatile { return value; }
+   T operator= (atomic_counter x) volatile { value = x.value; }
+   atomic_counter (T x) : value(x) {}
+   atomic_counter() {}
+   T operator++() volatile;
+   T operator--() volatile;
+   T operator++ (int) volatile;
+   T operator-- (int) volatile;
+   T operator+= (T) volatile;
+   T operator-= (T) volatile;
+   T exchange (T) volatile;
+   };
+
+// The implementation of the general case requires a critical
+// section.  No implementation is provided at this time.
+</pre>
+
+<P>This is a fairly ordinary template, which creates a class to hold a value of the specified type 
+and apply various operators to it.</P>
+
+<P>This parameterized class could be implemented using a <code>CRITICAL_SECTION</code>, and then it would handle 
+any kind of type so long as the underlying operations existed.  This would include floating point 
+values, and any user-defined types such as BCD.</P>
+
+<P>But, that's not what we have in mind.  We want the efficient atomic instructions to be used, not 
+critical sections.</P>
+
+<H1>Getting Specialized</H1>
+
+<P>The special atomic instructions only work for certain types.  Specifically, integers (signed or 
+unsigned) of 1, 2, or 4 bytes.  The instructions can also be applied to pointers with a slightly 
+different implementation.  They won't work on arbitrary types and certainly not on user-defined 
+class types.</P>
+
+<P>So, the idea is to define a generic <code>atomic_counter</code> that will take anything because it uses a 
+portable implementation.  Then, tell the compiler that for particular types, use an alternate 
+implementation.</P>
+
+<P>The fact that <code>int</code> is special is hidden from the user.  You can have:</P>
+
+<pre>
+atomic_counter&lt;double> dc;
+double val= dc++;
+</pre>
+
+<P>and a critical section will be used.  But if you write:</P>
+
+<pre>
+atomic_counter&lt;unsigned long> Lc;
+unsigned long val= Lc++;
+</pre>
+
+<P>then the atomic instructions will be used instead.</P>
+
+<P>Keeping the syntax uniform is more than just being neat and relaxing the need for the user to 
+remember two different template names and when to use each.  Keeping the syntax the same is 
+crucial in writing other templates.  Suppose I wrote:</P>
+
+<pre>
+template <typename T>
+T foo()
+ {
+ atomic_counter&lt;T> count;
+ // …
+</pre>
+
+<P>Here I don't know what T will be, and this template would inherit any special restrictions from 
+the templates used to implement it.  That is not nice.  In order to be able to use an 
+<code>atomic_counter&lt;T></code> within some other template function or template class, the syntax must be 
+uniform across all types.</P>
+
+<P>But that doesn't mean the implementation has to be the same!</P>
+
+<P>In the simplest case, you can write an explicit specialization of a class.  For example, listing 
+B sketches an explicit specialization of <code>atomic_counter&lt;int></code>.</P>
+
+<pre>
+template&lt;>
+class atomic_counter&lt;int> {
+   int value;
+public:
+      inline int operator++()
+         { return InterlockedExchangeAdd(&value, 1); }
+         in reality, would need volatile and casting.
+      // … etc
+   };
+</pre>
+
+<P>This tells the compiler that when it needs an <code>atomic_counter&lt;int></code>, to use the definition supplied 
+instead of generating it from the generic <code>atomic_counter&lt;T></code>.  In principle, we need to supply a 
+specialized definition of all the types that can be handled specially.</P>
+
+<P>That can get rather lengthy.  The thought of writing 10 classes each with ten functions makes me 
+cringe.  That's what templates are for!</P>
+
+<P>And sure enough, you can use another template to implement nine of the special cases.  You still 
+need to define all the classes, but now they are trivial.</P>
+
+<pre>
+template&lt;>
+class atomic_counter&lt;int> : public atomic_integer_xx&lt;int> {
+public:
+   atomic_counter() {}
+   atomic_counter (int x) : atomic_integer_xx&lt;int>(x) {}
+   int operator= (atomic_counter x) volatile { return value = x.value; }
+   };
+</pre>
+
+<P>The real work is done by the helper template <code>atomic_integer_xx</code>, and then we declare the 
+specialization to inherit the implementation generated by the helper template.  We need only 
+supply the constructors and assignment operator.</P>
+
+<P>The key to writing the helper template is uniformity.  If all the different flavors <I>look</I> the same, 
+then the template can generate them from a generic description.  The key to making all of them 
+look the same is to isolate the differences in small functions, and allow overloading to choose 
+the correct function.</P>
+
+<P>So, the implementation of one of the functions is:</P>
+
+<pre>
+T operator++() volatile
+      { return 1+ internal::Xadd (&value,1); }
+</pre>
+
+<P>where <code>internal::Xadd</code> is an overloaded function that handles one, two, or four byte values with 
+the appropriate atomic instructions.  The beauty is that all the functions except 
+<code>exchange</code> can be implemented in terms of <code>Xadd</code>.  So the template handles all the 
+common operators and all the available types, and the real implementation boils down to three primitives to atomically add 
+bytes, shorts, and longs.</P>
+
+<H1>Atomic CPU Instructions</H1>
+
+<P>To implement the three forms of <code>Xadd</code>, we need assembly language.  The supplied 
+<code>InterlockedExchangeAdd</code> only handles the 4-byte case, and no supplied function exists for the 
+other two sizes.  But, the function is quite trivial to write.</P>
+
+<pre>
+__declspec(naked) int __fastcall Xadd (volatile int*, int)
+ {
+ __asm {
+    lock xadd dword ptr [ECX], EDX
+    mov EAX, EDX
+    ret
+    }
+ }
+</pre>
+
+<P>As seen in Listing C, inline assembly can be used to spit out the instruction, and also to return 
+the proper result.  The <code>__fastcall</code> keyword tells the compiler that we want arguments passed in 
+registers instead of on the stack.  There, we can immediately use them in the <code>lock xadd</code> 
+instruction.  Then, return a value by moving it into the <code>EAX</code> register.  The 
+<code>__declspec(naked)</code> tells the Microsoft compiler not to bother generating the normal entry and exit code for the 
+function&mdash;we have no need for it.</P>
+
+<P>The byte and 16-bit forms are almost identical.</P>
+
+<H1>volatile values</H1>
+
+<P>You may have noticed that all the members of <code>atomic_counter</code> are declared volatile, as are various 
+arguments within the implementation.  This is necessary in order to allow the user to declare 
+volatile atomic counters.</P>
+
+<P>In C++, <code>volatile</code> is a modifier similar to <code>const</code>.  While 
+<code>const</code> says that the value will not be changed by the code, <code>volatile</code> says 
+that the value might be changed by some process unknown to the code.  In particular, any time a 
+volatile value is used, it must actually be checked.  The compiler is not allowed to optimize it out by 
+pulling it into a register or assume that just because it didn't change it means it still holds the same value.</P>
+
+<P>Consider a loop like this:</P>
+
+<pre>
+atomic_counter&lt;int> count= 0;
+// create some threads …
+// use count …
+
+//later,
+while (count > 0) Sleep(1000);
+</pre>
+
+<P>The idea here is that this code waits for other threads to finish their work, and those other 
+threads decrement <code>count</code> as they finish.  When the count hits zero, this code can proceed.  
+In reality, it causes an infinite loop when optimizations are turned on.  The compiler will see that 
+<code>count</code> is never changed in the body of the loop, and assume that it has not changed.  
+The <code>volatile</code> keyword tells the compiler that <code>count</code> could indeed changed
+by other means, in this case by other threads.</P>
+
+<pre><B>volatile</B> atomic_counter&lt;int> count= 0;</pre>
+
+<P>Because of the intended use of atomic counters as values that will be manipulated simultaneously 
+on multiple threads, they should be volatile in general. (so why not just make the 
+<code>value</code> member volatile?  Because I just now thought of it).</P>
+
+<P>Now, if <code>count</code> is declared as <code>volatile</code>, we could not call 
+<code>operator++</code> on it unless <code>operator++</code> were a <code>volatile</code> function.
+It's the same as with <code>const</code>, which you should be more familiar with.  The 
+compiler will not allow an implicit conversion that loses qualifiers.  If I declare the variable 
+as <code>volatile</code>, I can only pass a pointer or reference to it to a function that understands that it's 
+<code>volatile</code> and respects it as such.  I could not pass it to a function that then caches it in a 
+register&mdash;that would go against the standing orders about this variable.</P>
+
+<P>So, the need for the <code>volatile</code> keyword propagates all the way down into the most primitive 
+implementation functions.</P>
+
+<P>The use of <code>volatile</code> also requires me to supply an assignment operator, which at first glance 
+would seem to be no different than what the compiler would do for me anyway.  But, the compiler-
+generated copy assignment operator is not volatile, and if I want to assign a value to a volatile 
+variable, I need to specify otherwise.</p>
+
+<H1>In practice</H1>
+
+<P>The bottom line is that atomic counters are easy to use and satisfy a specialized but somewhat 
+common need more efficiently than a more general-purpose mutual exclusion mechanism.</P>
+
+<P>Benchmarks (see table) show that this class is more than twice the speed of a 
+<code>CRITICAL_SECTION</code>, 
+though it is still much slower than an ordinary non-thread-safe counter.  It is, however, as good 
+as we can get on the hardware.</P>
+
+<P>Besides the speed, it offers two more advantages.  It does not need to be initialized like a 
+<code>CRITICAL_SECTION</code>, so initialization order issues are avoided.  Second, it fits in the same place 
+as a primitive value&mdash;an atomic int is four bytes, no larger than a normal int.  This means 
+that atomic arithmetic can be performed on structures that have already been defined to hold 
+integer values at specific offsets, and we don't have large <code>CRITICAL_SECTION</code> objects that 
+outweigh the object being protected.</P>
+
+<P>The <code>atomic_counter</code> template is a powerful tool in my arsenal of thread-safe code.</P>
+
+<H1>Availability</H1>
+
+<P>The <code>atomic_counter</code> code is part of the Repertoire Project, a study in designing a set of solid 
+reusable primitive foundation components.  Complete code and documentation is available at http://
+www.dlugosz.com/Repertoire.  This class may be trivially extracted from the library and modified 
+and incorporated into your own code, or you can just use the entire <I>Classics</I> library, which 
+is full of other goodies.</P>
+
+</BODY>
+</HTML>
+

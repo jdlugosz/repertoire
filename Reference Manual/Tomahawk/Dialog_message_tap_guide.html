@@ -1,0 +1,177 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"  "http://www.w3.org/TR/html4/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=windows-1252">
+<TITLE>Dialog_message_tap User’s Guide</TITLE>
+<LINK REL=STYLESHEET HREF="../info.css" TYPE="text/css">
+</HEAD>
+
+<BODY>
+<IFRAME id="page_banner" src="../page_banner.html" scrolling="no"></IFRAME>
+<A NAME="toptop"></A>
+
+<H1>Dialog_message_tap User’s Guide</H1>
+
+<H2>Related Documents</H2>
+<UL>
+	<LI><A HREF="Dialog_message_tap_index.html" TARGET="index"><code>Dialog_message_tap</code> index</A>
+	<LI><A HREF="message_tap_index.html" TARGET="index"><code>message_tap</code> index</A>
+	<LI><A HREF="message_tap_guide.html#toptop" TARGET="info"><code>message_tap</code> User’s Guide</A>
+</UL>
+
+<H2>Overview</H2>
+
+<P>This class modifies the regular <A HREF="message_tap_index.html" TARGET="index" class="code">message_tap</A>
+to make it suitable for dialog boxes which
+use Windows’ dialog box mechanism.  That is, you can use this to handle messages from
+dialog boxes which use the Win32 <code>DialogBox</code> and <code>CreateDialog</code> functions, 
+or with property sheet pages, all of which are characterised by:</P>
+
+<UL>
+	<LI>Windows calls your <code>DialogProc</code> rather than a <code>WinProc</code>.
+	<LI>The message loop is expected to call <code>IsDialogMessage</code> for that window
+	<LI>It uses dialog box templates, possibly stored in a resource.
+</UL>
+
+<P>So, if you have a dialog box designed using a template, or want to create a page for a
+property sheet, this class will handle the details and allow you to write the “dialog proc” as
+a member function of an object.</P>
+
+
+<P>Read about:</P>
+<UL>
+<LI><A HREF="#modeless">Modeless Dialog Box</A>
+<LI><A HREF="#modal">Modal Dialog Box</A>
+<LI><A HREF="#proppage">Property Sheet Page</A>
+</UL>
+
+<H2 id="modeless">Modeless Dialog Box</H2>
+
+<P>A Modeless dialog box is the simplest case.  This is essentially like any other window, so all that is
+necessary is to hide the differences that the Windows API imposes on you.</P>
+
+<P>The program <code>message_tap_demo.cxx</code> contains a class <code>testhook_2</code> which shows how
+to use the <code>Dialog_message_tap</code>.  The basic steps are:</P>
+
+<OL><LI>derive your class from <code>Dialog_message_tap</code>.
+	<LI>implement the <code>handle_message</code> member function.
+	<LI>implement the <code>on_attach</code> member function, if needed.
+	<LI>Instansiate your class, and
+	<LI>call <code>ModelessDialogBox</code>.
+</OL>
+
+<H3>Derive Your Class</H3>
+
+<P>The <code>Dialog_message_tap</code> class is intended to be used as a base class.  Instances of your concrete class
+are bound 1:1 to Windows dialog boxes.  You supply virtual function overrides to make it do what you want of
+the dialog box.</P>
+
+
+<H3>The <code>handle_message</code> function</H3>
+
+<P>Where the Win32 API uses a supplied <code>DialogProc</code> callback function, you use the
+<A HREF="message_tap.html#handle_message" class="code">handle_message</A>
+virtual member function of the object bound to the on-screen window.  This is inherited from the
+regular <A HREF="message_tap_index.html" TARGET="index" class="code">message_tap</A> class, and is used with no difference.</P>
+
+<P>In the example program, a <code>WM_COMMAND</code> message is handled.  It illustrates basic interaction with
+some common controls.  See the <A HREF="MSG.html#toptop" class="code" TARGET="info">sMSG</A> class and message casts for a discussion on how the
+message is &ldquo;cracked&rdquo; based on the actual message type.</P>
+
+<H3>The <code>on_attach</code> function</H3>
+
+<P>This function is called as soon as the actual on-screen window handle has been created.  In this function,
+you can obtain the child control window information, and do any run-time customization of the dialog box.  In
+this example, it hides the OK Button if used as a Modal dialog box.  The same code and dialog template is used
+for both modal and modeless dialog boxes, and here is where it can accomidate the slight differences.</P>
+
+<H3>Create an Instance</H3>
+
+<P>Like the <A HREF="message_tap_index.html" TARGET="index" class="code">message_tap</A> class, your concrete instance will be tracked using smart pointers and will be “owned”
+by the on-screen window itself.  So, there is no need to keep a pointer to this object if you don’t otherwise need one.
+It will be destroyed when the window is closed, so the instance will not be a memory leak.  But, being a smart
+pointer, if you do maintain a pointer to the instance you may use it to get values out after the window has
+closed, as it will not have been destructed yet.</P>
+
+<P>It is important to note that instances of your class, derived from <code>Dialog_message_tap</code>, <I>must</I> be
+created on the heap using <code>new</code>, not defined as whole objects on the stack or elsewhere.</P>
+
+<P>The code in <code>testhook_1::on_attach</code> (the set-up code for the application’s main window) creates a 
+modeless dialog box.</P>
+
+<PRE class="code">
+//<I>member declared as:</I>     classics::handle&lt;testhook_2> dialogbox;
+ 
+dialogbox= new testhook_2 (classics::baro&lt;testhook_1>(this));  // <I>this is a smart pointer handle.</I>
+dialogbox->ModelessDialogBox (ratwin::util::get_Instance(), "SampleDialog", window_handle());
+</PRE>
+
+<P>The constructor for <code>testhook_2</code> takes a <code>baro</code>-style (that is, un-owned) smart
+pointer to the parent window.  The <code>testhook_1</code> object (the main app window) also wants to keep
+track of the modeless dialog box, so it remembers this as a smart pointer in its member data.</P>
+
+<H3>Call <code>ModelessDialogBox</code></H3>
+
+<P>Once the object is created, the code calls <A HREF="Dialog_message_tap.html#ModelessDialogBox" 
+class="code">ModelessDialogBox</A>.  This is modeled after the Win32
+primitive <code>CreateDialog</code>. It takes parameters for <code>HINSTANCE</code> in which to find resources, 
+the name of the dialog template resource, and optionally the <code>HWND</code> of a parent window.  Missing is a 
+parameter for the <code>DialogProc</code>, since that is handled by the implicit this parameter.</P>
+
+<P>Now the on-screen window exists and will interact with this object instance.  The object’s smart pointer
+and the Windows <code>HWND</code> may he handled in the same manner as with a regular <A HREF="message_tap_index.html" TARGET="index" class="code">message_tap</A>
+object.</P>
+
+<P>It is important that the message pump in the program do the right thing for a dialog box.  This is the
+case for any Windows program that uses <code>CreateDialog</code>.  You could use the dialog box’s <code>HWND</code>
+with <code>IsDialog</code> in the traditional way.  But, Tomahawk will handle it automatically with its 
+<A HREF="simple_message_pump.html#toptop" class="code">simple_message_pump</A> class.</P>
+
+
+
+<H2 id="modal">Modal Dialog Box</H2>
+
+<P>This explains what is different from the example of the Modeless Dialog Box, above.  The same
+example class handles all the different ways to run the dialog box.</P>
+
+<P>A modal dialog box is somewhat different from a normal window.  Normally when creating a window,
+the call to create returns right away and you have a new handle.  The program will send events to that window
+along with all the others, and the code that called create continues on its way.</P>
+
+<P>A modal dialog box is more like a function call.  It does not return until the user dismisses the window,
+and it returns a value reflecting what the user chose.</P>
+
+<P>The <code>Dialog_message_tap</code> supports a <A HREF="Dialog_message_tap.html#ModalDialogBox" class="code">
+ModalDialogBox</A> function which wraps the Win32 primitive
+<code>DialogBox</code>. The class takes care of the details, and your virtual functions get called just like with
+the modeless case.</P>
+
+<P>However, the code within the modal dialog <I>must</I> at some point call 
+<A HREF="Dialog_message_tap.html#EndDialog" class="code">EndDialog</A>.  This is
+wrapped as a member function of <code>Dialog_message_tap</code>.  In the example code, you can see it is
+called in responce to clicking the OK button.</P>
+
+<P>The code that calls <A HREF="Dialog_message_tap.html#ModalDialogBox" class="code">
+ModalDialogBox</A> creates a local variable <code>popup</code> that is a smart
+pointer to an instance, creates an instance, and then calls <code>popup->ModalDialogBox</code>.  It notes the return
+value, and then simply allows <code>popup</code> to go out of scope.</P>
+
+
+<H2 id="proppage">Property Sheet Page</H2>
+
+<P>The property page is more complex to demonstrate, not because this class is any more difficult to
+use in that case, but because it needs to put the resulting page into a sheet and run that sheet, things
+which are unrelated to this class.  This class takes care of the single page in exactly the same manner
+as a dialog box.</P>
+
+<P>Within the <code>demo_prop_page</code> function in the example code, you can see it call 
+<A HREF="Dialog_message_tap.html#CreatePropertySheetPage" class="code">CreatePropertySheetPage</A>
+on the instance.  This is modeled after the Win32 primitive by the same name, and the result is used
+in the same way as well.</P>
+
+
+<IFRAME id="page_footer" src="../page_footer.html"></IFRAME>
+
+</BODY>
+
+</HTML>

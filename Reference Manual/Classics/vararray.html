@@ -1,0 +1,369 @@
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=windows-1252">
+<TITLE>vararray class reference</TITLE>
+<LINK REL=STYLESHEET HREF="../info.css" TYPE="text/css">
+</HEAD>
+
+<BODY>
+<BODY>
+<!-- Standard banner at top of Reper file -->
+<P CLASS="banner">This document is one section of The Repertoire Reference, found at
+      <A HREF="http://www.dlugosz.com/Repertoire/refman/mainframe.html" TARGET="_top">http://www.dlugosz.com/Repertoire/refman/mainframe.html</A>.<BR>
+       Copyright 2004 by <A HREF="mailto:john&#x40;dlugosz.com">John M. Dlugosz</A>.
+    </P> 
+<A NAME="toptop"></A>
+<!-- end of standard banner -->
+<H1>vararray class reference</H1>
+This is a variable sized array</P>
+<HR SIZE=10 COLOR=black>
+
+<A NAME="constructor"><H2>vararray (const chdata& data)</H2></A>
+<P ALIGN="right"><FONT SIZE="-1">constructor, public, from <code>vararray&lt;T&gt;</code></FONT></P>
+This initializes a vararray with the value of the specified <code>chdata</code> object.  This is not meant for general 
+use.  In fact, it really ought to be protected.
+<HR SIZE=3 COLOR=black>
+
+<!-- WWWW		wwww		wwww		-->
+
+<H2>vararray (data_t* core)</H2>
+<P ALIGN="right"><FONT SIZE="-1">constructor, public, from <code>vararray&lt;T&gt;</code></FONT></P>
+This initializes the vararray with the specified <code>data_t</code> object.  The <code>data_t</code> is reference 
+counted, and this constructor causes the reference count to be incremented.  A new <code>ch_data</code> object is 
+created to hold the <code>core</code>.  This is not meant for general 
+use.  In fact, it really ought to be protected.
+
+<HR SIZE=3 COLOR=black>
+
+<!-- WWWW		wwww		wwww		-->
+
+<H2>vararray (vararray<T>& other, make_alias_t alias)</H2>
+<P ALIGN="right"><FONT SIZE="-1">constructor, public, from <code>vararray&lt;T&gt;</code></FONT></P>
+This is a copy constructor with an extra argument.  The argument's value is not used; it is meerly there for 
+overloading.  This form of copy constructor will cause this vararray to alias <code>other</code>, as opposed to the 
+regular form which also shares data but sets up a lazy copy.</P>
+
+Alias vs. COW semantics is explained...
+
+<HR SIZE=3 COLOR=black>
+
+<!-- WWWW		wwww		wwww		-->
+
+<H2>vararray_g()</H2>
+<P ALIGN="right"><FONT SIZE="-1">constructor, public, from <code>vararray_g&lt;T&gt;</code></FONT></P>
+<H2>vararray_s()</H2>
+<P ALIGN="right"><FONT SIZE="-1">constructor, public, from <code>vararray_s&lt;T&gt;</code></FONT></P>
+<HR SIZE=3 COLOR=black>
+
+<!-- WWWW		wwww		wwww-->
+
+<H2>explicit vararray_g (int elcount)</H2>
+<P ALIGN="right"><FONT SIZE="-1">constructor, public, from <code>vararray_g&lt;T&gt;</code></FONT></P>
+<H2>explicit vararray_s (int elcount)</H2>
+<P ALIGN="right"><FONT SIZE="-1">constructor, public, from <code>vararray_s&lt;T&gt;</code></FONT></P>
+<HR SIZE=3 COLOR=black>
+
+<!-- WWWW		wwww		wwww	-->
+
+<H2>vararray_g (int elcount, int capacity)</H2>
+<P ALIGN="right"><FONT SIZE="-1">constructor, public, from <code>vararray_g&lt;T&gt;</code></FONT></P>
+<H2>vararray_s (int elcount, int capacity)</H2>
+<P ALIGN="right"><FONT SIZE="-1">constructor, public, from <code>vararray_s&lt;T&gt;</code></FONT></P>
+<HR SIZE=3 COLOR=black>
+
+<!-- WWWW		wwww		wwww		-->
+
+<H2>vararray_g (vararray_g<T>& other, make_alias_t alias)</H2>
+<P ALIGN="right"><FONT SIZE="-1">constructor, public, from <code>vararray_g&lt;T&gt;</code></FONT></P>
+<H2>vararray_s (vararray_s<T>& other, make_alias_t alias)</H2>
+<P ALIGN="right"><FONT SIZE="-1">constructor, public, from <code>vararray_s&lt;T&gt;</code></FONT></P>
+<HR SIZE=3 COLOR=black>
+
+<!-- WWWW		wwww		wwww		-->
+
+<H2>vararray_g (const T* data, int len)</H2>
+<P ALIGN="right"><FONT SIZE="-1">constructor, public, from <code>vararray_g&lt;T&gt;</code></FONT></P>
+<H2>vararray_s (const T* data, int len)</H2>
+<P ALIGN="right"><FONT SIZE="-1">constructor, public, from <code>vararray_s&lt;T&gt;</code></FONT></P>
+<HR SIZE=10 COLOR=black>
+
+<!-- WWWW		wwww		wwww		wwww		wwww		wwww -->
+
+<H2>~vararray_g()</H2>
+<P ALIGN="right"><FONT SIZE="-1">destructor, public, from <code>vararray_g&lt;T&gt;</code></FONT></P>
+<H2>~vararray_s()</H2>
+<P ALIGN="right"><FONT SIZE="-1">destructor, public, from <code>vararray_s&lt;T&gt;</code></FONT></P>
+<HR SIZE=10 COLOR=black>
+
+<!-- WWWW		wwww		wwww		wwww		wwww		wwww -->
+
+<A NAME="[]"><H2>const T& operator[] (int index) const</H2></A>
+<H2>T& operator[] (int index)</H2>
+<P ALIGN="right"><FONT SIZE="-1">public, from <code>vararray&lt;T&gt;</code></FONT></P>
+This returns a reference to an element of the array.
+<HR SIZE=10 COLOR=black>
+
+<!-- WWWW		wwww		wwww		wwww		wwww		wwww -->
+
+<A NAME="alias_with"><H2>void alias_with (vararray_g<T>& other)</H2></A>
+<P ALIGN="right"><FONT SIZE="-1">public, from <code>vararray_g&lt;T&gt;</code></FONT></P>
+<H2>void alias_with (vararray_s<T>& other)</H2>
+<P ALIGN="right"><FONT SIZE="-1">public, from <code>vararray_s&lt;T&gt;</code></FONT></P>
+This is a variation of assignment.
+<HR SIZE=10 COLOR=black>
+<!-- WWWW		wwww		wwww		wwww		wwww		wwww -->
+
+<A NAME="append"><H2>void append (const T& x)</H2></A>
+<P ALIGN="right"><FONT SIZE="-1">public, from <code>vararray&lt;T&gt;</code></FONT></P>
+This function appends an element to the array.  The size of the array is increased by one.
+<HR SIZE=3 COLOR=black>
+
+<!-- WWWW		wwww		wwww -->
+
+<H2>void append (const vararray<T>& other, int frompos, int fromlen)</H2>
+<P ALIGN="right"><FONT SIZE="-1">public, from <code>vararray&lt;T&gt;</code></FONT></P>
+This function appends a substring of the <code>other</code> array onto <code>this</code> array.</P>
+
+It is equivilent to <code>replace (elcount(), 0, other, frompos, fromlen)</code></P>
+<HR SIZE=10 COLOR=black>
+
+<!-- WWWW		wwww		wwww		wwww		wwww		wwww -->
+<A NAME="debug_print"><H2>void debug_print() const</H2></A>
+<P ALIGN="right"><FONT SIZE="-1">public, from <code>nt_base</code></FONT></P>
+This function dumps a report to standard output.</P>
+<HR SIZE=10 COLOR=black>
+
+<!-- WWWW		wwww		wwww		wwww		wwww		wwww -->
+
+<A NAME="debug_snoop"><H2>void debug_snoop (snoop_t& results) const</H2></A>
+<P ALIGN="right"><FONT SIZE="-1">public, from <code>nt_base</code></FONT></P>
+This function is designed for use in the validation code.  It provides details of the internal
+state that are not normally public.  See the <code>snoop_t</code> structure, and the unit testing code.
+<HR SIZE=10 COLOR=black>
+
+<!-- WWWW		wwww		wwww		wwww		wwww		wwww -->
+
+<A NAME="elcount"><H2>int elcount() const</H2></A>
+<P ALIGN="right"><FONT SIZE="-1">public, from <code>nt_base</code></FONT></P>
+This function returns the number of elements in the vararray.  That is, the legal range of
+indexing the collection is <code>0</code> through <code>elcount()</code> inclusive.</P>
+
+This function is called <code>elcount</code> because it's meaning is clear.  Years ago, I was working on a project and 
+had members in various classes called <code>length</code>, <code>size</code>, and whatnot.  For collection classes, 
+there were various names for the size, and I wanted to standardize.  Upon discussing it with a co-worker, we decided 
+that either term was unclear.  <code>elcount</code> was decided upon because it is clearly the number of elements in a 
+collection.  Other terms could have other meanings: size in bytes, length in inches?</P>
+<HR SIZE=10 COLOR=black>
+
+<!-- WWWW		wwww		wwww		wwww		wwww		wwww -->
+
+<A NAME="eltype"><H2>typedef T eltype</H2></A>
+<P ALIGN="right"><FONT SIZE="-1">public, from <code>vararray&lt;T&gt;</code></FONT></P>
+Sometimes in a collection template it is handy to get the type of the element.  This typedef is provided for that purpose.
+<HR SIZE=10 COLOR=black>
+
+<!-- WWWW		wwww		wwww		wwww		wwww		wwww -->
+
+<A NAME="get"><H2>void get (T* dest, int count, int startpos=0) const</H2></A>
+<P ALIGN="right"><FONT SIZE="-1">public, from <code>vararray&lt;T&gt;</code></FONT></P>
+This function copies values out of the vararray into the <code>dest</code> buffer.  Note that this has assignment, not 
+constructor, semantics.
+<HR SIZE=10 COLOR=black>
+
+<!-- WWWW		wwww		wwww		wwww		wwww		wwww -->
+
+<A NAME="get_at"><H2>const T& get_at (int index) const</H2></A>
+<P ALIGN="right"><FONT SIZE="-1">public, from <code>vararray&lt;T&gt;</code></FONT></P>
+This gets a single value from the array.</P>
+
+It is better than the more general <code>operator[]</code> because it knows the value will be read, not written.  It 
+returns a const regardless of whether <code>this</code> is const, and avoids triggering a lazy copy.
+<HR SIZE=10 COLOR=black>
+
+<!-- WWWW		wwww		wwww		wwww		wwww		wwww -->
+
+<A NAME="get_buffer"><H2>T* get_buffer()</H2></A>
+<H2>const T* get_buffer() const</H2>
+<P ALIGN="right"><FONT SIZE="-1">public, from <code>vararray&lt;T&gt;</code></FONT></P>
+These functions return a pointer to the internal data of the vararray.
+<HR SIZE=10 COLOR=black>
+
+<!-- WWWW		wwww		wwww		wwww		wwww		wwww -->
+
+<A NAME="put"><H2>void put (const T* src, int count, int startpos=0)</H2></A>
+<P ALIGN="right"><FONT SIZE="-1">public, from <code>vararray&lt;T&gt;</code></FONT></P>
+This copies multiple elements into the array.  It does not insert -- it overwrites the current values.
+<HR SIZE=10 COLOR=black>
+
+<!-- WWWW		wwww		wwww		wwww		wwww		wwww -->
+
+<A NAME="put_at"><H2>void put_at (const T& val, int index)</H2></A>
+<P ALIGN="right"><FONT SIZE="-1">public, from <code>vararray&lt;T&gt;</code></FONT></P>
+This function replaces one value in the array.
+<HR SIZE=10 COLOR=black>
+
+<!-- WWWW		wwww		wwww		wwww		wwww		wwww -->
+
+<A NAME="remove"><H2>void remove (int pos, int len=1)</H2></A>
+<P ALIGN="right"><FONT SIZE="-1">public, from <code>nt_base</code></FONT></P>
+This removes elements from the array.  The elcount is reduced by len, and elements after the point of deletion are 
+shifted up.</P>
+See also remove_all, replace.</P>
+Preconditions...
+<HR SIZE=10 COLOR=black>
+
+<!-- WWWW		wwww		wwww		wwww		wwww		wwww -->
+
+<A NAME="remove_all"><H2>void remove_all ()</H2></A>
+<P ALIGN="right"><FONT SIZE="-1">public, from <code>nt_base</code></FONT></P>
+This function removes all elements from the array, producing an empty array.
+<HR SIZE=10 COLOR=black>
+
+<!-- WWWW		wwww		wwww		wwww		wwww		wwww -->
+
+<A NAME="replace"><H2>void replace (int pos, int lendel, const T* data, int datalen)</H2></A>
+<P ALIGN="right"><FONT SIZE="-1">public, from <code>vararray&lt;T&gt;</code></FONT></P>
+This is the workhorse of the array manipulation functions.  Starting at <code>pos</code> in <code>this</code> array, 
+<code>lendel</code> elements are removed.  Then <code>datalen</code> elements are inserted at that same position.  The 
+<code>data</code> parameter should point to the first element to insert (the others follow consecutivly).</P>
+
+The value of <code>pos</code> must be within the array, or may also be exactly equal to the array's length.  That is, 
+when <code>pos == elcount()</code> the function appends <code>data</code> (and <code>lendel</code> must be zero).</P>
+
+If <code>lendel == 0</code>, this function degenerates to an insert operation.</P>
+
+If <code>datalen == 0</code>, this function degenerates to a remove operation.</P>
+<HR SIZE=3 COLOR=black>
+
+<!-- WWWW		wwww		wwww	-->
+
+<H2>void replace (int pos, int lendel, const vararray<T>& other, int frompos, int fromlen)</H2>
+<P ALIGN="right"><FONT SIZE="-1">public, from <code>vararray&lt;T&gt;</code></FONT></P>
+This form of <code>replace</code> inserts from another vararray object.  The substring of <code>other</code> that is 
+inserted starts at index <code>frompos</code> and has a length of <code>fromlen</code>.  It is legal for 
+<code>other</code> to be the same object as <code>this</code>.
+
+<HR SIZE=10 COLOR=black>
+
+<!-- WWWW		wwww		wwww		wwww		wwww		wwww -->
+<A NAME="reserve"><H2>void reserve (int newcapacity)</H2></A>
+<P ALIGN="right"><FONT SIZE="-1">public, from <code>nt_base</code></FONT></P>
+<P>This function reserves extra room in the array, to accomidate additional growth without re-copying the values.</P>
+<P>A <code>vararray</code> has two sizes associated with it:  The <code>Count</code> is the number of elements present, and 
+defines the legal indexing range.  This is the value fetched by <A HREF="#elcount" class="code">elcount</A>.  Each vararray also has 
+a <code>Capacity</code>, which may be greater than or equal to the <code>Count</code>.  The <code>Capacity</code> is how
+much memory is actually allocated, such that Count can be revised upward without having to reallocate and relocate the 
+contents.</P>
+
+<P>Calling <A HREF="#reserve" class="code">reserve</A> will increase the <code>Capacity</code> to match the parameter, if it is 
+not at least that large already.  It also triggers copy-on-write if it needs to increase the allocation.  Note that another way for
+<code>Capacity</code> to become larger than <code>Count</code> is to delete items from a <code>vararray</code>; it will resize 
+downward without reallocating the storage.</P>
+
+<P>A subsequent <A HREF="#resize" class="code">resize</A> will not need to reallocate storage if the new size fits in the
+available capacity (which is always the case if resizing it to be smaller!) and it does not need to perform a copy-on-write (that is,
+the data is not being shared).</P>
+
+<P>Any of the splicing functions, including <A HREF="#replace" class="code">replace</A>,
+<A HREF="#replace_all" class="code">replace_all</A>, <A HREF="#append" class="code">append</A>,
+<A HREF="#sorted_insert" class="code">sorted_insert</A>,
+<A HREF="#truncate" class="code">truncate</A>,
+<A HREF="#remove" class="code">remove</A>,
+and <A HREF="#remove_all" class="code">remove_all</A>, will
+perform the operation in-place, moving only elements to the right of the insertion/deletion, and not reallocate, if:
+
+<UL>
+	<LI>It does not need to perform a copy-on-write.
+	<LI>The size of the result fits in the current <code>Capacity</code>.
+	<LI>It’s not copying from the same instance it’s copying to, and the source position is to the right of the destination position (that is,
+	the source material is not moving too).
+</UL>
+
+<P>Use of <code>reserve</code> can make code like the following much more efficient:</P>
+<PRE>
+void foo (vararray&lt;int&amp; A>)
+ {
+ const int iterations= 1000000;
+ A.reserve (iterations + A.elcount());
+ for (int loop= 0;  loop &lt; iterations;  ++loop)
+    A.append (loop);
+ }
+</PRE>
+
+<P>Without the call to <code>reserve</code>, the above code will reallocate the array a million times, each time having to re-copy the 
+entire result thus-far.  By reserving room in advance, each call to append extends the <code>Count</code> and copies only one element.</P>
+
+<P>Note that reserved space takes up memory.  For example, if the code above performed <code>A.remove(0,999998)</code>,
+<code>Count</code> would become 2 but <code>Capacity</code> would still be a million!  This is great if I’m amout to insert a bunch
+of stuff, but a waste if the capacity is caused by deleting and will not be used again.  There is no function provided simply to force a 
+reallocation and reclaim unneeded reserved space.  The <code>reserve</code> function will increase the <code>Capacity</code> if it 
+needs to, but if the argument is smaller than the existing <code>Capacity</code>, will do nothing.  One work around is to do this:</P>
+<PRE>
+{ // extra braces for scope
+vararray_s&lt;int> temp (A);  // now A and temp are sharing internal representation
+A.remove (0,999998);  // will reallocate A, since it triggers a copy-on-write
+} // temp goes away, freeing the million elements.
+</PRE>
+
+
+<HR SIZE=10 COLOR=black>
+
+<!-- WWWW		wwww		wwww		wwww		wwww		wwww -->
+
+<A NAME="resize"><H2>void resize (int newsize)</H2></A>
+<P ALIGN="right"><FONT SIZE="-1">public, from <code>nt_base</code></FONT></P>
+This function changes the elcount of an array.  If the array shrinks, remaining elements hold their values.  If the 
+array grows, additional default-initialized elements are appeneded.</P>
+See also: truncate</P>
+<HR SIZE=10 COLOR=black>
+
+<!-- WWWW		wwww		wwww		wwww		wwww		wwww -->
+
+<A NAME="sorted_insert"><H2>int sorted_insert (const T& value, int (*compare)(const T&, const T&))</H2></A>
+<P ALIGN="right"><FONT SIZE="-1">public, from <code>vararray&lt;T&gt;</code></FONT></P>
+This function inserts the <code>value</code> into the array.  It figures out the position by itself, assuming that the 
+array is being maintained in sorted order.  The function <code>compare</code> describes the relationship by returning a 
+negative number for "less than", a positive number for "greater than", and zero for "equal" (just like 
+<code>strcmp</code>).</P>
+
+The return value is the element's index.  That is, it tells you where the element was inserted.</P>
+<HR SIZE=10 COLOR=black>
+
+<!-- WWWW		wwww		wwww		wwww		wwww		wwww -->
+<A NAME="truncate"><H2>void truncate (int newsize)</H2></A>
+<P ALIGN="right"><FONT SIZE="-1">public, from <code>nt_base</code></FONT></P>
+This function is used to efficiently shrink the array.</P>
+See also: resize</P>
+<HR SIZE=10 COLOR=black>
+
+<!-- WWWW		wwww		wwww		wwww		wwww		wwww -->
+<!-- WWWW		wwww		wwww		wwww		wwww		wwww -->
+
+
+
+
+
+
+<HR SIZE=10 COLOR=black>
+
+<!-- WWWW		wwww		wwww		wwww		wwww		wwww -->
+<!-- WWWW		wwww		wwww		wwww		wwww		wwww -->
+
+
+
+
+<!-- Stock footer-->
+<FONT size="-2">Page content copyright 1997 by John M. Dlugosz.
+Home:<A HREF="http://www.dlugosz.com">http://www.dlugosz.com</A>,
+email:<A HREF="mailto:john@dlugosz.com">mailto:john@dlugosz.com</A>
+</FONT>
+<!-- End footer-->
+
+</BODY>
+
+</HTML>
+
+
+
+
+

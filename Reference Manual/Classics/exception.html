@@ -1,0 +1,194 @@
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=windows-1252">
+<TITLE>exception class reference</TITLE>
+<LINK REL=STYLESHEET HREF="../info.css" TYPE="text/css">
+</HEAD>
+
+<BODY>
+<H1>exception reference</H1>
+See the
+<A HREF="exception_guide.html">User's Guide</A> for more explaination.</P>
+<HR SIZE=10 COLOR=black>
+<!-- WWWW		wwww		wwww		wwww		wwww		wwww -->
+
+
+<A NAME="constructor"><H2>
+exception (const char* module, const char* name, const char* fname, int line)
+</H2></A><BR>
+<P ALIGN="right"><FONT SIZE="-1">constructor, public</FONT></P>
+The constructor takes the essential information contained in the exception
+object.  See the
+<A HREF="exception_guide.html">User's Guide</A> for examples and an overview of
+the concept.</P>
+<P>The <code>module</code> parameter should match the name of the library or other
+component.  The file name and line number is not unique, because different projects
+can contain similarly named files.  So this argument is designed to take the identification
+a step farther.  All exceptions created in the same component should use the same
+string here.</P>
+<P>The <code>fname</code> and <code>line</code> parameters identify the location
+of the exception.  You should (ultimatly) use <code>__FILE__</code> and <code>__LINE__</code>
+to supply these values.</P>
+<P>The <code>name</code> parameter is a short label identifying the nature of
+the problem.</P>
+
+<HR SIZE=10 COLOR=black>
+<!-- WWWW		wwww		wwww		wwww		wwww		wwww -->
+
+<A NAME="destructor"><H2>virtual ~exception()</H2></A>
+<P ALIGN="right"><FONT SIZE="-1">destructor, public</FONT></P>
+
+<HR SIZE=10 COLOR=black>
+<!-- WWWW		wwww		wwww		wwww		wwww		wwww -->
+
+<A NAME="operator+="><H2>void operator+= (const ustring& val)</H2>
+<P ALIGN="right"><FONT SIZE="-1">public</FONT></P>
+This function adds free text to the exception object.
+<HR SIZE=10 COLOR=black>
+<!-- WWWW		wwww		wwww		wwww		wwww		wwww -->
+
+
+<A NAME="operator()"><H2>void operator() (const char* module, const char* name, const char* fname, int line)</H2>
+<P ALIGN="right"><FONT SIZE="-1">public</FONT></P>
+This function adds a new stanza to the exception.  It's designed to look just
+like the constructor, which creates the first stanza.  Example,
+<pre>
+catch (exception& X) {
+   X ("module", "An Error", __FILE__, __LINE__);
+   X += "Here is some more specific information.";
+   throw;
+   }
+</pre>
+<HR SIZE=10 COLOR=black>
+<!-- WWWW		wwww		wwww		wwww		wwww		wwww -->
+
+
+<A NAME="add_key"><H2>void add_key (const wchar_t* key, const ustring& value)</H2>
+<BR><H2>void add_key (const wchar_t* key, int value)</H2>
+<P ALIGN="right"><FONT SIZE="-1">public</FONT></P>
+These functions add a named value to the exception object.
+<HR SIZE=10 COLOR=black>
+<!-- WWWW		wwww		wwww		wwww		wwww		wwww -->
+
+
+<A NAME="default_show_function"><H2>static void default_show_function (const exception&)</H2>
+<P ALIGN="right"><FONT SIZE="-1">public</FONT></P>
+This formats the exception and sends it to the standard error file.
+<HR SIZE=10 COLOR=black>
+<!-- WWWW		wwww		wwww		wwww		wwww		wwww -->
+
+
+<A NAME="get_internal_data"><H2>string& get_internal_data()</H2><BR>
+<H2>const wstring get_internal_data() const</H2>
+<P ALIGN="right"><FONT SIZE="-1">public</FONT></P>
+<P>These functions return a reference to the internal data.  It's used
+to implement operator+=.  Try using <A HREF="#value"><code>value</code></A> instead.
+<HR SIZE=10 COLOR=black>
+<!-- WWWW		wwww		wwww		wwww		wwww		wwww -->
+
+
+
+<A NAME="iterator"><H2>class iterator</H2>
+<P ALIGN="right"><FONT SIZE="-1">public</FONT></P>
+This nested class is used to access the information in the exception object
+in a structured manner.  See the <A HREF="exception_iterator_index.html" TARGET="index">class index</A>
+or the <A HREF="exception_iterator_guide.html">User's Guide</A> for more information.
+<HR SIZE=10 COLOR=black>
+<!-- WWWW		wwww		wwww		wwww		wwww		wwww -->
+
+
+<A NAME="setup_hook"><H2>static void (*setup_hook) (exception* self, const ustring&amp; module, const ustring&amp; name, const ustring&amp; fname, int line)</H2>
+<P ALIGN="right"><FONT SIZE="-1">public</FONT></P>
+This pointer is used by the <A HREF="#constructor">constructor</A> and <A HREF="#operator()"><code>operator()</code></A> function too
+do all the work of populating the normal values.  If this pointer is defined, the function is called and must do all the work.  The supplied function
+may call <A HREF="#normal_setup"><code>normal_setup</code></A> to do the basics, and supply additional code.  Or, it may do everything
+itself and not call <code>normal_setup</code>.</P>
+
+<P>If <code>setup_hook</code> is null, then <A HREF="#normal_setup" class="code">normal_setup</A> is called implicitly.</P>
+
+<P>For example, a main program could contain:</P>
+<PRE>
+int error_count= 0;
+std::wstring docname= "&lt;untitled-1>";
+static void my_setup_hook (classics::exception* self, const classics::ustring&amp; module, const classics::ustring&amp; name, const classics::ustring&;amp; fname, int line)
+ {
+ ++error_count;  // count how many times I'm called.  (each stanza actually)
+ // do all the normal stuff first.
+ classics::exception::normal_setup (self, module, name, fname, line);
+ // automatically add a time stamp
+ wchar_t timecode[17];
+ _i64tow(ratwin::GetSystemTimeAsFileTime(), timecode, 16);
+ self->add_key (L"timestamp", timecode);
+ // add the document name
+ self->add_key (L"docname", docname);
+ }
+</PRE>
+
+<P>and then call</P>
+<PRE>
+ classics::exception::setup_hook= my_setup_hook;
+</PRE>
+<P>from <code>main()</code>.</P>
+
+<P>See also: <A HREF="exception_register_callback.html">exception::register_callback</A> class for another mechanism.</P>
+<HR SIZE=10 COLOR=black>
+<!-- WWWW		wwww		wwww		wwww		wwww		wwww -->
+
+
+<A NAME="show"><H2>virtual void show() const</H2>
+<P ALIGN="right"><FONT SIZE="-1">public</FONT></P>
+<P>This function is used to present the information in the exception to
+the user.  The default implementation is to call <A HREF="#show_function"><code>(*show_function)</code></A>.
+An overriding function shouldn't change how the information is presented (use
+<code>show_function</code> for that) but can be used as a hook to finalize data before
+presenting it.
+<HR SIZE=10 COLOR=black>
+<!-- WWWW		wwww		wwww		wwww		wwww		wwww -->
+
+
+<A NAME="show_function"><H2>static void (*show_function)(const exception&)</H2>
+<P ALIGN="right"><FONT SIZE="-1">public</FONT></P>
+This pointer is used by the supplied definition of <A HREF="#show"><code>show</code></A>.
+Initially it points to <A HREF="#default_show_function"><code>default_show_function</code></A>,
+but you may change it to point to your own handler.  This allows you to control how the exception is displayed.
+<HR SIZE=10 COLOR=black>
+<!-- WWWW		wwww		wwww		wwww		wwww		wwww -->
+
+
+<A NAME="value"><H2>ustring value() const</H2>
+<P ALIGN="right"><FONT SIZE="-1">public</FONT></P>
+<P>This returns the complete description of the error as a string.</P>
+<P>The string is returned as a <code>ustring</code> so that it may easily
+be obtained in any desired flavor, but internally the data is kept as a single
+<code>wstring</code> value.</P>
+<P>The format of the string is described using the <A HREF="npdc.html">non-printing delimiter characters</A>.</P>
+<P>Stanzas are separated by <code>Split3</code>.  Multiple whole exceptions written
+to a text log should be separated by <code>Split4</code>, but this character will
+not appear (in the top level) in this string.</P>
+<P>Named attributes within the string are delimited by <code>Open1/Close1</code>
+brackets, and free text has no delimitation.</P>
+<P>It is better to manipulate the exception object using the 
+<A HREF="#iterator"><code>iterator</code></A>
+class, but the structure of the data is precicely defined so you can rely on this
+if you need to.</P>
+
+<HR SIZE=10 COLOR=black>
+<!-- WWWW		wwww		wwww		wwww		wwww		wwww -->
+
+
+
+
+
+
+
+
+<!-- Stock footer-->
+<FONT size="-2">Page content copyright 2004 by John M. Dlugosz.
+Home: <A HREF="http://www.dlugosz.com">http://www.dlugosz.com</A>,
+email: <A HREF="mailto:john&#x40;dlugosz.com">mailto:john&#x40;dlugosz.com</A>
+</FONT>
+<!-- End footer-->
+
+</BODY>
+
+</HTML>
