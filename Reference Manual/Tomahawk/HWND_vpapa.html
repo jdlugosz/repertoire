@@ -1,0 +1,121 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"  "http://www.w3.org/TR/html4/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=windows-1252">
+<TITLE>HWND_vpapa member reference</TITLE>
+<META http-equiv="Content-Script-Type" content="text/javascript">
+<SCRIPT type= "text/javascript" src="../helpers.js"></SCRIPT>
+<LINK REL=STYLESHEET HREF="../info.css" TYPE="text/css">
+<LINK REL="Start" HREF="http://www.dlugosz.com/Repertoire/refman/mainframe.html">
+<LINK REL="Contents" HREF="../reper_index.html">
+<LINK REL="Index" HREF="../class_summary.html">
+<LINK REL="Chapter" HREF="class_index.html">
+<LINK REL="Help" HREF="../accessibility_statement.html">
+<LINK REL="Copyright" HREF="../policy.html">
+<SCRIPT type="text/javascript">
+   checkframe ("Tomahawk/HWND_vpapa_index.html");
+</SCRIPT>
+
+<META name="date" content="2007-02-27">
+</HEAD>
+
+<BODY>
+
+<IFRAME id="page_banner" src="../page_banner.html" scrolling="no"></IFRAME>
+<A NAME="toptop"></A>
+
+
+<H1 id="overview" >HWND_vpapa</H1>
+<P>This class is a virtual base for various mix-ins that deal with windows.  Its concept is to
+make a C++ object that is synonomous with a <code>HWND</code>.  See the
+<A HREF="HWND_vpapa_guide.html#toptop">User’s Guide</A> for more discussion.</P>
+
+<HR class="sep1">
+
+<H2 id="constructor"><SPAN class="signame">HWND_vpapa</span>()</H2>
+<A HREF="HWND_vpapa_index.html" TARGET="index" class="memof">HWND_vpapa</A>
+<P class="mematt">constructor, public</P>
+<P>The constructor is unsurprising.</P>
+
+
+<HR  class="sep1">
+
+<H2 id="destructor"><SPAN class="signame">~HWND_vpapa</span>()</H2>
+<A HREF="HWND_vpapa_index.html" TARGET="index" class="memof">HWND_vpapa</A>
+<P class="mematt">destructor, virtual, public</P>
+<P>The destructor will <A HREF="#unhook" class="code">unhook</A> the class, to ensure that subsequent
+messages don’t get sent to a nonexistant object.  The WinProc itself is a thunk that’s a member of this class,
+so the WinProc function pointer becomes invalid!  Normally, the window owns this object so it won’t be
+destructed until after the window is destroyed, but usage can vary and the situation could be complex,
+so this is there just to be safe.</P>
+
+
+<HR  class="sep1">
+<H2 id="forge_reference">void <SPAN class="signame">forge_reference</span>()</H2>
+<A HREF="HWND_vpapa_index.html" TARGET="index" class="memof">HWND_vpapa</A>
+<P class="mematt">protected</P>
+<P>This creates a fake reference to this object, to mimic a <A HREF="../class_summary.html#handle" class="code">handle</A>
+being kept by the <code>HWND</code>.  It is called by
+<A HREF="message_tap.html#hook">message_tap::hook</A> as part of the binding operation.  Another
+implementation of such a binding would do likewise.</P>
+<P>It is named <I>forge</I> as a double entendre: it indicates “to form or give shape to” as in
+forging a chain, but it also indiates counterfeiting, because this relationship is formed by doctoring the books.</P>
+<P>This is actually implemented by keeping a <code>handle</code> to itself as a private member, because that is
+the only easy way to do it without breaking encapsulation of the smart pointer system.  It would be possible to
+implement without needing an extra data member, but keeping the implementation straightforward and simple
+is more important.</P>
+<P>See also: <A HREF="#release_forged_reference" class="code">release_forged_reference</A>.</P>
+
+<HR  class="sep1">
+<H2 id="release_forged_reference">void <SPAN class="signame">release_forged_reference</span>()</H2>
+<A HREF="HWND_vpapa_index.html" TARGET="index" class="memof">HWND_vpapa</A>
+<P class="mematt">protected</P>
+<P>This release the extra reference count created by <A HREF="#forge_reference" class="code">forge_reference</A>.
+It is called by <A HREF="message_tap.html#unhook">message_tap::unhook</A> when the <code>HWND</code> is destroyed,
+to mimic the <code>HWND</code>’s destructor holding a <code>handle</code> to this object.</P>
+<P>It must be used cautiously, as it can trigger <code>delete this;</code> if that was the only
+remaining owned reference!</P>
+
+<HR  class="sep1">
+<H2 id="report_error">void <SPAN class="signame">report_error</span> (const <A HREF="../class_summary.html#exception">classics::exception</A>&amp; X)</H2>
+<A HREF="HWND_vpapa_index.html" TARGET="index" class="memof">HWND_vpapa</A>
+<P class="mematt">public, virtual</P>
+<P>This function is called to log non-fatal errors generated within the class, and any exceptions caught by the
+internal hook handler.</P>
+<P>The supplied implementation calls <code>X.show()</code>.  This probably does not
+need to be changed, since you can customize the meaning of <code>show</code> already,
+on an application-wide basis.</P>
+
+<HR  class="sep1">
+
+<H2 id="set_window_handle">void <SPAN class="signame">set_window_handle</span> (HWND)</H2>
+<A HREF="HWND_vpapa_index.html" TARGET="index" class="memof">HWND_vpapa</A>
+<P class="mematt">public</P>
+<P>This function performs half the work needed to associate this object with the
+specified Win32 Window handle. It sets the data member so that subsequent calls to
+<A HREF="#window_handle" class="code">window_handle</A> will return the specified window handle.</P>
+<P>It is used to complete the circuit if you used <A HREF="message_tap.html#get_WndProc" class="code">message_tap::get_WndProc</A>
+to directly specify the window proc or dialog proc, as opposed to subclassing an existing window.  Specifically,
+<A HREF="#hook" class="code">hook</A> calls this for you.</P>
+<P>It is an error to call this function more than once (unless it is
+redundant&mdash;the parameter is the same).  This catches errors from duplicate use of the same instance.</P>
+<P>See also: <A HREF="message_tap.html#get_WndProc" class="code">message_tap::get_WndProc</A></P>
+
+<HR  class="sep1">
+
+<H2 id="window_handle">HWND <SPAN class="signame">window_handle</span>() const</H2>
+<A HREF="HWND_vpapa_index.html" TARGET="index" class="memof">HWND_vpapa</A>
+<P class="mematt">public</P>
+<P>This returns the Win32 window handle of the window to which this class is paired with.</P>
+<P>Note that this is a <code>const</code> member, as the state of this object is not
+affected. However, you can still modify the corresponding window object
+through this <code>HWND</code>, since there is no const-ness concept on <code>HANDLE</code>’s.</P>
+<P>See also: <A HREF="#set_window_handle" class="code">set_window_handle</A>,
+<A HREF="message_tap.html#hook" class="code">message_tap::hook</A>
+
+<HR  class="sep1">
+
+<IFRAME id="page_footer" src="../page_footer.html"></IFRAME>
+</BODY>
+</HTML>
+

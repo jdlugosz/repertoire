@@ -1,0 +1,77 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"  "http://www.w3.org/TR/html4/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=windows-1252">
+<TITLE>HWND_vpapa User’s Guide</TITLE>
+<META http-equiv="Content-Script-Type" content="text/javascript">
+<SCRIPT type= "text/javascript" src="../helpers.js"></SCRIPT>
+<LINK REL=STYLESHEET HREF="../info.css" TYPE="text/css">
+<LINK REL="Start" HREF="http://www.dlugosz.com/Repertoire/refman/mainframe.html">
+<LINK REL="Contents" HREF="../reper_index.html">
+<LINK REL="Index" HREF="../class_summary.html">
+<LINK REL="Chapter" HREF="class_index.html">
+<LINK REL="Help" HREF="../accessibility_statement.html">
+<LINK REL="Copyright" HREF="../policy.html">
+<LINK REL=STYLESHEET HREF="../info.css" TYPE="text/css">
+<SCRIPT type="text/javascript">
+   checkframe ("Tomahawk/HWND_vpapa_index.html");
+</SCRIPT>
+
+<META name="date" content="2007-02-27">
+</HEAD>
+
+<BODY>
+<IFRAME id="page_banner" src="../page_banner.html" scrolling="no"></IFRAME>
+
+<H1 id="toptop">HWND_vpapa User’s Guide</H1>
+
+<H2>Related Documents</H2>
+<UL>
+	<LI><A HREF="HWND_vpapa_index.html" TARGET="index"><code>HWND_vpapa</code> index</A>
+</UL>
+
+<H2>Contents</H2>
+<UL>
+	<LI><A HREF="#overview">Overview</A>
+	<LI><A HREF="#threading">Threading Issues</A>
+	<LI><A HREF="#housekeeping">Housekeeping Issues</A>
+	<LI><A HREF="#howtouse"><B>How to Use</B></A>
+</UL>
+
+<H2 id="overview">Overview</H2>
+<P>This class is a virtual base for various mix-ins that deal with windows.  Its concept is to
+make a C++ object that is synonomous with a <code>HWND</code>.</P>
+
+<P>Even if fully refactored, the basic units of functionality of a windowing class like
+<A HREF="eagduru_index.html" TARGET="index" class="code">eagduru</a> have one thing
+in common: they need the corresponding <code>HWND</code>.  There is also another thing
+that needs to be a virtual base, and that’s the <A HREF="../class_summary.html#can_handle" class="code">can_handle</A>
+base class for efficient smart pointers.</P>
+<P>This class is designed to be used as a virtual base to provide both features.  See <A HREF="eagduru_index.html" TARGET="index" class="code">eagduru</a>
+for more about the architecture.</P>
+<P>By itself, this class’s concept is to provide a correspondance between an <code>HWND</code> and a C++ object.
+So the feature set presented is that of an “is-a” relationship.  Anything derived from this class “is-a” <code>HWND</code>.
+However, it is like an “interface” concept in that it provides semantics but not mechanism.  It does not create the
+correspondance, but it provides a protected interface to allow classes like <A HREF="../class_summary.html#message_tap" class="code">message_tap</A>
+and <A HREF="../class_summary.html#foreign_window" class="code">foreign_window</A> to do so, and provides a uniform way
+for other mix-in derived classes to access this relationship.</P>
+
+<H2 id="threading">Threading Issues</H2>
+<P>The public interface has no special threading issues.  The implementation of the protected interface&mdash;the code
+that sets and clears the HWND&mdash;will note its own issues.</P>
+
+<H2 id="housekeeping">Housekeeping Issues</H2>
+<P>Objects cannot be copied or assigned.  They should be allocated on the heap and used with
+the smart pointers.</P>
+
+<H2 id="howtouse">How to Use</H2>
+<P>Declare this as a virtual base class.  One mix-in must provide implementation to call <A HREF="HWND_vpapa.html#set_window_handle" class="code">set_window_handle</A>
+to set up and destroy the correspondance.  Other mix-ins can access the <code>HWND</code> using <A HREF="HWND_vpapa.html#window_handle" class="code">window_handle</A>.
+</P>
+
+
+<IFRAME id="page_footer" src="../page_footer.html"></IFRAME>
+</BODY>
+
+</HTML>
+
