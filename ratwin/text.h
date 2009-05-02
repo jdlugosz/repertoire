@@ -1,12 +1,13 @@
-// The Repertoire Project copyright 1999 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
+// The Repertoire Project copyright 2001 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: ratwin\text.h
-// Revision: public build 6, shipped on 28-Nov-1999
+// Revision: revised
 
 #pragma once
-#if !defined RATWIN_TEXT_INCLUDED
-#define RATWIN_TEXT_INCLUDED
+#if defined RATWIN_NoGlobals
+   #error ratwin\text.h contains globals.
+#endif
 
-#include "ratwin\base.h"
+#include "ratwin\color=struct.h"
 
 // DLL imports "cloaked" for overloading
 extern "C" {
@@ -22,7 +23,6 @@ __declspec(dllimport) Dlugosz::ratwin::arg::arg32 __stdcall GetTextColor (Dlugos
 
 STARTWRAP
 namespace ratwin {
-
 namespace text {
 
 inline bool TextOut (types::HDC dc, int x, int y, const char* s, int len)
@@ -89,10 +89,7 @@ inline bool GetTextExtent (types::HDC dc, const char* s, int strlen, types::POIN
  return ::GetTextExtentPoint32A (reinterpret_cast<arg::arg32>(dc), s, strlen, &result);
  }
 
-inline ulong SetTextColor (types::HDC dc, ulong newcolor)
-// I'll introduce a COLORREF class or type later.  Using raw integer for now.
-// 17-Mar-97: there is a color_t class in Tomahawk.  I don't know if it's worth
-// introducing it in the ratwin layer.
+inline ulong SetTextColor (types::HDC dc, color::COLORREF newcolor)
  {
  return reinterpret_cast<ulong>(::SetTextColor (reinterpret_cast<arg::arg32>(dc), reinterpret_cast<arg::arg32>(newcolor)));
  }
@@ -106,5 +103,4 @@ inline ulong GetTextColor (types::HDC dc)
 
 }
 ENDWRAP
-#endif
 

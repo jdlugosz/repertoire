@@ -1,10 +1,8 @@
-// The Repertoire Project copyright 1999 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
+// The Repertoire Project copyright 2001 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: ratwin\base.h
-// Revision: public build 6, shipped on 28-Nov-1999
+// Revision: updated
 
 #pragma once
-#if !defined RATWIN_BASE_INCLUDED
-#define RATWIN_BASE_INCLUDED
 
 #include "classics\common.h"
 #include "classics\2D_point.h"
@@ -45,13 +43,16 @@ namespace types {
 namespace internal {
 
    struct HANDLE_struct {/*empty*/};
-   struct SOCKET_struct : public HANDLE_struct {/*empty*/};
+   struct Kernel_HANDLE_struct : public HANDLE_struct {/*empty*/};
+   struct SOCKET_struct : public Kernel_HANDLE_struct {/*empty*/};
    struct HWND_struct : public HANDLE_struct {/*empty*/};
    struct HGDIOBJ_struct : public HANDLE_struct {/*empty*/};
    struct HBITMAP_struct : public HGDIOBJ_struct {/*empty*/};
    struct HBRUSH_struct : public HGDIOBJ_struct {/*empty*/};
+   struct HPEN_struct : public HGDIOBJ_struct {/*empty*/};
+   struct HFONT_struct : public HGDIOBJ_struct {/*empty*/};
+   struct HREGION_struct : public HGDIOBJ_struct {/*empty*/};
    struct HKEY_struct : public HANDLE_struct {/*empty*/};
-      // pen, font, and region are also derived from GDIOBJ
    struct HMENU_struct : public HANDLE_struct {/*empty*/};
    struct HICON_struct : public HANDLE_struct {/*empty*/};
    struct HCURSOR_struct : public HANDLE_struct {/*empty*/};
@@ -61,11 +62,15 @@ namespace internal {
    struct HDC_struct : public HANDLE_struct {/*empty*/};
    struct HRSRC_struct : public HANDLE_struct {/*empty*/};
 
+   // Specializations of HANDLE that are not present in WINDOWS.H
+   struct Thread_HANDLE_struct : public Kernel_HANDLE_struct {/*empty*/};
+
    // other handle-like things that don't map directly to Windows.H
    struct TLS_key_struct : public HANDLE_struct {/*empty*/};
    } //end of internal
 
 typedef internal::HANDLE_struct* HANDLE;
+typedef internal::Kernel_HANDLE_struct* Kernel_HANDLE;
 typedef internal::SOCKET_struct* SOCKET;
 typedef internal::HWND_struct* HWND;
 typedef internal::HINSTANCE_struct* HINSTANCE;
@@ -77,9 +82,24 @@ typedef internal::HGDIOBJ_struct* HGDIOBJ;
 typedef internal::HICON_struct* HICON;
 typedef internal::HCURSOR_struct* HCURSOR;
 typedef internal::HBRUSH_struct* HBRUSH;
+typedef internal::HPEN_struct* HPEN;
+typedef internal::HFONT_struct* HFONT;
+typedef internal::HREGION_struct* HREGION;
 typedef internal::HRSRC_struct* HRSRC;
+typedef internal::Thread_HANDLE_struct* Thread_HANDLE;
 typedef internal::TLS_key_struct* TLS_key;
 typedef internal::HKEY_struct* HKEY;
+
+// hsoft<Hwhatever> allows me to define an "in" parameter that accepts
+// a strictly-typed Handle subtype, or a plain HANDLE, but not the =wrong=
+// strictly-typed Handle.
+
+template <typename T>
+struct hsoft {
+   arg::arg32 value;
+   hsoft (T param) : value (reinterpret_cast<arg::arg32>(param)) {}
+   hsoft (HANDLE param) : value (reinterpret_cast<arg::arg32>(param)) {}
+   };
 
 typedef unsigned short ATOM;
 
@@ -108,7 +128,4 @@ struct security_attributes : public SECURITY_ATTRIBUTES {
 } // end of types
 } // end of ratwin
 ENDWRAP
-
-
-#endif
 

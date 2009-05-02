@@ -3,8 +3,6 @@
 // Revision: public build 6, shipped on 28-Nov-1999
 
 #pragma once
-#if !defined CLASSICS_SCHEDULE_INCLUDED
-#define CLASSICS_SCHEDULE_INCLUDED
 
 #include "classics\common.h"
 
@@ -35,7 +33,4 @@ schedule_t always (schedule_t x)
 
 } // end of classics
 ENDWRAP
-
-#endif
-
 

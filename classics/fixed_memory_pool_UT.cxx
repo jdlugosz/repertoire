@@ -1,6 +1,6 @@
-// The Repertoire Project copyright 1999 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
+// The Repertoire Project copyright 2001 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: classics\fixed_memory_pool_UT.cxx
-// Revision: public build 6, shipped on 28-Nov-1999
+// Revision: post-public build 6
 
 // test of the fixed_memory_pool
 
@@ -86,8 +86,22 @@ void test2()
 void test3()
 // this verifies that (new C) worked before main() was called.
  {
- cout << "Test 3 -- works before main is called\n" << endl;
+ cout << "Test 3 -- works before main is called" << endl;
  premain->check (99);
+ }
+ 
+/* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
+
+void test4()
+// check out the check_address function
+ {
+ cout << "Test 4 -- check_address function" << endl;
+ if (C::check_address (0))  { ++errorcount; cout << "Failed 4.1\n"; }
+ if (!C::check_address (premain))  { ++errorcount; cout << "Failed 4.2\n"; }
+ int x;
+ if (C::check_address (&x))  { ++errorcount; cout << "Failed 4.3 (local variable misidentified)\n"; }
+ char* p= reinterpret_cast<char*>(premain);
+ if (C::check_address (1+p))  {++errorcount; cout << "Failed 4.4 (didn't catch misaligned)\n"; }
  }
  
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
@@ -97,6 +111,7 @@ int main()
  test1();
  test2();
  test3();
+ test4();
  if (errorcount)  cout << "** There were " << errorcount << " errors detected." << endl;
  else cout << "All tests passed." << endl;
  return 0;

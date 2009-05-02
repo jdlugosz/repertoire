@@ -7,9 +7,6 @@
 #include "classics\common.h"
 #include "ratwin\tasking\thread.h"
 
-// Note:  need to encapsulate thread type, and define a ratwin specialized form.
-// For now, just using HANDLE.
-
 STARTWRAP
 namespace classics {
 
@@ -24,7 +21,7 @@ struct dummy {
    };
 
 template <typename T>
-ratwin::types::HANDLE launch_thread (T& x)
+ratwin::types::Thread_HANDLE launch_thread (T& x)
  {
  ulong id;
  ratwin::tasking::THREAD_START_ROUTINE start= &dummy<T>::launch_thread_helper;

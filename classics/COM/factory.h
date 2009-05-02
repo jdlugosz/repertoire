@@ -38,6 +38,7 @@ ratwin::HRESULT __stdcall factory<T>::CreateInstance (ratwin::IUnknown* pUnknown
  ratwin::HRESULT hr= pA->QueryInterface(iid, ppv);
  pA->Release();
  return hr;
+// >> Need try block here.  How to report errors?  Integrate mechanism with upcoming COM framework object.
  }
 
 }  //end of COM namespace

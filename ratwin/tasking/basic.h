@@ -3,8 +3,9 @@
 // Revision: public build 6, shipped on 28-Nov-1999
 
 #pragma once
-#if !defined RATWIN_TASKING_BASIC_INCLUDED
-#define RATWIN_TASKING_BASIC_INCLUDED
+#if defined RATWIN_NoGlobals
+   #error ratwin\tasking\basic.h contains globals.
+#endif
 
 #include "ratwin\base.h"
 
@@ -35,23 +36,23 @@ const ulong WAIT_IO_COMPLETION= 0x000000C0L;
 enum alertable_t { alertable=1, not_alertable=0 };
 
 inline
-ulong WaitForSingleObject (types::HANDLE object, ulong time=0xffffffff)
+ulong WaitForSingleObject (types::Kernel_HANDLE object, ulong time=0xffffffff)
  { return ::WaitForSingleObject (reinterpret_cast<arg::arg32>(object), time); }
 
 inline
-ulong WaitForSingleObject (types::HANDLE object, alertable_t alertable, ulong time=0xffffffff)
+ulong WaitForSingleObject (types::Kernel_HANDLE object, alertable_t alertable, ulong time=0xffffffff)
  { return ::WaitForSingleObjectEx (reinterpret_cast<arg::arg32>(object), time, alertable); }
 
 inline
-ulong WaitForMultipleObjects (int count, types::HANDLE* objectlist, bool all, ulong time=0xffffffff)
+ulong WaitForMultipleObjects (int count, types::Kernel_HANDLE* objectlist, bool all, ulong time=0xffffffff)
  { return ::WaitForMultipleObjects (count, reinterpret_cast<arg::arg32>(objectlist), all, time); }
 
 inline
-ulong WaitForMultipleObjects (int count, types::HANDLE* objectlist, bool all, alertable_t alertable, ulong time=0xffffffff)
+ulong WaitForMultipleObjects (int count, types::Kernel_HANDLE* objectlist, bool all, alertable_t alertable, ulong time=0xffffffff)
  { return ::WaitForMultipleObjectsEx (count, reinterpret_cast<arg::arg32>(objectlist), all, time, alertable); }
 
 inline
-ulong SignalObjectAndWait (types::HANDLE sig, types::HANDLE wait, alertable_t alertable, ulong time= 0xffffffff)
+ulong SignalObjectAndWait (types::Kernel_HANDLE sig, types::Kernel_HANDLE wait, alertable_t alertable, ulong time= 0xffffffff)
  { return ::SignalObjectAndWait (reinterpret_cast<arg::arg32>(sig), reinterpret_cast<arg::arg32>(wait), time, alertable); }
 
 
@@ -59,5 +60,4 @@ ulong SignalObjectAndWait (types::HANDLE sig, types::HANDLE wait, alertable_t al
 
 }
 ENDWRAP
-#endif
 

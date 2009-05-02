@@ -1,6 +1,6 @@
-// The Repertoire Project copyright 1999 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
+// The Repertoire Project copyright 2001 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: classics\exception.cpp
-// Revision: public build 6, shipped on 28-Nov-1999
+// Revision: post-public build 6
 
 #define CLASSICS_EXPORT __declspec(dllexport)
 #include "classics\exception.h"
@@ -13,6 +13,8 @@ using std::endl;
 
 STARTWRAP
 namespace classics {
+static const char FNAME[]= __FILE__;
+static const char MODULE[]= "Classics";
 
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
@@ -145,11 +147,15 @@ static ustring format_message (int errorcode)
     int retval= ratwin::util::FormatMessage (0, errorcode, wbuffer, maxsize);
     if (retval==0 && ratwin::util::GetLastError()==win_exception::call_not_implemented_error)
        Unicode= false;
-    else return wbuffer;    //OK, got a result
+    else {
+       wstring s (wbuffer);
+       return s;    //OK, got a result
+       }
     }
  // use ANSI version instead
  ratwin::util::FormatMessage (0, errorcode, nbuffer, maxsize);
- return nbuffer;
+ string s (nbuffer);
+ return s;
  }
  
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
@@ -195,6 +201,11 @@ void exception::iterator::parse() const
     if (ch == string_marker::Open1) {
        // process a named attribute
        int matchpos= string_marker::scan_for_match (Data, curpos);
+       if (matchpos < 0) {
+          exception X (MODULE, "Parser Error", FNAME, __LINE__);
+          wFmt(X) << L"position: " << curpos << L" is an unmatched open.";
+          throw X;
+          }
        int splitpos= string_marker::scan_for (Data, string_marker::Split1, curpos, matchpos);
        pair newval;
        newval.key= wstring(buffer+curpos+1, splitpos-curpos-1);

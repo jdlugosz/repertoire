@@ -1,12 +1,13 @@
-// The Repertoire Project copyright 1999 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
+// The Repertoire Project copyright 2001 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: ratwin\io\filemapping.h
-// Revision: public build 6, shipped on 28-Nov-1999
+// Revision: post-public build 6
 
 #pragma once
-#if !defined RATWIN_IO_FILEMAPPING_INCLUDED
-#define RATWIN_IO_FILEMAPPING_INCLUDED
+#if !defined Ib9a6bdc0_4b7d_11d4_8e10_0006296222ef
+#define Ib9a6bdc0_4b7d_11d4_8e10_0006296222ef
 
 #include "ratwin\io\general.h"
+#include "ratwin\io\filemapping=struct.h"
 
 extern "C" {
 __declspec(dllimport) Dlugosz::ratwin::arg::arg32 __stdcall CreateFileMappingA (
@@ -22,19 +23,12 @@ MapViewOfFileEx
 OpenFileMapping 
 */
 
+
+
 }
 STARTWRAP
 namespace ratwin {
 namespace io {
-
-enum page_protection { PAGE_READONLY= 2, PAGE_READWRITE=4 };
-// VIEW_READONLY = SECTION_MAP_READ(4)
-// VIEW_READWRITE = SECTION_MAP_WRITE(2) | SECTION_MAP_READ(4)
-// VIEW_ALL_ACCESS = SECTION_QUERY(1) | SECTION_MAP_WRITE(2) | SECTION_MAP_READ(4) |
-//                   SECTION_MAP_EXECUTE(8) | SECTION_MAP_EXTEND_SIZE(0x10) |
-//                   DELETE(0x00010000) | READ_CONTROL(0x00020000) | WRITE_DAC(0x00040000) |
-//                   WRITE_OWNER(0x00080000)
-enum view_access_t { VIEW_READONLY=4, VIEW_READWRITE=6, VIEW_ALL_ACCESS=0x000F001F };
 
 inline
 types::HANDLE CreateFileMapping (types::HANDLE file, page_protection protection, __int64 size, const char* name=0)

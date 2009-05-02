@@ -1,6 +1,7 @@
-// The Repertoire Project copyright 1999 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
+// The Repertoire Project copyright 2001 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: classics\handle_UT.cxx
-// Revision: public build 6, shipped on 28-Nov-1999
+// Revision: post-public build 6
+
 #include "classics\new.h"
 #include "classics\pointers.h"
 #include "classics\debug.h"
@@ -69,7 +70,7 @@ enum {
 
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
-class test_object : public classics::can_handle {
+class test_object : public classics::debug_can_handle {
    static ulong dump;
    ulong* flags;
 public:
@@ -78,7 +79,7 @@ public:
    test_object (ulong* flags) : flags(flags) {}
    test_object() : flags (&dump) {}
    test_object (const test_object& other) : flags(&dump) {}
-   ~test_object() { *flags |= dtor; }
+   virtual ~test_object() { *flags |= dtor; }
    test_object& operator= (const test_object&);
    void set_flag_location (ulong* p) { flags= p; }
    void foo() const  { *flags |= const_foo; }
@@ -347,6 +348,54 @@ void callback (int mode, void* p)
  }
  
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
+
+struct node {
+   node* next;
+   };
+
+unsigned find_checksum (node* p)
+ {
+ unsigned sum= 0;
+ while (p) {
+    sum += unsigned (p);
+    p= p->next;
+    }
+ return sum;
+ }
+ 
+// ==========================================
+
+void validate (unsigned checksum, node* top, int LINE)
+ {
+ if (checksum != find_checksum (top)) {
+    throw "OOps!";  //keep it simple, to avoid recursive failures!
+    }
+ }
+ 
+// ==========================================
+
+void fmp_friendly_callback (int mode, void* p)
+ {
+ static classics::static_fixed_memory_pool& Pool= classics::lifetime::pool;
+ static unsigned checksum= 0;
+ if (!checksum) {
+    checksum= find_checksum (reinterpret_cast<node*>(Pool.get_nodelist()));  // rebuild.
+    }
+ switch (mode) {
+    case 1:  //allocate
+       // I just removed this node.
+       checksum -= unsigned(p);
+       validate (checksum, reinterpret_cast<node*>(Pool.get_nodelist()), __LINE__);
+       break;
+    case 2:  // free
+       // I'm about to add this node.
+       validate (checksum, reinterpret_cast<node*>(Pool.get_nodelist()), __LINE__);
+       checksum += unsigned(p);
+       break;
+    }
+ }
+ 
+/* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 //  test 7 (thread safety) infrastructure
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 #if !defined NOTHREAD
@@ -543,7 +592,7 @@ void test7()
     testers[loop]= new cruncher1 (*testers[0]);
  cout << "(1) There are " << thread_test_object::instances << " objects." << endl;
  // perform the processing
- ratwin::types::HANDLE handles[thread_count];
+ ratwin::types::Kernel_HANDLE handles[thread_count];
  for (loop= 0;  loop < thread_count;  loop++) {
     handles[loop]= classics::launch_thread (*testers[loop]);
     }
@@ -567,6 +616,63 @@ void test7()
 #endif
 
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
+
+class backref : public classics::debug_can_handle {
+   classics::baro<test_object> x;
+public:
+   backref (test_object* x) : x(x) {}
+   };
+
+class recursive_test_object : public test_object {
+   classics::handle<backref> x;
+public:
+   recursive_test_object() {
+      backref* p= new backref(this);
+      x= classics::handle<backref> (p);
+      }
+   };
+
+
+int test8_failed= 0;
+
+void test8_callback (int mode, void* p)
+ {
+ static bool enabled= true;
+ switch (mode) {
+    case 2:
+       if (enabled) {
+          // here is what I'm watching for.
+          unsigned* q= static_cast<unsigned*>(p);
+          if (*q != 0) {
+             // this is the owned reference count.  If it's not zero, why are we freeing it?
+             // it is also used for the NEXT pointer in the freelist, so a duplicate free will
+             // be detected by this test.
+             ++test8_failed;
+             }
+          }
+       break;
+    case 3:
+       enabled= false;
+       break;
+    case 4:
+       enabled= true;
+    }
+ }
+ 
+void test8()
+ {
+ cout << "test 8 -- recursive freeing" << endl;
+ classics::lifetime::pool.callback= test8_callback;
+ /* extra scope */ {
+    handle h1 (new recursive_test_object);
+    }
+ if (test8_failed) {
+    ++errorcount;
+    cout << "** FAILED **"<< endl;
+    }
+ }
+
+/* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 // main program
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
@@ -577,6 +683,7 @@ int main (int argc, char* argv[])
     test1();
     //classics::lifetime::pool.callback= callback;
     // un-comment above line for additional verboseness in troubleshooting
+//    classics::lifetime::pool.callback= fmp_friendly_callback;  // another one.
     // all "perminant" lifetime objects are created by this point, so now note how many.
     usecount=  classics::lifetime::get_pool_use_count();
     test2();
@@ -592,6 +699,8 @@ int main (int argc, char* argv[])
     #if !defined NOTHREAD
        test7();
        #endif
+    test8();
+    check_leaks();
     if (errorcount != 0) {
        cout << errorcount << " errors detected." << endl;
        return 10;

@@ -150,6 +150,10 @@ SOURCE=..\..\classics\debug.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\classics\directory_list.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\classics\event_flag.cpp
 # End Source File
 # Begin Source File

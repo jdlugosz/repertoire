@@ -1,10 +1,8 @@
-// The Repertoire Project copyright 1999 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
+// The Repertoire Project copyright 2001 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: classics\mutex.h
-// Revision: post-public build 6
+// Revision: updated
 
 #pragma once
-#if !defined Iec302e48_4691_11d3_aadc_0020af6bccd6
-#define Iec302e48_4691_11d3_aadc_0020af6bccd6
 
 #if !defined CLASSICS_EXPORT
 #define CLASSICS_EXPORT __declspec(dllimport)
@@ -17,7 +15,7 @@ STARTWRAP
 namespace classics {
 
 class mutex {
-   ratwin::types::HANDLE H;  //later will have something more specific.
+   ratwin::types::Kernel_HANDLE H;
    bool Created;
    const wstring Name;
 public:
@@ -32,7 +30,7 @@ public:
    CLASSICS_EXPORT bool wait (unsigned timeout=-1);
    CLASSICS_EXPORT void leave();
    bool created() const  { return Created; }
-   ratwin::types::HANDLE h() const  { return H; }
+   ratwin::types::Kernel_HANDLE h() const  { return H; }
    class locker;
    };
    
@@ -50,5 +48,4 @@ public:
 
 } //end namespace classics
 ENDWRAP
-#endif
 

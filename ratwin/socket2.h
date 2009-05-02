@@ -1,6 +1,6 @@
-// The Repertoire Project copyright 1999 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
+// The Repertoire Project copyright 2000 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: ratwin\socket2.h
-// Revision: public build 6, shipped on 28-Nov-1999
+// Revision: post- public build 5, modified 24-August-2000 or later
 
 #pragma once
 #if !defined RATWIN_SOCKET2_INCLUDED
@@ -98,7 +98,13 @@ inline int send (SOCKET s, const char* buf, int len, int flags)
 int sendto (SOCKET s, const char* buf, int len, int flags, const sockaddr*to, int tolen);
 inline int setsockopt (SOCKET s, int level, int optname, const char* optval, int optlen)
  { return ::setsockopt (reinterpret_cast<arg::arg32>(s), level, optname, optval, optlen); }
-int shutdown (SOCKET s, int how);
+
+inline int shutdown (SOCKET s, shutdown_how how)
+ {
+ return  ::shutdown (reinterpret_cast<arg::arg32>(s), how);
+ // Note: 0 for OK, -1 for error (see Get Last Error)
+ }
+
 inline SOCKET socket (int af, int type, int protocol)  //not properly cloaked
   { return reinterpret_cast<SOCKET>(::socket(af,type,protocol)); }
 

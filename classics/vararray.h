@@ -1,10 +1,8 @@
-// The Repertoire Project copyright 1999 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
+// The Repertoire Project copyright 2001 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: classics\vararray.h
-// Revision: public build 6, shipped on 28-Nov-1999
+// Revision: post-public build 6
 
 #pragma once
-#if !defined CLASSICS_VARARRAY_INCLUDED
-#define CLASSICS_VARARRAY_INCLUDED
 
 #include "classics\pointers.h"
 #include "classics\dynalloc_reservation.h"
@@ -347,6 +345,7 @@ class vararray_g : public vararray<T> {
    static /*vararray_internal::*/g_data_t<T>* empty();
    static /*vararray_internal::*/g_data_t<T>* make_the_empty();
    data_t* create_core (int capacity);
+   static g_data_t<T>* the_empty;
 public:
    vararray_g() : vararray<T> (empty()) {}
    explicit vararray_g (int elcount);
@@ -364,6 +363,9 @@ data_t* vararray_g<T>::create_core (int capacity)
  }
 
 template <class T>
+g_data_t<T>* vararray_g<T>::the_empty;
+
+template <class T>
 g_data_t<T>* vararray_g<T>::make_the_empty()
  {
  static dynalloc_reservation<g_data_t<T> > placement;
@@ -379,8 +381,8 @@ g_data_t<T>* vararray_g<T>::make_the_empty()
 template <class T>
 g_data_t<T>* vararray_g<T>::empty()
  {
- static g_data_t<T>* p= make_the_empty();
- return p;
+ if (!the_empty)  the_empty= make_the_empty();
+ return the_empty;
  }
 
 template <class T>
@@ -406,6 +408,7 @@ class vararray_s : public vararray<T> {
    static /*vararray_internal::*/s_data_t* make_the_empty();
    static /*vararray_internal::*/s_data_t* empty();
    data_t* create_core (int capacity)  { return new /*vararray_internal::*/s_data_t(sizeof(T),0,capacity); }
+   static s_data_t* the_empty;
 public:
    vararray_s() : vararray<T> (empty()) {}
    explicit vararray_s (int elcount);
@@ -416,6 +419,9 @@ public:
    ~vararray_s() {}
    };
 
+
+template <class T>
+s_data_t* vararray_s<T>::the_empty;
 
 template <class T>
 vararray_s<T>::vararray_s (int elcount)
@@ -438,8 +444,8 @@ s_data_t* vararray_s<T>::make_the_empty()
 template <typename T>
 s_data_t* vararray_s<T>::empty()
  {
- static s_data_t* p= make_the_empty();
- return p;
+ if (!the_empty)  the_empty= make_the_empty();
+ return the_empty;
  }
 
 
@@ -467,5 +473,4 @@ struct snoop_t {
 }
 ENDWRAP
 
-#endif
 

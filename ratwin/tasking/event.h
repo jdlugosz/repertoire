@@ -1,10 +1,11 @@
-// The Repertoire Project copyright 1999 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
+// The Repertoire Project copyright 2001 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: ratwin\tasking\event.h
-// Revision: public build 6, shipped on 28-Nov-1999
+// Revision: updated
 
 #pragma once
-#if !defined RATWIN_TASKING_EVENT_INCLUDED
-#define RATWIN_TASKING_EVENT_INCLUDED
+#if defined RATWIN_NoGlobals
+   #error ratwin\tasking\event.h contains globals.
+#endif
 
 #include "ratwin\tasking\basic.h"
 
@@ -22,25 +23,24 @@ namespace ratwin {
 namespace tasking {
 
 inline
-types::HANDLE CreateEvent (bool manual_reset, bool initial_state=false, const char* name= 0)
- { return reinterpret_cast<types::HANDLE> (::CreateEventA (0, manual_reset, initial_state, name)); }
+types::Kernel_HANDLE CreateEvent (bool manual_reset, bool initial_state=false, const char* name= 0)
+ { return reinterpret_cast<types::Kernel_HANDLE> (::CreateEventA (0, manual_reset, initial_state, name)); }
 
 inline
-bool SetEvent (types::HANDLE event)
+bool SetEvent (types::Kernel_HANDLE event)
  { return ::SetEvent (reinterpret_cast<arg::arg32>(event)); }
 
 inline
-bool ResetEvent (types::HANDLE event)
+bool ResetEvent (types::Kernel_HANDLE event)
  { return ::ResetEvent (reinterpret_cast<arg::arg32>(event)); }
 
 inline
-bool PulseEvent (types::HANDLE event)
+bool PulseEvent (types::Kernel_HANDLE event)
  { return ::PulseEvent (reinterpret_cast<arg::arg32>(event)); }
 
 } //end tasking
 
 }
 ENDWRAP
-#endif
 
 

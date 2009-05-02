@@ -3,8 +3,6 @@
 // Revision: public build 6, shipped on 28-Nov-1999
 
 #pragma once
-#if !defined CLASSICS_CHAIN_INCLUDED
-#define CLASSICS_CHAIN_INCLUDED
 
 #if !defined CLASSICS_EXPORT
 #define CLASSICS_EXPORT __declspec(dllimport)
@@ -92,5 +90,4 @@ public:
 
 } // end of classics
 ENDWRAP
-#endif
 

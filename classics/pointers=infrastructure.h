@@ -1,8 +1,6 @@
-// The Repertoire Project copyright 1999 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
+// The Repertoire Project copyright 2001 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: classics\pointers=infrastructure.h
-// Revision: public build 6, shipped on 28-Nov-1999
-
-// This one part broken out of of "classics\pointers.h."
+// Revision: post-public build 6
 
 #include "classics\atomic_counter.h"
 #include "classics\fixed_memory_pool.h"
@@ -55,7 +53,8 @@ struct handle_structure_nt {  //non-template base
    lifetime* Lifetime;
    void* Data;
    handle_structure_nt (lifetime* Lifetime, void* p) : Lifetime(Lifetime), Data(p) { Lifetime->deleted= false; }
-   void assign (lifetime* L, void* p)  { Lifetime=L;  Data=p;  Lifetime->deleted= false; }
+   ~handle_structure_nt() { Lifetime=0; Data=0; }  // for debugging.
+   void assign (lifetime* L, void* p)  { Lifetime=L;  Data=p;  }
    CLASSICS_EXPORT void zap_unowned() const;  //called when baro count hits zero
    void inc_unowned_reference() const { Lifetime->inc_unowned_count(); }
    void dec_unowned_reference() const { if (Lifetime->dec_unowned_count()) zap_unowned(); }   
@@ -100,7 +99,11 @@ void handle_structure<T>::zap_owned() const
     //    Lifetime->deleted= true;
     //    done as a side effect of the "...and_delete()".
     // The dec, test, and deleted=false needs to be atomic.
+    Lifetime->inc_hold();
+      // must prevent the destructor from deleting Lifetime, if it happens to
+      // remove the last unowned count.
     delete data();
+    Lifetime->dec_hold();
     Lifetime->check_no_baro();
     }
  }

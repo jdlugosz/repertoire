@@ -1,12 +1,13 @@
 // The Repertoire Project copyright 1999 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: classics\COM\prothonotary.cpp
-// Revision: public build 6, shipped on 28-Nov-1999
+// Revision: post-public build 5, shipped on 8-April-1999
 
 #define CLASSICS_EXPORT __declspec(dllexport)
 #include "classics\COM\prothonotary.h"
 #include "classics\misc_API.h"
 #include "classics\exception.h"
 #include "ratwin\utilities.h"
+#include "ratwin\MessageBox.h"
 using ratwin::HRESULT;
 
 static const char FNAME[]= __FILE__;
@@ -20,7 +21,7 @@ static void error_report (classics::exception& X)
  {
  wstring message= X.value();
  // ??? how should I report this?
- ratwin::util::MessageBox (message.c_str(), L"Error!");    //for now
+ ratwin::MessageBox::MessageBox (message.c_str(), L"Error!");    //for now
  }
 
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */

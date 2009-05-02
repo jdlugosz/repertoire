@@ -15,7 +15,7 @@ using std::endl;
 
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
-bool wait (ratwin::types::HANDLE h, unsigned timeout)
+bool wait (ratwin::types::Kernel_HANDLE h, unsigned timeout)
  {
  using namespace ratwin::tasking;
  unsigned retval= WaitForSingleObject (h, timeout); 

@@ -1,17 +1,17 @@
-// The Repertoire Project copyright 1999 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
+// The Repertoire Project copyright 2001 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: ratwin\bitmap.h
-// Revision: public build 6, shipped on 28-Nov-1999
+// Revision: updated
 
 #pragma once
-#if !defined RATWIN_BITMAP_INCLUDED
-#define RATWIN_BITMAP_INCLUDED
+#if defined RATWIN_NoGlobals
+   #error ratwin\bitmap.h contains globals.
+#endif
 
 #include "ratwin\base.h"
 
 // DLL imports "cloaked" for overloading
 extern "C" {
 __declspec(dllimport) int __stdcall GetObjectA (Dlugosz::ratwin::arg::arg32, int, void*);
-__declspec(dllimport) int __stdcall BitBlt (Dlugosz::ratwin::arg::arg32, int, int, int, int, Dlugosz::ratwin::arg::arg32, int, int, unsigned long);
 }
 
 ///////////////////////////////////////////////////
@@ -92,12 +92,13 @@ inline int GetObject (types::HBITMAP bitmap, BITMAP& data)
  { return ::GetObjectA (reinterpret_cast<arg::arg32>(bitmap), sizeof(BITMAP), &data); }
 // other forms of GetObject elsewhere.
 
-inline bool BitBlt (types::HDC dest, int destX, int destY, int width, int height, types::HDC src, int srcX, int srcY, rop ropcode)
- { return ::BitBlt (reinterpret_cast<arg::arg32>(dest), destX, destY, width, height, reinterpret_cast<arg::arg32>(src), srcX, srcY, ropcode); }
+
+//////////////
+// See Also:  bitmap.h for BitBlt
+
 
 } //end of bitmap
 
 }
 ENDWRAP
-#endif
 

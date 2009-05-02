@@ -1,12 +1,12 @@
-// The Repertoire Project copyright 1999 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
+// The Repertoire Project copyright 2001 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: ratwin\resource.h
-// Revision: public build 6, shipped on 28-Nov-1999
+// Revision: post-public build 6
 
 #pragma once
 #if !defined RATWIN_RESOURCE_INCLUDED
 #define RATWIN_RESOURCE_INCLUDED
 
-#include "ratwin\base.h"
+#include "ratwin\NumOrName.h"
 
 // DLL imports "cloaked" for overloading
 extern "C" {
@@ -19,9 +19,13 @@ __declspec(dllimport) Dlugosz::ratwin::arg::arg32 __stdcall
 __declspec(dllimport) Dlugosz::ratwin::arg::arg32 __stdcall
   LoadResource (Dlugosz::ratwin::arg::arg32, Dlugosz::ratwin::arg::arg32);
 __declspec(dllimport) Dlugosz::ratwin::arg::arg32 __stdcall
-  FindResourceA (Dlugosz::ratwin::arg::arg32, const char*, const char*);
+  FindResourceA (Dlugosz::ratwin::arg::arg32, Dlugosz::ratwin::arg::carg32, Dlugosz::ratwin::arg::carg32);
 __declspec(dllimport) Dlugosz::ratwin::arg::arg32 __stdcall
-  FindResourceW (Dlugosz::ratwin::arg::arg32, const wchar_t*, const wchar_t*);
+  FindResourceW (Dlugosz::ratwin::arg::arg32, Dlugosz::ratwin::arg::carg32, Dlugosz::ratwin::arg::carg32);
+__declspec(dllimport) Dlugosz::ratwin::arg::arg32 __stdcall
+  FindResourceExA (Dlugosz::ratwin::arg::arg32, Dlugosz::ratwin::arg::carg32, Dlugosz::ratwin::arg::carg32, int);
+__declspec(dllimport) Dlugosz::ratwin::arg::arg32 __stdcall
+  FindResourceExW (Dlugosz::ratwin::arg::arg32,Dlugosz::ratwin::arg::carg32, Dlugosz::ratwin::arg::carg32, int);
 __declspec(dllimport) int __stdcall DestroyCursor (Dlugosz::ratwin::arg::arg32);
 __declspec(dllimport) Dlugosz::ratwin::arg::arg32 __stdcall SetCursor (Dlugosz::ratwin::arg::arg32);
 }
@@ -51,6 +55,29 @@ enum cursor_id {
 //   IDC_SIZE            MAKEINTRESOURCE(32640)  /* OBSOLETE: use IDC_SIZEALL */
 //   IDC_ICON            MAKEINTRESOURCE(32641)  /* OBSOLETE: use IDC_ARROW */
 
+
+enum resource_type {
+   RT_CURSOR=1,
+   RT_BITMAP,
+   RT_ICON,
+   RT_MENU,
+   RT_DIALOG,
+   RT_STRING,
+   RT_FONTDIR,
+   RT_FONT,      
+   RT_ACCELERATOR,
+   RT_RCDATA,
+   RT_MESSAGETABLE,
+   RT_GROUP_CURSOR= 12,
+   RT_GROUP_ICON= 14,
+   RT_VERSION= 16,
+   RT_DLGINCLUDE= 17,
+   RT_PLUGPLAY= 19,
+   RT_VXD,
+   RT_ANICURSOR,
+   RT_ANIICON,
+   RT_HTML
+   };
    
 inline types::HBITMAP LoadBitmap (types::HINSTANCE hInstance, const char* lpBitmapName)
 {return reinterpret_cast<types::HBITMAP>(::LoadBitmapA (reinterpret_cast<arg::arg32>(hInstance), lpBitmapName)); }
@@ -76,14 +103,20 @@ inline types::HCURSOR SetCursor (types::HCURSOR x)
 inline const void* LoadResource (types::HINSTANCE hInstance, types::HRSRC resource_handle)
 {return ::LoadResource (reinterpret_cast<arg::arg32>(hInstance), reinterpret_cast<arg::arg32>(resource_handle)); }
 
-inline types::HRSRC FindResource (types::HINSTANCE hInstance, const char* name, int type)
-{return reinterpret_cast<types::HRSRC>(::FindResourceA(reinterpret_cast<arg::arg32>(hInstance), name, reinterpret_cast<const char*>(type))); }
+inline types::HRSRC FindResource (types::HINSTANCE hInstance, NumOrName<char> name, NumOrNameOrEnum<char,resource_type> type)
+{return reinterpret_cast<types::HRSRC>(::FindResourceA(reinterpret_cast<arg::arg32>(hInstance), name, type)); }
 
-inline types::HRSRC FindResource (types::HINSTANCE hInstance, const wchar_t* name, int type)
-{return reinterpret_cast<types::HRSRC>(::FindResourceW(reinterpret_cast<arg::arg32>(hInstance), name, reinterpret_cast<const wchar_t*>(type))); }
-
-inline types::HRSRC FindResource (types::HINSTANCE hInstance, const wchar_t* name, const wchar_t* type)
+inline types::HRSRC FindResource (types::HINSTANCE hInstance, NumOrName<wchar_t> name, NumOrNameOrEnum<wchar_t,resource_type> type)
 {return reinterpret_cast<types::HRSRC>(::FindResourceW(reinterpret_cast<arg::arg32>(hInstance), name, type)); }
+
+
+// Note:  Parameters are reversed from Win32 API's FindResourceEx, to be consistant with non-Ex form.
+inline types::HRSRC FindResource (types::HINSTANCE hInstance, NumOrName<char> name, NumOrNameOrEnum<char,resource_type> type, int LangID)
+{return reinterpret_cast<types::HRSRC>(::FindResourceExA(reinterpret_cast<arg::arg32>(hInstance), type, name, LangID)); }
+
+inline types::HRSRC FindResource (types::HINSTANCE hInstance, NumOrName<wchar_t> name, NumOrNameOrEnum<wchar_t,resource_type> type, int LangID)
+{return reinterpret_cast<types::HRSRC>(::FindResourceExW(reinterpret_cast<arg::arg32>(hInstance), type, name, LangID)); }
+
 
 }  //end resource
 

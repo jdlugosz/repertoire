@@ -1,10 +1,11 @@
 // The Repertoire Project copyright 1999 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: ratwin\tasking\thread.h
-// Revision: public build 6, shipped on 28-Nov-1999
+// Revision: updated
 
 #pragma once
-#if !defined I_4d2ad6e8_4511_11d3_aadb_0020af6bccd6
-#define I_4d2ad6e8_4511_11d3_aadb_0020af6bccd6
+#if defined RATWIN_NoGlobals
+   #error ratwin\thread.h contains globals.
+#endif
 
 #include "ratwin\tasking\basic.h"
 
@@ -34,33 +35,33 @@ namespace tasking {
 typedef ulong (__stdcall *THREAD_START_ROUTINE)(void*);
 
 inline
-types::HANDLE CreateThread (
+types::Thread_HANDLE CreateThread (
     ulong stack_size,
     THREAD_START_ROUTINE start_address,
     void* param,
     ulong flags,
     ulong& id
     )
- { return reinterpret_cast<types::HANDLE>(::CreateThread (0, stack_size, reinterpret_cast<arg::arg32>(start_address), reinterpret_cast<arg::arg32>(param), flags, &id)); }
+ { return reinterpret_cast<types::Thread_HANDLE>(::CreateThread (0, stack_size, reinterpret_cast<arg::arg32>(start_address), reinterpret_cast<arg::arg32>(param), flags, &id)); }
 
 RATWIN_EXPORT
-types::HANDLE CreateThread (ulong& id, THREAD_START_ROUTINE, void* argument);
+types::Thread_HANDLE CreateThread (ulong& id, THREAD_START_ROUTINE, void* argument);
 
 inline
-bool TerminateThread (types::HANDLE thd, ulong exitcode)
- { return ::TerminateThread (reinterpret_cast<arg::arg32>(thd), exitcode); }
+bool TerminateThread (types::hsoft<types::Thread_HANDLE> thd, ulong exitcode)
+ { return ::TerminateThread (thd.value, exitcode); }
 
 inline
-bool QueueUserAPC (void (__stdcall *func)(void*), types::HANDLE thr, void* data)
- {  return ::QueueUserAPC (reinterpret_cast<arg::arg32>(func), reinterpret_cast<arg::arg32>(thr), data); }
+bool QueueUserAPC (void (__stdcall *func)(void*),types::hsoft<types::Thread_HANDLE> thr, void* data)
+ {  return ::QueueUserAPC (reinterpret_cast<arg::arg32>(func), thr.value, data); }
 
 inline
-bool GetThreadTimes (types::HANDLE thd, __int64& creation_time, __int64& exit_time, __int64& kernel_time, __int64& user_time)
- {  return ::GetThreadTimes (reinterpret_cast<arg::arg32>(thd), &creation_time, &exit_time, &kernel_time, &user_time); }
+bool GetThreadTimes (types::hsoft<types::Thread_HANDLE> thd, __int64& creation_time, __int64& exit_time, __int64& kernel_time, __int64& user_time)
+ {  return ::GetThreadTimes (thd.value, &creation_time, &exit_time, &kernel_time, &user_time); }
 
 inline
-types::HANDLE GetCurrentThread()
- {  return reinterpret_cast<types::HANDLE>( ::GetCurrentThread() ); }
+types::Thread_HANDLE GetCurrentThread()
+ {  return reinterpret_cast<types::Thread_HANDLE>( ::GetCurrentThread() ); }
 
 inline
 void ExitThread (int exitcode)
@@ -69,5 +70,4 @@ void ExitThread (int exitcode)
 } //end tasking
 }
 ENDWRAP
-#endif
 

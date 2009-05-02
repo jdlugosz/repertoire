@@ -1,10 +1,8 @@
-// The Repertoire Project copyright 1999 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
+// The Repertoire Project copyright 2001 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: ratwin\menu.h
-// Revision: public build 6, shipped on 28-Nov-1999
+// Revision: updated
 
 #pragma once
-#if !defined RATWIN_MENU_INCLUDED
-#define RATWIN_MENU_INCLUDED
 
 #include "ratwin\base.h"
 
@@ -16,6 +14,7 @@ __declspec(dllimport) int __stdcall TrackPopupMenuEx (Dlugosz::ratwin::arg::arg3
 __declspec(dllimport) Dlugosz::ratwin::arg::arg32 __stdcall GetSystemMenu (Dlugosz::ratwin::arg::arg32, int);
 __declspec(dllimport) Dlugosz::ratwin::arg::arg32 __stdcall LoadMenuA (Dlugosz::ratwin::arg::arg32, const char*);
 __declspec(dllimport) Dlugosz::ratwin::arg::arg32 __stdcall GetSubMenu (Dlugosz::ratwin::arg::arg32, int);
+__declspec(dllimport) int __stdcall DestroyMenu (Dlugosz::ratwin::arg::arg32);
 }
 
 ////////////////////////////////////
@@ -86,10 +85,14 @@ inline types::HMENU GetSubMenu (types::HMENU m, int index)
  {
  return reinterpret_cast<types::HMENU>( ::GetSubMenu (reinterpret_cast<arg::arg32>(m), index) );
  }
+
+inline bool DestroyMenu (types::HMENU m)
+ {
+ return ::DestroyMenu (reinterpret_cast<arg::arg32>(m));
+ }
   
 }  //end menu
 
 }
 ENDWRAP
-#endif
 

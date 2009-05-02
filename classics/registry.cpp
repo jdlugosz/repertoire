@@ -1,6 +1,6 @@
-// The Repertoire Project copyright 1999 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
+// The Repertoire Project copyright 2001 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: classics\registry.cpp
-// Revision: public build 6, shipped on 28-Nov-1999
+// Revision: post-public build 6
 
 #define CLASSICS_EXPORT __declspec(dllexport)
 #include "classics\registry.h"
@@ -170,7 +170,7 @@ bool registry_key::key_exists (const ustring& keyname) const
  switch (uses_Unicode) {
     case Yes: {
        wstring s= keyname;  //16-bit string
-       result= ratwin::registry::RegOpenKey (out, s.c_str(), out, ratwin::registry::KEY_QUERY_VALUE);
+       result= ratwin::registry::RegOpenKey (key, s.c_str(), out, ratwin::registry::KEY_QUERY_VALUE);
        } break;
     case Maybe: {
        //work-around for improper implementation of Unicode stub in Win95
@@ -190,12 +190,12 @@ bool registry_key::key_exists (const ustring& keyname) const
        } // no break here!
     case No: {
        string s= keyname;  //8-bit string
-       result= ratwin::registry::RegOpenKey (out, s.c_str(), out, ratwin::registry::KEY_QUERY_VALUE);
+       result= ratwin::registry::RegOpenKey (key, s.c_str(), out, ratwin::registry::KEY_QUERY_VALUE);
        } break;
     }
  if (result) return false;  //could not open the key, so it doesn't exist (or I can't read it)
  else {
-    ratwin::registry::RegCloseKey(key);
+    ratwin::registry::RegCloseKey(out);
     return true;
     }
  }

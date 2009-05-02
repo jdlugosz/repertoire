@@ -1,6 +1,6 @@
-// The Repertoire Project copyright 1999 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
+// The Repertoire Project copyright 2001 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: ratwin\COM\HRESULT.h
-// Revision: public build 6, shipped on 28-Nov-1999
+// Revision: post-public build 6
 
 #pragma once
 
@@ -58,7 +58,8 @@ static const HRESULT E_UNEXPECTED= reinterpret_cast<HRESULT>(0x8000FFFF);
 static const HRESULT CLASS_E_NOAGGREGATION= reinterpret_cast<HRESULT> (0x80040110);
 static const HRESULT E_OUTOFMEMORY= reinterpret_cast<HRESULT>(0x8007000E);
 static const HRESULT CLASS_E_CLASSNOTAVAILABLE= reinterpret_cast<HRESULT>(0x80040111);
-static const HRESULT E_NOTIMPL= reinterpret_cast<HRESULT>(0x80004001L);
+static const HRESULT E_NOTIMPL= reinterpret_cast<HRESULT>(0x80004001);
+static const HRESULT RPC_E_SERVERFAULT= reinterpret_cast<HRESULT>(0x80010105); //"The server threw an exception."
 #if 0
 #define E_INVALIDARG                     _HRESULT_TYPEDEF_(0x80070057L)
 #define E_POINTER                        _HRESULT_TYPEDEF_(0x80004003L)
@@ -67,6 +68,7 @@ static const HRESULT E_NOTIMPL= reinterpret_cast<HRESULT>(0x80004001L);
 #define E_FAIL                           _HRESULT_TYPEDEF_(0x80004005L)
 #define E_ACCESSDENIED                   _HRESULT_TYPEDEF_(0x80070005L)
 #define E_PENDING                        _HRESULT_TYPEDEF_(0x8000000AL)
+
 #endif
 #if 0 // sort these out later...
 #define CO_E_INIT_TLS                    _HRESULT_TYPEDEF_(0x80004006L)
@@ -2659,14 +2661,6 @@ static const HRESULT E_NOTIMPL= reinterpret_cast<HRESULT>(0x80004001L);
 //
 #define RPC_E_FAULT                      _HRESULT_TYPEDEF_(0x80010104L)
 
-//
-// MessageId: RPC_E_SERVERFAULT
-//
-// MessageText:
-//
-//  The server threw an exception.
-//
-#define RPC_E_SERVERFAULT                _HRESULT_TYPEDEF_(0x80010105L)
 
 //
 // MessageId: RPC_E_CHANGED_MODE

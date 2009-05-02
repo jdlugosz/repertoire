@@ -1,6 +1,7 @@
 // The Repertoire Project copyright 1999 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: classics\filename_t_UT.cxx
-// Revision: public build 6, shipped on 28-Nov-1999
+// Revision: post-public build 6
+
 #include <iostream>
 #include "classics\filename_t.h"
 #include "classics\string_ios.h"
@@ -459,6 +460,34 @@ void S (ustring name)
     
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
+void C (ustring sourcename, ustring destname)
+ {
+ try {
+    classics::PC_filesystem_t::move_file_delayed (destname, sourcename);
+    cout << "OK" << endl;
+    }
+ catch (classics::exception& X) {
+    X.show();
+    }
+    
+ }
+ 
+/* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
+
+void E (ustring name)
+ {
+ filename_t f (name);
+ try {
+    bool result= f.exists();
+    cout << "exists: " << (result ? "true" : "false") << endl;
+    }
+ catch (classics::exception& X) {
+    X.show();
+    }
+ }
+ 
+/* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
+
 int main (int argc, const char* argv[])
  {
  if (argc == 1)  return main_test();
@@ -472,6 +501,12 @@ int main (int argc, const char* argv[])
           break;
        case 'S':  //for "short name"
           S (argv[2]);
+          break;
+       case 'C':  //for "copy deferred"
+          C (argv[2], argv[3]);
+          break;
+       case 'E':  //for "exists"
+          E (argv[2]);
           break;
        default:
           cout << "error: invalid argument" << endl;

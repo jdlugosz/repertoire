@@ -3,8 +3,6 @@
 // Revision: public build 6, shipped on 28-Nov-1999
 
 #pragma once
-#if !defined DLUGOSZ_CLASSICS_POINTERS_DEFINED
-#define DLUGOSZ_CLASSICS_POINTERS_DEFINED
 
 #if !defined CLASSICS_EXPORT
 #define CLASSICS_EXPORT __declspec(dllimport)
@@ -22,5 +20,4 @@
 
 // >> will add COM stuff
 
-#endif
 

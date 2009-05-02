@@ -1,6 +1,6 @@
 // The Repertoire Project copyright 1999 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: classics\filename_t.h
-// Revision: public build 6, shipped on 28-Nov-1999
+// Revision: post-public build 6
 
 #pragma once
 #if !defined CLASSICS_EXPORT
@@ -8,6 +8,8 @@
 #endif
 
 #include "classics\ustring.h"
+#include "classics\flagword.h"
+#include "ratwin\io\file=struct.h"
 
 STARTWRAP
 namespace classics {
@@ -215,7 +217,7 @@ public:
    CLASSICS_EXPORT __int64 timestamp (const filename_t&) const;
    // features unique to this derived class
    CLASSICS_EXPORT virtual ustring fold_case (const ustring&) const;
-   CLASSICS_EXPORT static void move_file (const filename_t& dest, const filename_t& src);   // new: add to docs.
+   CLASSICS_EXPORT static void move_file (const filename_t& dest, const filename_t& src, flagword<ratwin::io::move_flags> flags = ratwin::io::move_flags(0));   // new: add to docs.
    CLASSICS_EXPORT static void move_file_delayed (const filename_t& dest, const filename_t& src);   // new: add to docs.
    CLASSICS_EXPORT static ustring get_short_name (const filename_t&);  // new: add to docs.
    };

@@ -200,7 +200,7 @@ int main (int argc, char* argv[])
  if (verbose)
     cout << "(1) There are " << test_object::instances << " objects." << endl;
  // perform the processing
- ratwin::types::HANDLE handles[thread_count];
+ ratwin::types::Kernel_HANDLE handles[thread_count];
  for (loop= 0;  loop < thread_count;  loop++) {
     handles[loop]= classics::launch_thread (*testers[loop]);
     }

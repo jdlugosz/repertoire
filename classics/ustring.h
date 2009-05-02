@@ -1,6 +1,6 @@
-// The Repertoire Project copyright 1999 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
+// The Repertoire Project copyright 2001 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: classics\ustring.h
-// Revision: public build 6, shipped on 28-Nov-1999
+// Revision: post-public build 6
 
 #pragma once
 
@@ -30,14 +30,14 @@ public:
       awareness_t (type_t type, const char* name) : type(type), name(name) {}
       };
 private:
-   ustring (const ustring&);  //not defined
-   void operator= (const ustring&);  //not defined
 protected:
    void* p;
    const awareness_t* awareness;
 public:
    const awareness_t* get_awareness() const  { return awareness; }
    void* get_p() const  { return p; }  //do not use.  Should have been private.
+   CLASSICS_EXPORT ustring (const ustring&);
+   CLASSICS_EXPORT void operator= (const ustring&);
    CLASSICS_EXPORT ~ustring();
    CLASSICS_EXPORT ustring (const char*);
    CLASSICS_EXPORT ustring (const wchar_t*);

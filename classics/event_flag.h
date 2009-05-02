@@ -1,6 +1,6 @@
-// The Repertoire Project copyright 1999 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
+// The Repertoire Project copyright 2001 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: classics\event_flag.h
-// Revision: public build 6, shipped on 28-Nov-1999
+// Revision: updated
 
 #pragma once
 
@@ -16,12 +16,12 @@ namespace classics {
 
 
 class event_flag {
-   ratwin::types::HANDLE H;  //later will have something more specific.
+   ratwin::types::Kernel_HANDLE H;
 public:
    enum type { auto_reset= 0, manual_reset=1 };
    CLASSICS_EXPORT event_flag (type tp, bool initial_state=false, const char* name= 0);
    CLASSICS_EXPORT ~event_flag();
-   ratwin::types::HANDLE h() const { return H; }
+   ratwin::types::Kernel_HANDLE h() const { return H; }
    CLASSICS_EXPORT void set() const;
    CLASSICS_EXPORT void reset() const;
    CLASSICS_EXPORT void pulse() const;

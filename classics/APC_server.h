@@ -1,6 +1,6 @@
-// The Repertoire Project copyright 1999 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
+// The Repertoire Project copyright 2001 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: classics\APC_server.h
-// Revision: public build 6, shipped on 28-Nov-1999
+// Revision: updated
 
 #pragma once
 
@@ -15,7 +15,7 @@ STARTWRAP
 namespace classics {
 
 class APC_server {
-   ratwin::types::HANDLE thread_handle;
+   ratwin::types::Thread_HANDLE thread_handle;
    volatile bool done;
    static void __stdcall handler (void*);
    class commander;

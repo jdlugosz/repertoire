@@ -18,6 +18,5 @@ namespace classics {
 //   A)  full error checking
 //   B)  no global functions in this header.
 
-CLASSICS_EXPORT bool wait (ratwin::types::HANDLE h, unsigned timeout=-1);
-
+CLASSICS_EXPORT bool wait (ratwin::types::Kernel_HANDLE h, unsigned timeout=-1);
 }

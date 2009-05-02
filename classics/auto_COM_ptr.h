@@ -32,6 +32,8 @@ public:
       // COM's meaning of ->Release().
    operator T** ()  { reset(); return &p; }
       // designed for [out] parameters, unsiutable for [in.out] parameters
+   operator void** ()  { reset(); return reinterpret_cast<void**>(&p); }
+      // designed for [out] parameters, unsiutable for [in,out] parameters
    operator bool() const  { return p != 0; }
       // operator bool needed to prevent accidential calling of operator T** which is destructive.
    operator ! () const  { return p == 0; }

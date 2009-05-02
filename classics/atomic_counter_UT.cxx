@@ -18,6 +18,10 @@ using classics::byte;
 
 int passed_count= 0;
 
+// configuration of threading tests
+const int hcount= 10;  //how many threads to make
+const int loopcount= 10000;
+
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
 template <typename T>
@@ -40,7 +44,7 @@ volatile T tester<T>::control;
 template <typename T>
 void tester<T>::start()
  {
- for (int loop= 0;  loop < 10000;  loop++) {
+ for (int loop= 0;  loop < loopcount;  loop++) {
     ++counter;
     ++control;
     ++counter;
@@ -84,8 +88,7 @@ void testit (T* =0)
 // bug in Microsoft's compiler.
  {
  cout << "testing atomic_counter< " << typeid(T).name() << " >" << endl;
- const int hcount= 4;  //how many threads to make
- ratwin::types::HANDLE handles[hcount];
+ ratwin::types::Kernel_HANDLE handles[hcount];
  tester<T> x;
  for (int loop= 0;  loop < hcount;  loop++) {
     handles[loop]= classics::launch_thread (x);
@@ -137,7 +140,7 @@ void nomatch()
  {
  cout << "testing mismatched counters" << endl;
  const int hcount= 4;  //how many threads to make
- ratwin::types::HANDLE handles[hcount];
+ ratwin::types::Kernel_HANDLE handles[hcount];
  mismatch x;
  for (int loop= 0;  loop < hcount;  loop++) {
     handles[loop]= classics::launch_thread (x);
@@ -160,7 +163,12 @@ int main()
  testit<char>();
  testit<byte>();
  if (passed_count == 8)  cout << "All tests successfully passed." << endl;
- else  cout << "some tests failed -- read log carefully." << endl;
+ else  {
+ 	cout << "some tests inconclusive or failed -- read log carefully." << endl;
+ 	cout << "Meaning of inconclusive: not using the atomic counter (the control case) didn't mess up,\n"
+ 		"so we can't prove that using the atomic counter fixed anything.\n" 
+ 		"Try increasing the thread and loop count."<< endl;
+ 	}
  nomatch();
  return 0;
  }

@@ -1,6 +1,6 @@
 // The Repertoire Project copyright 1999 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: classics\file_factory.cpp
-// Revision: public build 6, shipped on 28-Nov-1999
+// Revision: public build 6
 
 #define CLASSICS_EXPORT __declspec(dllexport)
 #include "classics\file_factory.h"
@@ -28,7 +28,7 @@ ratwin::types::HANDLE file_factory::Create (const filename_t& name) const
     case Yes: {
        wstring s= name.text();
        handle= ratwin::io::CreateFile (s.c_str(), access, share, how, even_more_flags);
-       if (handle != ratwin::INVALID_HANDLE_VALUE)
+       if (handle != ratwin::io::INVALID_FILE)
           return handle;
        } break;
 
@@ -42,7 +42,7 @@ ratwin::types::HANDLE file_factory::Create (const filename_t& name) const
           Unicode= No;
           // fall through to ANSI case
           }
-       else if (handle == ratwin::INVALID_HANDLE_VALUE) {
+       else if (handle == ratwin::io::INVALID_FILE) {
           if (errorcode == win_exception::call_not_implemented_error)
              Unicode= No;
              // and fall through to ANSI case
@@ -57,7 +57,7 @@ ratwin::types::HANDLE file_factory::Create (const filename_t& name) const
     case No: {
        string s= name.text();
        handle= ratwin::io::CreateFile (s.c_str(), access, share, how, even_more_flags);
-       if (handle != ratwin::INVALID_HANDLE_VALUE)
+       if (handle != ratwin::io::INVALID_FILE)
           return handle;
        } break;
     }

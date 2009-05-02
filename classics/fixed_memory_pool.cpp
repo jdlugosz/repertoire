@@ -1,6 +1,6 @@
-// The Repertoire Project copyright 1999 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
+// The Repertoire Project copyright 2001 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: classics\fixed_memory_pool.cpp
-// Revision: public build 6, shipped on 28-Nov-1999
+// Revision: post-public build 6
 
 #define CLASSICS_EXPORT __declspec(dllexport)
 
@@ -57,6 +57,30 @@ void static_fixed_memory_pool::newchunk()
     }
  if (callback)  callback (4, 0);
  use_count= oldcount;  //only counting what the user asked for
+ }
+
+/* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
+
+bool static_fixed_memory_pool::check_address (const void* p) const
+ {
+ #ifdef _WIN64
+ 	typedef __int64 address_t;
+ #else
+ 	typedef unsigned int address_t;
+ #endif
+ const address_t address= reinterpret_cast<address_t>(p);
+ for (const chunk* current_chunk= chunklist; current_chunk; current_chunk= current_chunk->next) {
+    const address_t top= reinterpret_cast<address_t>(current_chunk->top);
+    if (top > address)  continue;  // is before this chunk.
+    address_t offset= address-top;
+    #pragma warning (push)
+    #pragma warning (disable: 4018)  // all values positive.
+    if (offset/Recsize >= current_chunk->reccount)  continue;  // is after this chunk.
+    #pragma warning (pop)
+    if (offset%Recsize != 0)  return false;  // error: is not properly aligned.
+    return true;  // is part of this chunk.
+    }
+ return false;  // can't find a matching pointer anywhere.
  }
 
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */

@@ -3,6 +3,9 @@
 // Revision: public build 6, shipped on 28-Nov-1999
 
 #pragma once
+#if defined RATWIN_NoGlobals
+   #error ratwin\misc_API.h contains globals.
+#endif
 
 #if !defined CLASSICS_EXPORT
 #define CLASSICS_EXPORT __declspec(dllimport)

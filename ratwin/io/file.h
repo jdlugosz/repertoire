@@ -1,14 +1,14 @@
-// The Repertoire Project copyright 1999 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
+// The Repertoire Project copyright 2001 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: ratwin\io\file.h
-// Revision: public build 6, shipped on 28-Nov-1999
+// Revision: post - public build 6
 
 #pragma once
 #if !defined Iaac0f2b0_2fec_11d3_aacf_0020af6bccd6
 #define Iaac0f2b0_2fec_11d3_aacf_0020af6bccd6
 
 
-#include "ratwin\io\general.h"
 #include "classics\flagword.h"
+#include "ratwin\io\file=struct.h"
 
 extern "C" {
 __declspec(dllimport) Dlugosz::ratwin::arg::arg32 __stdcall CreateFileA (
@@ -35,6 +35,8 @@ __declspec(dllimport) int __stdcall GetShortPathNameA (Dlugosz::ratwin::arg::car
 __declspec(dllimport) int __stdcall GetShortPathNameW (Dlugosz::ratwin::arg::carg32, Dlugosz::ratwin::arg::arg32, unsigned long);
 __declspec(dllimport) Dlugosz::ratwin::arg::arg32 __stdcall FindFirstFileW (Dlugosz::ratwin::arg::carg32, void*);
 __declspec(dllimport) Dlugosz::ratwin::arg::arg32 __stdcall FindFirstFileA (Dlugosz::ratwin::arg::carg32, void*);
+__declspec(dllimport) int __stdcall FindNextFileW (Dlugosz::ratwin::arg::arg32, void*);
+__declspec(dllimport) int __stdcall FindNextFileA (Dlugosz::ratwin::arg::arg32, void*);
 __declspec(dllimport) int __stdcall FindClose (Dlugosz::ratwin::arg::arg32);
 __declspec(dllimport) unsigned long __stdcall GetTempPathW (unsigned long, Dlugosz::ratwin::arg::arg32);
 __declspec(dllimport) unsigned long __stdcall GetTempPathA (unsigned long, Dlugosz::ratwin::arg::arg32);
@@ -53,63 +55,6 @@ STARTWRAP
 namespace ratwin {
 namespace io {
 
-static const int MAX_PATH= 260;
-
-enum access_t {
-   ACCESS_ONLY = 0, 
-   FILE_LIST_DIRECTORY = 1,
-   FILE_READ_ATTRIBUTES= 0x80,
-   GENERIC_READ = 0x80000000, 
-   GENERIC_WRITE = 0x40000000, 
-   GENERIC_READWRITE= GENERIC_READ|GENERIC_WRITE
-   };
-
-enum sharing_t {
-   FILE_SHARE_EXCLUSIVE = 0,
-   FILE_SHARE_DELETE = 4,
-   FILE_SHARE_READ = 1,
-   FILE_SHARE_WRITE = 2,
-   FILE_SHARE_READWRITE = 3,
-   FILE_SHARE_WIDEOPEN = 7
-   };
-
-enum creation_t {
-   CREATE_NEW = 1,	  // error if file already exists.
-   CREATE_ALWAYS = 2,  // blows away any existing file.
-   OPEN_EXISTING = 3,  // error if file doesn't already exist.
-   OPEN_ALWAYS = 4,  // open or create if needed.
-   TRUNCATE_EXISTING = 5  // destroys existing file, error if doesn't already exist.
-   };
-
-enum attribute_flags {
-   FILE_ATTRIBUTE_READONLY=         0x00000001,
-   FILE_ATTRIBUTE_HIDDEN=           0x00000002,
-   FILE_ATTRIBUTE_SYSTEM=           0x00000004,
-   FILE_ATTRIBUTE_DIRECTORY=        0x00000010,
-   FILE_ATTRIBUTE_ARCHIVE=          0x00000020,
-   FILE_ATTRIBUTE_NORMAL=           0x00000080,
-   FILE_ATTRIBUTE_TEMPORARY=        0x00000100,
-   FILE_FLAG_WRITE_THROUGH=     0x80000000,
-   FILE_FLAG_RANDOM_ACCESS=     0x10000000,
-   FILE_FLAG_OVERLAPPED=            0x40000000,
-   FILE_FLAG_NO_BUFFERING=          0x20000000,
-   FILE_FLAG_SEQUENTIAL_SCAN=       0x08000000,
-   FILE_FLAG_DELETE_ON_CLOSE=       0x04000000,
-   FILE_FLAG_BACKUP_SEMANTICS=      0x02000000,
-   FILE_FLAG_POSIX_SEMANTICS=       0x01000000
-   };
-
-enum move_flags {
-   MOVEFILE_REPLACE_EXISTING= 0x00000001,
-   MOVEFILE_COPY_ALLOWED= 0x00000002,
-   MOVEFILE_DELAY_UNTIL_REBOOT= 0x00000004,
-   MOVEFILE_WRITE_THROUGH= 0x00000008,
-   // following are new for Windows 2000
-   MOVEFILE_CREATE_HARDLINK= 0x00000010,
-   MOVEFILE_FAIL_IF_NOT_TRACKABLE= 0x00000020
-   };
-
-const types::HANDLE INVALID_FILE= reinterpret_cast<types::HANDLE> (0xffffffff);
 
 inline
 types::HANDLE CreateFile (const char* name, access_t access, sharing_t share, creation_t how, ulong even_more_flags)
@@ -160,10 +105,9 @@ bool CreateDirectoryEx (const wchar_t* proto, const wchar_t* newdir)
  }
 
 inline
-ulong GetFileAttributes (const wchar_t* name)
-// returns members of attribute_flags |'ed together
+classics::flagword<file_attributes> GetFileAttributes (const wchar_t* name)
  {
- return ::GetFileAttributesW (reinterpret_cast<arg::carg32>(name));
+ return static_cast<file_attributes>( ::GetFileAttributesW (reinterpret_cast<arg::carg32>(name)) );
  }
  
 inline
@@ -230,22 +174,6 @@ ulong GetShortPathName (const wchar_t* input, wchar_t* output, ulong buflen)
  return ::GetShortPathNameW (reinterpret_cast<arg::carg32>(input), reinterpret_cast<arg::arg32>(output), buflen);
  }
 
-#pragma pack (push, 1)
-template <typename CharType>
-struct WIN32_FIND_DATA {
-   ulong FileAttributes;
-   __int64 ftCreationTime;
-   __int64 ftLastAccessTime;
-   __int64 ftLastWriteTime;
-   ulong FileSizeHigh;
-   ulong FileSizeLow;
-   ulong dwReserved0;
-   ulong dwReserved1;
-   CharType FileName [MAX_PATH];
-   CharType AlternateFileName [14];
-   };
-#pragma pack (pop)
-
 inline
 types::HANDLE FindFirstFile (const wchar_t* name, WIN32_FIND_DATA<wchar_t>& result)
  {
@@ -256,6 +184,18 @@ inline
 types::HANDLE FindFirstFile (const char* name, WIN32_FIND_DATA<char>& result)
  {
  return reinterpret_cast<types::HANDLE>( ::FindFirstFileA (reinterpret_cast<arg::carg32>(name), &result) );
+ }
+
+inline
+bool FindNextFile (types::HANDLE handle, WIN32_FIND_DATA<wchar_t>& result)
+ {
+ return ::FindNextFileW (reinterpret_cast<arg::arg32>(handle), &result);
+ }
+
+inline
+bool FindNextFile (types::HANDLE handle, WIN32_FIND_DATA<char>& result)
+ {
+ return ::FindNextFileA (reinterpret_cast<arg::arg32>(handle), &result);
  }
 
 inline

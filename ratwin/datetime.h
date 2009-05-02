@@ -1,6 +1,6 @@
-// The Repertoire Project copyright 1999 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
+// The Repertoire Project copyright 2001 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: ratwin\datetime.h
-// Revision: public build 6, shipped on 28-Nov-1999
+// Revision: post-public build 6
 
 #pragma once
 
@@ -13,6 +13,7 @@ __declspec(dllimport) int __stdcall GetTimeZoneInformation (Dlugosz::ratwin::arg
 __declspec(dllimport) void __stdcall GetLocalTime (Dlugosz::ratwin::arg::arg32);
 __declspec(dllimport) void __stdcall GetSystemTime (Dlugosz::ratwin::arg::arg32);
 __declspec(dllimport) int __stdcall FileTimeToSystemTime (Dlugosz::ratwin::arg::carg32, Dlugosz::ratwin::arg::arg32);
+__declspec(dllimport) void __stdcall GetSystemTimeAsFileTime (Dlugosz::ratwin::arg::arg32);
 }
 
 
@@ -59,6 +60,13 @@ inline void GetSystemTime (SYSTEMTIME& out)
 
 inline bool FileTimeToSystemTime (__int64 filetime, SYSTEMTIME& out)
  {   return ::FileTimeToSystemTime (reinterpret_cast<arg::carg32>(&filetime), reinterpret_cast<arg::arg32>(&out)); }
+
+inline __int64 GetSystemTimeAsFileTime()
+ {
+ __int64 result;
+ ::GetSystemTimeAsFileTime (reinterpret_cast<arg::arg32>(&result));
+ return result;
+ }
 
 // note: GetThreadLocale is found in ratwin\charset.h
 

@@ -1,6 +1,6 @@
-// The Repertoire Project copyright 1999 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
+// The Repertoire Project copyright 2001 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: classics\MFC_CString.cpp
-// Revision: public build 6, shipped on 28-Nov-1999
+// Revision: post-public build 6
 
 #define CLASSICS_EXPORT __declspec(dllexport)
 
@@ -46,7 +46,7 @@ CStringData* CStringData::create (int charcount, int charsize)
     // Microsoft's headers are confused as to whether BYTE is a char or an unsigned char.
     // It shouldn't matter in real implementations which is used in 'new' here.
  p->nRefs= 1;
- p->nDataLength= p->nDataLength= charcount;  //not counting extra room for nul
+ p->nAllocLength= p->nDataLength= charcount;  //not counting extra room for nul
  if (charsize==1)  access<char>(p)[charcount]= '\0';
  else if (charsize==2)  access<wchar_t>(p)[charcount]= L'\0';
  else bad_charsize (charsize);

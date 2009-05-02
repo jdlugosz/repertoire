@@ -1,6 +1,6 @@
 // The Repertoire Project copyright 1999 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: classics\filename_t.cpp
-// Revision: public build 6, shipped on 28-Nov-1999
+// Revision: post-public build 6
 
 #define CLASSICS_EXPORT __declspec(dllexport)
 
@@ -13,6 +13,7 @@
 #include "ratwin\utilities.h"
 #include "ratwin\INI_file.h"
 #include "classics\file_factory.h"
+#include "classics\directory_list.h"
 using std::endl;
 
 // for debugging
@@ -40,13 +41,17 @@ filename_t_base::filename_t_base (const ustring& s)
 
 filename_t_base::filename_t_base()
  : FileSystem(default_filesystem), Index(0)
- {}
+ {
+ Index= FileSystem->parse(Text);
+ }
  
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
 filename_t_base::filename_t_base (cow<filesystem_t> h)
  : FileSystem(h), Index(0)
-{}
+{
+Index= FileSystem->parse(Text);
+}
 
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
@@ -372,50 +377,17 @@ PC_filesystem_t::PC_filesystem_t()
  
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
-static ratwin::types::HANDLE findfirst (const wstring& s, ulong& attributes)
- {
- using namespace ratwin::io;
- static bool Unicode= true;
- if (Unicode) {
-    WIN32_FIND_DATA<wchar_t> result;
-    ratwin::types::HANDLE search_handle= FindFirstFile (s.c_str(), result);
-    attributes= result.FileAttributes;
-    if (search_handle == ratwin::INVALID_HANDLE_VALUE) {
-       int errorcode= ratwin::util::GetLastError();
-       if (errorcode == win_exception::call_not_implemented_error)  Unicode= false;
-       else return search_handle;
-       }
-    }
- // must be ANSI
- ustring u= s;
- string ns= u;
- WIN32_FIND_DATA<char> result;
- ratwin::types::HANDLE search_handle= FindFirstFile (ns.c_str(), result);
- attributes= result.FileAttributes;
- return search_handle;
- }
- 
-/* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
-
 bool PC_filesystem_t::exists (const filename_t& filename) const
  {
- using namespace ratwin::io;
+ directory_list D (filename);
  bool want_directory= filename.name_count()==0;
- wstring name= filename.text();
- // >> note: using Unicode only, not auto-switching as needed
- if (want_directory) {
-    if (filename.path_count()==1 && filename.absolute()) {
-       // is the root directory.
-       // >> check for valid prefix?
-       return true;
-       }
-    name.resize (name.elcount()-1);  // FindFirstFile doesn't want trailing backslash
+  if (want_directory && filename.path_count()==1 && filename.absolute()) {
+    // is the root directory.
+    // >> check for valid prefix?
+    return true;
     }
- ulong attributes;
- ratwin::types::HANDLE search_handle= findfirst (name, attributes);
- if (search_handle == ratwin::INVALID_HANDLE_VALUE)  return false;
- FindClose (search_handle);
- bool is_directory= FILE_ATTRIBUTE_DIRECTORY&attributes;
+ if (!D.OK())  return false;  // does not exist.
+ bool is_directory= D.attributes().is_on (ratwin::io::FILE_ATTRIBUTE_DIRECTORY);
  return is_directory == want_directory;
  }
  
@@ -770,14 +742,14 @@ void PC_filesystem_t::remove (const filename_t& filename, bool strict) const
 
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
-void PC_filesystem_t::move_file (const filename_t& dest, const filename_t& src)
+void PC_filesystem_t::move_file (const filename_t& dest, const filename_t& src, flagword<ratwin::io::move_flags> flags)
  {
  static bool Unicode= true;
  int errorcode;
  if (Unicode) {
     wstring Dest= dest.text();
     wstring Src= src.text();
-    const bool b= ratwin::io::MoveFile (Src.c_str(),Dest.c_str());
+    const bool b= ratwin::io::MoveFile (Src.c_str(),Dest.c_str(), flags);
     if (!b) {
        errorcode= ratwin::util::GetLastError();
        if (errorcode == win_exception::call_not_implemented_error)  Unicode= false;
@@ -789,7 +761,8 @@ void PC_filesystem_t::move_file (const filename_t& dest, const filename_t& src)
     {
     string Dest= dest.text();
     string Src= src.text();
-    const bool b= ratwin::io::MoveFile (Src.c_str(),Dest.c_str());
+    const bool b= flags.validdata() ? ratwin::io::MoveFile (Src.c_str(),Dest.c_str(), flags) : ratwin::io::MoveFile (Src.c_str(),Dest.c_str());
+       // Win9X doesn't like third argument.
     if (!b) {
        errorcode= ratwin::util::GetLastError();
        goto error;
@@ -798,6 +771,8 @@ void PC_filesystem_t::move_file (const filename_t& dest, const filename_t& src)
     }
  error:
     win_exception X ("Classics", FNAME, __LINE__, errorcode);
+	X.add_key ("Unicode", Unicode);
+	X.add_key ("flags", flags.validdata());
     wFmt (X) << L"Error renaming \"" << wstring(src.text()) << "\" to \""
        << wstring (dest.text()) << "\".";
     throw X;
@@ -822,7 +797,7 @@ void PC_filesystem_t::move_file_delayed (const filename_t& dest, const filename_
     }
  // Windows 95/98 does it a different way.
     {
-    string Dest= PC_filesystem_t::get_short_name(dest);
+    string Dest= filename_t::PC_filesystem->directory(PC_filesystem_t::get_short_name(dest.remove_name())).set_name(dest.name()).text();
     string Src= PC_filesystem_t::get_short_name(src);
     const bool b= ratwin::WritePrivateProfileString ("Rename", Dest.c_str(), Src.c_str(), "wininit.ini");
     if (!b) {

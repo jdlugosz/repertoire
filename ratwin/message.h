@@ -1,12 +1,13 @@
-// The Repertoire Project copyright 1999 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
+// The Repertoire Project copyright 2001 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: ratwin\message.h
-// Revision: public build 6, shipped on 28-Nov-1999
+// Revision: updated
 
 #pragma once
-#if !defined RATWIN_MESSAGE_INCLUDED
-#define RATWIN_MESSAGE_INCLUDED
+#if defined RATWIN_NoGlobals
+   #error ratwin\message.h contains globals.  Use ratwin\message=struct.h instead.
+#endif
 
-#include "ratwin\base.h"
+#include "ratwin\message=struct.h"
 
 // DLL imports "cloaked" for overloading
 extern "C" {
@@ -27,15 +28,6 @@ STARTWRAP
 namespace ratwin {
 
 namespace message {
-
-struct MSG {
-   types::HWND hwnd;
-   unsigned message;
-   unsigned wParam;
-   ulong lParam;
-   ulong time;
-   types::POINT pt;
-   };
 
 inline bool TranslateMessage (const MSG& msg)
  { return ::TranslateMessage (reinterpret_cast<arg::carg32>(&msg)); }
@@ -75,5 +67,4 @@ unsigned RegisterWindowMessage (const char* s)
 }
 ENDWRAP
 
-#endif
 

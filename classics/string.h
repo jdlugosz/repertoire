@@ -1,10 +1,8 @@
 // The Repertoire Project copyright 1999 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: classics\string.h
-// Revision: public build 6, shipped on 28-Nov-1999
+// Revision: updated
 
 #pragma once
-#if !defined CLASSICS_STRING_INCLUDED
-#define CLASSICS_STRING_INCLUDED
 
 #include "classics\vararray.h"
 //#include "classics\std_forward_declare.h"
@@ -68,8 +66,4 @@ typedef generic_string<wchar_t> wstring;
 } // end of classics
 
 ENDWRAP
-
-
-
-#endif
 

@@ -1,6 +1,6 @@
-// The Repertoire Project copyright 1999 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
+// The Repertoire Project copyright 2001 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: classics\pointers.cpp
-// Revision: public build 6, shipped on 28-Nov-1999
+// Revision: updated
 
 #define CLASSICS_EXPORT __declspec(dllexport)
 #include "classics\pointers.h"
@@ -9,6 +9,27 @@
 STARTWRAP
 namespace classics {
 
+/* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
+
+lifetime* can_handle::get_lifetime_object() const
+ {
+ /* the Lifetime pointer is cloaked, so that bugs in user's code can't easily obtain a pointer
+   to the lifetime object.
+ */
+ lifetime* Lifetime= reinterpret_cast<lifetime*>(~cloaked_Lifetime);
+ if (!Lifetime) {  // could avoid this test, but need to change a few details.  Get back to it.
+    Lifetime= new lifetime;
+    Lifetime->clear();
+    set_lifetime_object(Lifetime);
+    }
+ if (Lifetime->deleted)  {
+    // stray pointer bug discovered!
+    __asm int 3;
+    // serious problem:  memory may have already been corrupted.
+    }
+ return Lifetime;
+ }
+ 
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
 static lifetime create_null()

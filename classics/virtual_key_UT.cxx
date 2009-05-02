@@ -1,12 +1,13 @@
 // The Repertoire Project copyright 1999 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: classics\virtual_key_UT.cxx
-// Revision: public build 6, shipped on 28-Nov-1999
+// Revision: public build 5, shipped on 8-April-1999
+
 #include "classics\virtual_key.h"
 #include <iostream>
 #include "classics\string_ios.h"
 #include "ratwin\io\console.h"
 #include "ratwin\io\general.h"
-#include "ratwin\handle.h"
+#include "ratwin\io\file=struct.h"
 using classics::string;
 using std::cout;
 using std::endl;
@@ -37,7 +38,7 @@ void test2()
  cout << "monitoring Console events." << endl;
  using namespace ratwin::io;
  ratwin::types::HANDLE console= GetStdHandle(STD_INPUT_HANDLE);
- if (console == ratwin::INVALID_HANDLE_VALUE) {
+ if (console == ratwin::io::INVALID_FILE) {
     classics::win_exception X ("test2", __FILE__, __LINE__);
     X += "can't get std input handle";
     throw X;

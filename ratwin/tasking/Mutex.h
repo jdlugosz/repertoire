@@ -3,8 +3,10 @@
 // Revision: public build 6, shipped on 28-Nov-1999
 
 #pragma once
-#if !defined RATWIN_Tasking_KernalObjects_INCLUDED
-#define RATWIN_Tasking_KernalObjects_INCLUDED
+
+#if defined RATWIN_NoGlobals
+   #error ratwin\Mutex.h contains globals.
+#endif
 
 #include "ratwin\tasking\basic.h"
 
@@ -20,19 +22,19 @@ namespace ratwin {
 namespace tasking {
 
 inline
-types::HANDLE CreateMutex (bool initially_owned= false, const char* name= 0)
+types::Kernel_HANDLE CreateMutex (bool initially_owned= false, const char* name= 0)
  {
- return reinterpret_cast<types::HANDLE>( ::CreateMutexA (0, initially_owned, name) );
+ return reinterpret_cast<types::Kernel_HANDLE>( ::CreateMutexA (0, initially_owned, name) );
  }
 
 inline
-types::HANDLE CreateMutex (bool initially_owned= false, const wchar_t* name= 0)
+types::Kernel_HANDLE CreateMutex (bool initially_owned= false, const wchar_t* name= 0)
  {
- return reinterpret_cast<types::HANDLE>( ::CreateMutexW (0, initially_owned, name) );
+ return reinterpret_cast<types::Kernel_HANDLE>( ::CreateMutexW (0, initially_owned, name) );
  }
 
 inline
-bool ReleaseMutex (types::HANDLE h)
+bool ReleaseMutex (types::Kernel_HANDLE h)
  {
  return ::ReleaseMutex (reinterpret_cast<arg::arg32>(h));
  }
@@ -40,9 +42,5 @@ bool ReleaseMutex (types::HANDLE h)
 
 }}
 ENDWRAP
-
-#endif
-
-
 
 

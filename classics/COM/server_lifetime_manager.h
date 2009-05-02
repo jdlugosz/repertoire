@@ -1,6 +1,6 @@
-// The Repertoire Project copyright 1999 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
+// The Repertoire Project copyright 2001 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: classics\COM\server_lifetime_manager.h
-// Revision: public build 6, shipped on 28-Nov-1999
+// Revision: post-public build 6
 
 #pragma once
 
@@ -26,9 +26,18 @@ public:
       { return server_lock_count==0 && object_count==0; }
    CLASSICS_EXPORT event_flag& unload_flag() const;
    CLASSICS_EXPORT void idlewait (int time);
+   class obj_reference {
+   // use this as a class member to give destructor semantics
+   public:
+      inline obj_reference();
+      inline ~obj_reference();
+      };
    };
 
 extern server_lifetime_manager_t CLASSICS_EXPORT server_lifetime_manager;
+
+server_lifetime_manager_t::obj_reference::obj_reference() { server_lifetime_manager.inc_objects(); }
+server_lifetime_manager_t::obj_reference::~obj_reference() { server_lifetime_manager.dec_objects(); }
 
 }}  //end of classics namespace
 ENDWRAP

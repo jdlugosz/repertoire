@@ -1,6 +1,10 @@
+// Kodak Foundation Components ©2000 Kodak Health Imaging (Dallas)
+// Information:  intranet website not yet established.  Contact Lance VanNostrand for info.
+// Documentation:  reference manual is part number 2E0104.
+// File: Dependant_Libs\Repertoire\ratwin\window.cpp
+// Version: Iteration 2, Revision 1, Patch 2, released 11-Oct-2000
 // The Repertoire Project copyright 1999 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
-// File: ratwin\window.cpp
-// Revision: public build 6, shipped on 28-Nov-1999
+// Revision: public build 5, shipped on 8-April-1999
 
 #define RATWIN_EXPORT __declspec(dllexport)
 
@@ -45,7 +49,7 @@ types::HWND CreateWindow (const char* lpClassName, const char* lpWindowName, ulo
  {
  return CreateWindow (lpClassName, lpWindowName, dwStyle,
     CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
-    0, 0, util::get_Instance(), 0);
+    0, ChildidOrHMENU(), util::get_Instance(), 0);
  }
 
 
@@ -53,7 +57,7 @@ types::HWND CreateWindowEx (ulong moreflags, const char* lpClassName, const char
  {
  return CreateWindowEx (moreflags, lpClassName, lpWindowName, dwStyle,
     CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
-    0, 0, util::get_Instance(), 0);
+    0, ChildidOrHMENU(), util::get_Instance(), 0);
  }
 
 #if 0

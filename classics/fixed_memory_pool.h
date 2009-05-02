@@ -1,6 +1,6 @@
-// The Repertoire Project copyright 1999 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
+// The Repertoire Project copyright 2001 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: classics\fixed_memory_pool.h
-// Revision: public build 6, shipped on 28-Nov-1999
+// Revision: post-public build 6
 
 #pragma once
 #if !defined CLASSICS_EXPORT
@@ -30,6 +30,8 @@ public:
    CLASSICS_EXPORT void clean();
    int use_count;  //for auditing and leak detection
    void (*callback)(int mode, void* p);
+   void* get_nodelist() const  { return nodelist; }  //for debugging and testing only.
+   CLASSICS_EXPORT bool check_address (const void*p) const;  //for debugging: verify p is part of this pool, not forign.
    };
 
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
@@ -61,6 +63,7 @@ public:
    void* operator new (size_t size) { return pool.alloc (size); }
    void operator delete (void* p)  { pool.free(p); }
    static int get_pool_use_count()  { return pool.use_count; }
+   static bool check_address (const void* p)  { return pool.check_address(p); }
    };
 
 template <typename T>
@@ -76,6 +79,7 @@ public:
    void* operator new (size_t size);
    void operator delete (void* p);
    static int get_pool_use_count()  { return pool.use_count; }
+   static bool check_address (const void* p)  { return pool.check_address(p); }
    };
 
 template <typename T>

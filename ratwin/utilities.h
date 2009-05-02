@@ -1,16 +1,12 @@
-// The Repertoire Project copyright 1999 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
+// The Repertoire Project copyright 2001 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: ratwin\utilities.h
-// Revision: public build 6, shipped on 28-Nov-1999
+// Revision: post-public build 5
 
 #pragma once
-#if !defined RATWIN_utilities_INCLUDED
-#define RATWIN_utilities_INCLUDED
 
 #include "ratwin\base.h"
 
 extern "C" {
-__declspec(dllimport) int __stdcall MessageBoxA (Dlugosz::ratwin::arg::arg32 hWnd, const char* lpText, const char* lpCaption, unsigned uType);
-__declspec(dllimport) int __stdcall MessageBoxW (Dlugosz::ratwin::arg::arg32 hWnd, const wchar_t* lpText, const wchar_t* lpCaption, unsigned uType);
 __declspec(dllimport) int __cdecl wsprintfA (char* dest, const char* format ...);
 __declspec(dllimport) Dlugosz::ratwin::arg::arg32 __stdcall GetModuleHandleA (Dlugosz::ratwin::arg::carg32);
 __declspec(dllimport) unsigned long __stdcall GetLastError();
@@ -22,6 +18,12 @@ __declspec(dllimport) unsigned long __stdcall FormatMessageW (unsigned long, con
 __declspec(dllimport) int __stdcall DebugActiveProcess (unsigned long dwProcessId);
 __declspec(dllimport) unsigned long __stdcall GetTickCount();   //not cloaked!
 __declspec(dllimport) int __stdcall MessageBeep (Dlugosz::ratwin::arg::arg32);
+__declspec(dllimport) void __stdcall OutputDebugStringA (Dlugosz::ratwin::arg::carg32);
+__declspec(dllimport) void __stdcall OutputDebugStringW (Dlugosz::ratwin::arg::carg32);
+__declspec(dllimport) int __stdcall GetWindowsDirectoryA (void*, int);
+__declspec(dllimport) int __stdcall GetWindowsDirectoryW (void*, int);
+__declspec(dllimport) int __stdcall GetSystemDirectoryA (void*, int);
+__declspec(dllimport) int __stdcall GetSystemDirectoryW (void*, int);
 
 
 // put these in with system info, later
@@ -41,11 +43,11 @@ __declspec(dllimport) int __stdcall FreeLibrary (Dlugosz::ratwin::arg::arg32);
 
 STARTWRAP
 namespace ratwin {
-
 namespace util {
 
 inline ushort LOWORD (int x) { return x; }
 inline ushort HIWORD (ulong x) { return ushort(x >> 16); }
+inline ulong MAKELONG (ushort H, ushort L) { return L | (H<<16); }
 
 struct SYSTEM_INFO {
    unsigned short wProcessorArchitecture;
@@ -90,27 +92,21 @@ bool GetVersionEx (OSVERSIONINFO& info)
  return ::GetVersionExA (reinterpret_cast<arg::arg32>(&info));
  }
 
-inline
-int MessageBox (types::HWND parent, const char* text, const char* caption, unsigned options=0)
- { return ::MessageBoxA (reinterpret_cast<arg::arg32>(parent), text, caption, options); }
- 
-inline
-int MessageBox (const char* text, const char* caption, unsigned options=0)
- { return ::MessageBoxA (0, text, caption, options); }
-
-inline
-int MessageBox (types::HWND parent, const wchar_t* text, const wchar_t* caption, unsigned options=0)
- { return ::MessageBoxW (reinterpret_cast<arg::arg32>(parent), text, caption, options); }
- 
-inline
-int MessageBox (const wchar_t* text, const wchar_t* caption, unsigned options=0)
- { return ::MessageBoxW (0, text, caption, options); }
 
 inline
 bool MessageBeep (unsigned options=0)
  { return ::MessageBeep (reinterpret_cast<arg::arg32>(options)); }
  
-inline 
+
+inline
+void OutputDebugString (const char* string)
+ { ::OutputDebugStringA (reinterpret_cast<arg::carg32>(string)); }
+
+inline
+void OutputDebugString (const wchar_t* string)
+ { ::OutputDebugStringW (reinterpret_cast<arg::carg32>(string)); }
+
+inline
 types::HINSTANCE GetModuleHandle (const char* module_name= 0)
  { return reinterpret_cast<types::HINSTANCE>(::GetModuleHandleA(reinterpret_cast<arg::carg32>(module_name))); }
 
@@ -169,10 +165,33 @@ inline
 ulong GetTickCount()
  { return ::GetTickCount(); }
 
+inline ulong
+GetWindowsDirectory (char* result, int bufsize)
+ {
+ return ::GetWindowsDirectoryA (result, bufsize);
+ }
+ 
+inline ulong
+GetWindowsDirectory (wchar_t* result, int bufsize)
+ {
+ return ::GetWindowsDirectoryW (result, bufsize);
+ }
+
+inline ulong
+GetSystemDirectory (char* result, int bufsize)
+ {
+ return ::GetSystemDirectoryA (result, bufsize);
+ }
+ 
+inline ulong
+GetSystemDirectory (wchar_t* result, int bufsize)
+ {
+ return ::GetSystemDirectoryW (result, bufsize);
+ }
+
 } //end of util
 
 }
 ENDWRAP
 
-#endif
 

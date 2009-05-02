@@ -1,6 +1,7 @@
-// The Repertoire Project copyright 1999 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
+// The Repertoire Project copyright 2001 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: classics\ustring_UT.cxx
-// Revision: public build 6, shipped on 28-Nov-1999
+// Revision: post-public build 6
+
 #include "classics\new.h"
 #include <string>
 #include <iostream>
@@ -39,6 +40,11 @@ inline int len (const std::wstring& s)
  return s.size();
  }
 
+inline int len (const char* s)
+ {
+ return strlen (s);
+ }
+ 
 ////////////////////////////
 
 inline const char* get_data (const classics::string& s)
@@ -250,12 +256,29 @@ void test3()
  
 ////////////////////////////
 
+void test4()
+ {
+ cout << "test 4 -- ustring copy semantics" << endl;
+ classics::string s1 ("this is s1");
+ ustring result (s1);
+ result= "some other literal";    // * assignment operator here.
+ std::string s2 (result);  // get it out again
+ direct_compare (s2, "some other literal");
+ result= classics::string ("another test");
+ ustring u2 (result);  // * copy constructor here.
+ s2= u2;
+ direct_compare (s2, "another test");
+ }
+ 
+////////////////////////////
+
 int main()
  {
  try {
     test1();
     test2();
     test3();
+    test4();
     }
  catch (classics::exception& X) {
     X.show();

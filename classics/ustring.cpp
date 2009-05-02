@@ -1,6 +1,6 @@
-// The Repertoire Project copyright 1999 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
+// The Repertoire Project copyright 2001 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: classics\ustring.cpp
-// Revision: public build 6, shipped on 28-Nov-1999
+// Revision: post-public build 6
 
 #define CLASSICS_EXPORT __declspec(dllexport)
 
@@ -178,10 +178,7 @@ struct literal_string_support : public ustring::awareness_t {
 
    void* clone (const void* st) const
     {
-    exception X ("Classics", "ustring conversion problem", FNAME, __LINE__);
-    wFmt(X) << L"Can't \"clone\" a string literal";
-    throw X;
-    return 0;  //stupid compiler
+    return const_cast<void*>(st);  // note that string literals are not "owned" by ustring.
     }
  
    void destroy (void* st) const
@@ -319,9 +316,26 @@ const ustring::awareness_t* get_string_awareness (const wchar_t**)
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
+void ustring::operator= (const ustring& other)
+ {
+ awareness->destroy (p);  // out with the old
+ awareness= other.awareness;
+ p= awareness->clone (other.p);
+ }
+
+/* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
+
 ustring::~ustring()
  {
  awareness->destroy (p);
+ }
+
+/* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
+
+ustring::ustring (const ustring& other)
+ {
+ awareness= other.awareness;
+ p= awareness->clone (other.p); 
  }
 
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */

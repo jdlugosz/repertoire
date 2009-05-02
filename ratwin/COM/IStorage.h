@@ -1,6 +1,6 @@
-// The Repertoire Project copyright 1999 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
+// The Repertoire Project copyright 2001 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: ratwin\COM\IStorage.h
-// Revision: public build 6, shipped on 28-Nov-1999
+// Revision:post- public build 6
 
 #pragma once
 
@@ -109,6 +109,9 @@ IStorage : public IUnknown {
       /* [size_is][unique][in] */ void* reserved2,
       /* [in] */ ulong reserved3,
       /* [out] */ IEnumSTATSTG** ppenum) = 0;
+
+   HRESULT EnumElements (IEnumSTATSTG** ppenum)
+      { return EnumElements (0,0,0,ppenum); }
         
    virtual HRESULT __stdcall DestroyElement ( 
       /* [string][in] */ const wchar_t* pwcsName) = 0;
