@@ -133,11 +133,32 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "registry_permissions", "Cla
 		{711033DB-C296-44E6-AFFC-8AABB3454448} = {711033DB-C296-44E6-AFFC-8AABB3454448}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "first_parliament", "Tomahawk\first_parliament.vcproj", "{8D181223-5BDE-42F5-8904-4F42A4D6122D}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
 Global
+	GlobalSection(SourceCodeControl) = preSolution
+		SccNumberOfProjects = 2
+		SccProjectUniqueName0 = classics\\classics.vcproj
+		SccProjectName0 = \u0022$/repertoire/classics\u0022,\u0020DAAAAAAA
+		SccLocalPath0 = ..\\classics
+		SccProvider0 = MSSCCI:Microsoft\u0020Visual\u0020SourceSafe
+		CanCheckoutShared = false
+		SccProjectFilePathRelativizedFromConnection0 = ..\\compile.vc71\\classics\\
+		SccProjectUniqueName1 = ratwin\\ratwin.vcproj
+		SccProjectName1 = \u0022$/repertoire/ratwin\u0022,\u0020PAAAAAAA
+		SccLocalPath1 = ..\\ratwin
+		SccProvider1 = MSSCCI:Microsoft\u0020Visual\u0020SourceSafe
+		CanCheckoutShared = false
+		SccProjectFilePathRelativizedFromConnection1 = ..\\compile.vc71\\ratwin\\
+	EndGlobalSection
 	GlobalSection(SolutionConfiguration) = preSolution
 		CLR Release = CLR Release
 		Debug = Debug
 		Release = Release
+	EndGlobalSection
+	GlobalSection(ProjectDependencies) = postSolution
 	EndGlobalSection
 	GlobalSection(ProjectConfiguration) = postSolution
 		{35CA5310-2B1D-4B29-9464-1D87E84ADB72}.CLR Release.ActiveCfg = CLR Release|Win32
@@ -298,6 +319,12 @@ Global
 		{18334F41-362C-4605-BC2A-63980ADA7676}.Debug.Build.0 = Debug|Win32
 		{18334F41-362C-4605-BC2A-63980ADA7676}.Release.ActiveCfg = Release|Win32
 		{18334F41-362C-4605-BC2A-63980ADA7676}.Release.Build.0 = Release|Win32
+		{8D181223-5BDE-42F5-8904-4F42A4D6122D}.CLR Release.ActiveCfg = CLR Release|Win32
+		{8D181223-5BDE-42F5-8904-4F42A4D6122D}.CLR Release.Build.0 = CLR Release|Win32
+		{8D181223-5BDE-42F5-8904-4F42A4D6122D}.Debug.ActiveCfg = Debug|Win32
+		{8D181223-5BDE-42F5-8904-4F42A4D6122D}.Debug.Build.0 = Debug|Win32
+		{8D181223-5BDE-42F5-8904-4F42A4D6122D}.Release.ActiveCfg = Release|Win32
+		{8D181223-5BDE-42F5-8904-4F42A4D6122D}.Release.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 	EndGlobalSection

@@ -16,7 +16,7 @@
    checkframe ("Tomahawk/message_tap_index.html");
 </SCRIPT>
 
-<META name="date" content="2007-02-23">
+<META name="date" content="2007-03-01">
 </HEAD>
 
 <BODY>
@@ -122,7 +122,9 @@ is better design, and passing by reference is more efficient than re-pushing all
 forwarding going on.</P>
 <P>The handling of <code>WM_NCDESTROY</code>, etc. as it relates to keeping up with this class
 is performed higher up in the plumbing before it calls this virtual function.  So, you are not compelled to chain
-back to this base class  implementation from your own class’s override.</P>
+back to this base class  implementation from your own class’s override.  Likewise, this function does not
+deal with the pre-translation step.  See <A HREF="#hook_handler" class="code">hook_handler</A> for a description of how these
+are handled invisibly to you.</P>
 
 <P>This base class implementation simply calls the original WndProc of a subclassed window, or
 <code>DefWindowProc</code> if there wasn’t one, for all messages.  (see <A HREF="#call_old_wndproc" class="code">call_old_wndproc</A>.)</P>
@@ -147,6 +149,18 @@ class.</P>
 <P>It is an error to call this more than once.</P>
 <P>See also: <A HREF="HWND_vpapa.html#set_window_handle" class="code">set_window_handle</A>,
 <A HREF="#unhook" class="code">unhook</A></P>
+
+<HR  class="sep1">
+
+<H2 id="hook_handler">void <SPAN class="signame">hook_handler</span> (<A HREF="../class_summary.html#MSG">MSG</A>&amp;)</H2>
+<A HREF="message_tap_index.html" TARGET="index" class="memof">message_tap</A>
+<P class="mematt"><em>private</em></P>
+<P>This function is the invisible plumbing that allows <A HREF="#handle_message" class="code">handle_message</A> to not worry
+about internal handling and concentrate on the outward functionality.</P>
+<P>This is where processing really begins, and it will decide whether to do something very special (unhook on destroy), call
+<A HREF="#pre_translate_message" class="code">pre_translate_message</A>, or call <A HREF="#handle_message" class="code">handle_message</A>.</P>
+<P>It also catches all exceptions, so they may propagate out of <code>handle_message</code> or <code>pre_translate_message</code>
+without problems, and calls the <A HREF="HWND_vpapa.html#report_error" class="code">report_error</A> function.</P>
 
 <HR class="sep1">
 

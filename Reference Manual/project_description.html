@@ -1,3 +1,4 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"  "http://www.w3.org/TR/html4/loose.dtd">
 <HTML>
 <HEAD>
 <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=windows-1252">
@@ -18,79 +19,78 @@ This document is one section of The Repertoire Reference, found at
 http://www.dlugosz.com/Repertoire/refman/mainframe.html</A>.<BR>
 Copyright 1998 by <A HREF="mailto:john@dlugosz.com">John M. Dlugosz</A>.
 </P>
-<A NAME="toptop">
 <!-- end of standard banner -->
-<H1>The Repertiore Project</H1>
+<H1 id="toptop">The Repertiore Project</H1>
 
 <H2>Introduction to General Purpose Libraries</H2>
 
-<P>Reuse is good.  Reusable code is nice because we can use something again 
-without building a new one.  It's also nice when one part can be used several 
-times in the same program, since that keeps the program's size down and also 
+<P>Reuse is good.  Reusable code is nice because we can use something again
+without building a new one.  It's also nice when one part can be used several
+times in the same program, since that keeps the program's size down and also
 makes it more maintainable.</P>
 
-<P>But reuse of code goes beyond simple convenience.  If a component was written 
-to be reusable, it may be very well designed and carefully crafted.  All the 
-little details will be taken care of, and upon reuse you just don't have to 
+<P>But reuse of code goes beyond simple convenience.  If a component was written
+to be reusable, it may be very well designed and carefully crafted.  All the
+little details will be taken care of, and upon reuse you just don't have to
 worry about it anymore.</P>
 
 <P>Consider a simple case of reusing a function:
-When creating a window, how many people just use a stock 
-white brush for the background?  The robust behavior is to look up the 
-control panel settings for what window backgrounds ought to be.  A small 
-detail, but a function such as <code>CreateWindow</code> that has a zillion parameters has 
+When creating a window, how many people just use a stock
+white brush for the background?  The robust behavior is to look up the
+control panel settings for what window backgrounds ought to be.  A small
+detail, but a function such as <code>CreateWindow</code> that has a zillion parameters has
 a lot of small details.</P>
 
-<P>A reusable part to create a program's main window is a very simple part: a 
-single function, perhaps half a page in length.  However, by building such a 
-part you put a great deal of attention into details that you might omit if 
+<P>A reusable part to create a program's main window is a very simple part: a
+single function, perhaps half a page in length.  However, by building such a
+part you put a great deal of attention into details that you might omit if
 you were just coding yet another call to <code>CreateWindow</code> in some program.
-The work pays off, because once built, you can get better functionality, in 
+The work pays off, because once built, you can get better functionality, in
 addition to being easier to use than writing yet another call to <code>CreateWindow</code>.</P>
 
 <H2>John's Principles of Library Design</H2>
 
-<P>So just what is a "class library", anyway?  I've seen libraries that try to 
-make C++ look like SmallTalk.  I've seen specialized libraries for various 
-purposes.  But, for the most part, the "general purpose" libraries I've seen 
-are actually programming religions.  That is, to use the library, you have to 
-adopt the library's way of doing things, throughout the entire program.  It's 
+<P>So just what is a "class library", anyway?  I've seen libraries that try to
+make C++ look like SmallTalk.  I've seen specialized libraries for various
+purposes.  But, for the most part, the "general purpose" libraries I've seen
+are actually programming religions.  That is, to use the library, you have to
+adopt the library's way of doing things, throughout the entire program.  It's
 like kudzu:  once planted, it gets into everything.  Microsoft's MFC is an example of this kind of system.</P>
 
-<P>My feelings are somewhat different.  A library should provide components that 
-are useful in places such that you want to use it, as opposed to requiring 
-the entire program to be written a certain way just so you can get some 
+<P>My feelings are somewhat different.  A library should provide components that
+are useful in places such that you want to use it, as opposed to requiring
+the entire program to be written a certain way just so you can get some
 feature.</P>
 
-<P>That is, <B>the use of a library component in one place should not 
+<P>That is, <B>the use of a library component in one place should not
 have an undue influence on how the program is written in other places.</B></P>
 
-<P>Second, <B>the library should be useful as separate parts, and the use of one 
-simple part should not drag in the entire beast.</B>  This can be paradoxical, 
-since if components are generally useful why can't you use then when writing 
-other components in the library?  This issue is thorny, and will be covered 
+<P>Second, <B>the library should be useful as separate parts, and the use of one
+simple part should not drag in the entire beast.</B>  This can be paradoxical,
+since if components are generally useful why can't you use then when writing
+other components in the library?  This issue is thorny, and will be covered
 again in more detail.</P>
 
-Third, <B>reusable code should be general and extensible.</B>
-A good library needs to embody a compromise between being too flexible and 
+<P>Third, <B>reusable code should be general and extensible.</B>
+A good library needs to embody a compromise between being too flexible and
 being inflexible.</P>
 
 
-<A NAME="whyuse"><H2>Why Use This Stuff?</H2></A>
+<H2 id="whyuse">Why Use This Stuff?</H2>
 
 <P>With so many C++ libraries out there, including stuff that comes with the compiler,
 why look into another one?  It boils down to two compelling reasons:  <B>features</B>
 and <B>robustness</B>.</P>
 
 <P>Some of the things in the Classics library are new, in the sence of not seeing them
-in other libraries.  For example, the 
+in other libraries.  For example, the
 <A HREF="class_summary.html#ustring">ustring</A>
-class is a new concept, the 
+class is a new concept, the
 <A HREF="Classics/Smart%20Pointers%20Overview.html#toptop">smart pointers</A>
-are more technically advanced than others, the multi-stanza 
+are more technically advanced than others, the multi-stanza
 <A HREF="class_summary.html#exception">exception</A>
 objects provide
-superior error reporting, and the 
+superior error reporting, and the
 <A HREF="class_summary.html#vararray">vararray</A>
 collection offers handy
 copy-on-write features not found in traditional implementations.</P>
@@ -109,8 +109,8 @@ caveats.</P>
 
 <P>The vararray class will work properly (unlike STL vectors) without bizzare failures at
 boundary conditions and some choices of template arguments.
-The string class will operate correctly 
-(<A HREF="Classics/ustring.html#CString_notes">unlike MFC's CString</A>) even when multiple threads
+The string class will operate correctly
+(<A HREF="classics/ustring.html#CString_notes">unlike MFC's CString</A>) even when multiple threads
 are being used.  Count on it.  If I'm ever in a hospital, I'll take comfort in knowing
 that the medical imaging equitment uses Classics rather than MFC.  Microsoft Word
 might lose work from time to time and users put up with it.  But don't pull that stunt
@@ -137,12 +137,12 @@ deadlocks.</P>
 
 
 <HR>
-<A NAME="Classics"><H2>Classics</H2>
+<H2 id="Classics">Classics</H2>
 
-<P><I>ClassICs</I> is a library of general purpose C++ components.  This is actually 
+<P><I>ClassICs</I> is a library of general purpose C++ components.  This is actually
 the third major redesign of the library, so it ought to be called Classics 3.
-However, it was never widely distributed&mdash;it was just a (less than 
-successful) attempt to gather my own useful objects together into a common 
+However, it was never widely distributed&mdash;it was just a (less than
+successful) attempt to gather my own useful objects together into a common
 place, and document them.</P>
 
 <P>The name Classics has a double meaning.  "Class ICs" brings to mind reusable
@@ -154,22 +154,22 @@ with established principles of excellence in the arts and sciences.</I>  Another
 library, that of high quality, robustness, and simple elegance.</P>
 
 <HR>
-<A NAME="RatWin"><H2>RatWin</H2></A>
+<H2 id="RatWin">RatWin</H2>
 
-RatWin stands for <I>Rationalized Windows</I>, and is a set of C++ header files
+<P>RatWin stands for <I>Rationalized Windows</I>, and is a set of C++ header files
 as an alternative to the traditional WINDOWS.H file.  They feature strong type
 checking, overloading, namespaces, and no macros.</P>
 
 <HR>
-<A NAME="Tomahawk"><H2>Tomahawk</H2></A>
+<H2 id="Tomahawk">Tomahawk</H2>
 
-Tomahawk is an experimental Windows programming framework.  It's still in
+<P>Tomahawk is an experimental Windows programming framework.  It's still in
 the experimental stages.</P>
 
 <HR>
-<A NAME="Conquer"><H2>Conquer</H2></A>
+<H2 id="Conquer">Conquer</H2>
 
-Conquer will be a library for multi-threaded programming.  It is still in the
+<P>Conquer will be a library for multi-threaded programming.  It is still in the
 planning stages.</P>
 
 </BODY>

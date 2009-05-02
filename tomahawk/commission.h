@@ -15,13 +15,23 @@ namespace tomahawk {
 
 class minister;
 
-class commission {
-public:
+namespace internal {
+struct commission_data {
    typedef classics::baro<minister> baro;
    baro appointed_minister;
    message_range range;
    classics::schedule_t schedule;
    int id;
+   };
+}
+
+class commission : public internal::commission_data {
+public:
+   TOMAHAWK_EXPORT commission();
+   TOMAHAWK_EXPORT virtual ~commission();
+   TOMAHAWK_EXPORT commission (const commission&);
+   TOMAHAWK_EXPORT commission& operator= (const commission&);
+
    };
 
 }

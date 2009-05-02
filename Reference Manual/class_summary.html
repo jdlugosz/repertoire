@@ -7,7 +7,7 @@
  CONTENT="Repertoire documentation class index">
 <TITLE>Class Summary</TITLE>
 <LINK REL="STYLESHEET" HREF="info.css" TYPE="text/css">
-<META name="date" content="2006-10-27">
+<META name="date" content="2007-02-28">
 <STYLE TYPE="text/css">
 .ib /* info block */ {
    white-space: pre;
@@ -415,6 +415,17 @@ of options passed as a single parameter.
 <p>See <A HREF="Classics/flagword.html"><code>flagword</code></a> documentation.</p>
 
 
+<HR id="Fo">
+<H2 id="foreign_window">foreign_window</H2>
+<P class="ib">library: tomahawk
+header: foreign_window.h
+usage: main API</P>
+<P>
+This provides a concrete implementation of <A HREF="#HWND_vpapa" class="code">HWND_vpapa</A>,
+XXXXX (other interfaces) to allow access to existing <code>HWND</code> objects.
+</P>
+
+
 <A NAME="G"></A>
 
 <HR>
@@ -662,6 +673,7 @@ in the <code>ustring</code> documentation.
 <H2 id="MSG">MSG</H2>
 <P class="ib">library: RatWin
 header: message=struct.h or message.h
+namespace: ratwin::message
 usage: public</P>
 
 <P>This is the same structure as defined in <code>WINDOWS.H</code> with that name.</P>
@@ -671,6 +683,16 @@ usage: public</P>
 <A NAME="N"></A>
 
 <HR id="No">
+
+<H2 id="no_auto_copy">no_auto_copy</H2>
+<P class="ib">library: classics
+header: no_auto_copy.h
+usage: main API</P>
+<P>This implements the idiom of making a class not have an automatically-generated
+copy constructor or copy assignment operator.  You can derive from this class rather than
+defining the dummy functions directly.</P>
+
+<HR>
 <H2>noisy1</H2>
 <P class="ib">library: classics
 header: debug.h

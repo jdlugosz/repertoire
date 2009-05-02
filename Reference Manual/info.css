@@ -25,7 +25,7 @@ P {	/* browser defaults differ, so set it up explicitly so I get consistant resu
 	}
 
 PRE {
-	font-family: "Lucida Sans Typewriter", monospace
+	font-family: "Lucida Sans Typewriter", monospace;
 	overflow: auto;
 	}
 

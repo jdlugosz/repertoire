@@ -3,6 +3,8 @@
 <HEAD>
 <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=windows-1252">
 <TITLE>simple_message_pump Member Reference</TITLE>
+<META http-equiv="Content-Script-Type" content="text/javascript">
+<SCRIPT type= "text/javascript" src="../helpers.js"></SCRIPT>
 <LINK REL=STYLESHEET HREF="../info.css" TYPE="text/css">
 <LINK REL="Start" HREF="http://www.dlugosz.com/Repertoire/refman/mainframe.html">
 <LINK REL="Contents" HREF="../reper_index.html">
@@ -14,7 +16,7 @@
    checkframe ("Tomahawk/message_tap_index.html");
 </SCRIPT>
 
-<META name="date" content="2007-02-27">
+<META name="date" content="2007-03-01">
 </HEAD>
 
 <BODY>
@@ -25,12 +27,102 @@
 <HR class="sep1">
 
 <H2 id="constructor"><span class="signame">simple_message_pump</span>()</H2>
-<A HREF="message_tap_index.html" TARGET="index" class="memof">simple_message_pump</A>
+<A HREF="simple_message_pump.html" TARGET="index" class="memof">simple_message_pump</A>
 <P class="mematt">constructor, public</P>
 <P>The constructor is unsurprising.</P>
 
 <HR class="sep1">
 
+<H2 id="destructor"><span class="signame">~simple_message_pump</span>()</H2>
+<A HREF="simple_message_pump.html" TARGET="index" class="memof">simple_message_pump</A>
+<P class="mematt">destructor, public</P>
+<P>The destructor is unsurprising.</P>
+
+<HR class="sep1">
+<H2 id="report_error">bool <span class="signame">report_error</span> (const <A HREF="../class_summary.html#exception">classics::exception</A>&amp;)</H2>
+<A HREF="simple_message_pump.html" TARGET="index" class="memof">simple_message_pump</A>
+<P class="mematt">virtual, protected</P>
+<P>This is called when <A HREF="#pumpit" class="code">pumpit</A> catches an exception.  The default implementation
+calls <A HREF="../Classics/exception.html#show" class="code">exception::show</A>.  Since the behavior of <code>show</code>
+can be customized on an application-wide basis, you probably don’t need to override this function to provide for display and/or logging
+of the error.</P>
+<P>However, this function will return <code>true</code> to indicate a fatal error.  If it returns <code>false</code>, the
+<code>pumpit</code> function will re-enter the <A HREF="#mainloop" class="code">mainloop</A>.  If it is fatal, then
+<code>pumpit</code> returns, just like it would if a <code>WM_QUIT</code> message had been posted.</P>
+<P>So, you can override this function to take special cleanup action or indicate which errors are fatal.  The default
+implementation always returns <code>false</code> (non-fatal).</P>
+
+<HR class="sep1">
+
+<H2 id="mainloop">int <span class="signame">mainloop</span>()</H2>
+<A HREF="simple_message_pump.html" TARGET="index" class="memof">simple_message_pump</A>
+<P class="mematt">virtual, protected</P>
+<P>This is the canonocal logic of the message pump.  It looks aproximatly like this:</P>
+
+<PRE class="code">
+MSG msg;
+while ( GetMessage(msg) ) {
+if (msg.hwnd == 0)  <A HREF="#thread_message">thread_message</A> (msg);
+else {
+   if (!<A HREF="#pre_translate">pre_translate</A> (msg)) {  <I>// check IsDialog,  TranslateAccelerator</I>
+      if (!<A HREF="#translate_key_even">translate_key_even</A>(msg))  <I>// Win32 TranslateMessage</I>
+         <A HREF="#DispatchMessage">DispatchMessage</A>(msg);
+         }
+      }
+   }
+return (msg.wParam);
+</PRE>
+
+<P>Override this if you need to customize this beyond the point provided
+for by the virtual functions provided for the individual steps.</P>
+
+<HR class="sep1">
+
+<H2 id="pre_translate">bool <span class="signame">pre_translate</span> (<A HREF="../class_summary.html#MSG">MSG</A>&amp;)</H2>
+<A HREF="simple_message_pump.html" TARGET="index" class="memof">simple_message_pump</A>
+<P class="mematt">virtual, protected</P>
+<P>This implements the Tomahawk mechanism for having windows know how to pre-translate their own messages,
+instead of the main loop having to be aware of every modeless dialog box and accelerator table in the application.</P>
+<P>It works by sending a <A HREF="WM_TOMAHAWK.html#pre_translate_message" class="code">WM_TOMAHAWK pre_translate_message</A>
+to the target window.  If that does not return a code stating that it was handled, it tries the parent window.  It
+continues checking enclosing windows until it is handled or it runs out of windows to try.</P>
+<P>This will ensure that any window within a dialog box will have the proper dialog box pre-translation done, and any child of a main
+application window will have accelerators performed if the accelerator key handling is done by the main window.</P>
+<P>You can customize the handling by overriding this function.  For example, you may want the “scope” of accelerator keys to
+be different, or you can handle modal dialog boxes that are not <A HREF="message_tap.html#hook">hooked</A> by Tomahawk, or there may be other kinds of pre-translation
+needed by your program.</P>
+
+<HR class="sep1">
+
+<H2 id="pumpit">int <span class="signame">pumpit</span>()  throw()</H2>
+<A HREF="simple_message_pump.html" TARGET="index" class="memof">simple_message_pump</A>
+<P class="mematt">public</P>
+<P>This calls <A class="code" href="#mainloop">mainloop</A>, and adds error handling.
+The <A class="code" href="mainloop">mainloop</A> is broken out separatly so it can be replaced, while still keeping the error
+handling code in place.</P>
+<P>This is the function you call to run the message pump.  It returns
+with the <code>wParam</code> from the <code>WM_QUIT</code> message.</P>
+
+<HR class="sep1">
+
+<H2 id="thread_message">void <span class="signame">thread_message</span> (<A HREF="../class_summary.html#MSG">MSG</A>&amp;)</H2>
+<A HREF="simple_message_pump.html" TARGET="index" class="memof">simple_message_pump</A>
+<P class="mematt">virtual, protected</P>
+<P>This is called for all messages that have 0 for the window handle.  None of the regular processing is done on these messages (see
+<A HREF="#mainloop" class="code">mainloop</A>).  The base implementation does nothing.  You need to implement it to know about the
+thread messages you are expecting.</P>
+<P>A “thread message” is caused by a call to the Win32 function<code>PostThreadMessage</code>.</P>
+
+<HR class="sep1">
+
+<H2 id="translate_key_event">bool <span class="signame">translate_key_event</span> (<A HREF="../class_summary.html#MSG">MSG</A>&amp;)</H2>
+<A HREF="simple_message_pump.html" TARGET="index" class="memof">simple_message_pump</A>
+<P class="mematt">virtual, protected</P>
+<P>This calls the Win32 function <code>TranslateMessage</code>.
+Override this if you want to do something different than normal at this stage of processing.</P>
+
+
+<HR class="sep1">
 
 <IFRAME id="page_footer" src="../page_footer.html"></IFRAME>
 </BODY>

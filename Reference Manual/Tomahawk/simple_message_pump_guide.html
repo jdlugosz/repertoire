@@ -9,12 +9,66 @@
 <SCRIPT type="text/javascript">
    checkframe ("Tomahawk/simple_message_pump_index.html");
 </SCRIPT>
+<LINK REL="Start" HREF="http://www.dlugosz.com/Repertoire/refman/mainframe.html">
+<LINK REL="Contents" HREF="../reper_index.html">
+<LINK REL="Index" HREF="../class_summary.html">
+<LINK REL="Chapter" HREF="class_index.html">
+<LINK REL="Help" HREF="../accessibility_statement.html">
+<LINK REL="Copyright" HREF="../policy.html">
+
+<META name="date" content="2007-03-01">
 </HEAD>
 
 <BODY>
 <IFRAME id="page_banner" src="../page_banner.html" scrolling="no"></IFRAME>
 
+<H1 id="toptop">simple_message_pump User’s Guide</H1>
 
+<H2>Related Documents</H2>
+
+
+<H2>Contents</H2>
+<UL>
+	<LI><A HREF="#overview">Overview</A>
+	<LI><A HREF="#threading">Threading Issues</A>
+	<LI><A HREF="#housekeeping">Housekeeping Issues</A>
+	<LI><A HREF="#howtouse"><B>How to Use</B></A>
+</UL>
+
+<H2 id="overview">Overview</H2>
+<P>This implements a “message loop” as needed to drive the low-level Win32 windows management.</P>
+
+<H2 id="threading">Threading Issues</H2>
+<P>The class does not have any instance data, and you will normally only call one function:
+<A HREF="simple_message_pump.htmp#pumpit" class="code">pumpit</A>.  So there are no
+threading issues in the normal sence.</P>
+<P>But the underlying Win32 functions are very thread-centric.  The message pump only operates on
+windows created on the same thread.  If you have multiple GUI threads, you will have a message pump
+on each one.</P>
+
+<H2 id="housekeeping">Housekeeping Issues</H2>
+<P>N/A.  It is only an instance (as opposed to all static or being a namespace rather than a class) to
+provide for virtual functions.</P>
+
+<H2 id="howtouse">How to Use</H2>
+<P>Customize the behavior by overriding any virtual functions in your derived class.
+You may create windows before starting the message pump, but they will not be
+serviced untill messaging starts, and you must create with the same thread.
+Instantiate this class, and call <A HREF="simple_message_pump.htmp#pumpit" class="code">pumpit</A>.
+It will not return until the program (or that auxilary GUI thread) is ready to terminate.</P>
+
+<P>The most primitive example is found in <span class="filename">message_tap_demo.cxx</span>.<P>
+<PRE class="code">
+int __stdcall WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance, char* lpCmdLine, int nCmdShow)
+ {
+ if (!InitApplication(hInstance))  return (1);
+ if (!InitInstance(hInstance, ratwin::window::SW_window(nCmdShow))) return (2);
+    <I>// The call to InitInstance created the application window</I>
+ tomahawk::<EM>simple_message_pump</EM> pump;
+ int exitcode= pump.<EM>pumpit</EM>();
+ return exitcode;
+ }
+</PRE>
 
 
 <HR>

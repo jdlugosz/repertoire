@@ -28,10 +28,20 @@ long message_parliament::handle_message (ratwin::message::sMSG& msg)
  return retval;
  }
 
+/* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
+
+void message_parliament::add (const commission&)
+ {
+ }
 
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
+int message_parliament:: remove (const minister*, int id)
+ {
+ return 0;
+ }
 
+/* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
 }
 
