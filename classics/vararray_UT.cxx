@@ -2,6 +2,10 @@
 // File: classics\vararray_UT.cxx
 // Revision: public build 6, shipped on 28-Nov-1999
 
+#if _MSC_VER == 1310
+   #pragma warning( disable : 4348 )  // Microsoft's std headers don't clean compile!
+#endif
+
 #include "classics/vararray.h"
 #include "classics/exception.h"
 #include "classics/string.h"
@@ -278,9 +282,98 @@ void tester<testarray_t>::dotests()
 // test 6-8 infrastructure for replace() testing
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
-typedef classics::vararray_s<int> Vector;
+class int_object {
+   int value;
+   void* valid;
+   static int count;
+public:
+   int_object() : value(-1234), valid(this) { ++count; }
+   int_object (int x) : value(x), valid(this) { ++count; }
+   int_object (const int_object&);
+   int_object& operator= (const int_object& other);
+   ~int_object();
+   operator int () const;
+   void check() const;
+   static int get_count()  { return count; }
+   };
 
-void show (const Vector& v)
+int int_object::count= 0;
+
+int_object::~int_object()
+ {
+ static int recursive= 0;  //beware of double exceptions.
+ if (recursive++ == 0 && valid != this) {
+    classics::exception X ("unit test", "incorrect destruction", __FILE__, __LINE__);
+    throw X;
+    }
+ valid= 0;
+ --count;
+ --recursive;
+ }
+
+void int_object::check() const
+ {
+ if (valid != this) {
+    classics::exception X ("unit test", "invalid/corrupt object detected", __FILE__, __LINE__);
+    throw X;
+    }
+ }
+
+int_object::operator int () const
+ {
+ check();
+ return value;
+ }
+ 
+int_object& int_object::operator= (const int_object& other)
+ {
+ check();
+ other.check();
+ value=other.value;
+ return *this;
+ }
+
+int_object::int_object (const int_object& other)
+ : valid(this), value(other.value)
+ {
+ other.check();
+ ++count;
+ }
+
+/* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
+
+
+typedef classics::vararray_s<int> Vector_int;
+typedef classics::vararray_g<int_object> Vector_object;
+const int array_size= 20;
+
+template <typename Vector>
+class replace_tester {
+public:
+   static Vector test_array[array_size];
+   static int* control_array[array_size];
+   static int length_array[array_size];
+   static void show (const Vector& v);
+   static void sanity_replace();
+   static void coverage_resize();
+   static void memorize (int i);
+   static bool check_memory();
+   static void setup_population();
+   static void validate_replace (int target, int delpos, int dellen, int donor, int copypos, int copylen);
+   static void crunching_replace (int iterations);
+   static void test_replace();
+   static void bannerout (int);
+   static int get_total_population ()
+      {
+      int result= 0;
+      for (int loop= 0;  loop < array_size;  ++loop)  result += length_array[loop];
+      return result;
+      }
+   };
+
+
+template <typename Vector>
+void replace_tester<Vector>::show (const Vector& v)
  {
  const int max= v.elcount();
  if (max == 0)  cout << "empty" << endl;
@@ -296,16 +389,22 @@ void show (const Vector& v)
 //  simple sanity tests
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
-void sanity_replace()
+template <typename Vector>
+void replace_tester<Vector>::sanity_replace()
  {
  cout << "==== Test 6 - sanity_replace" << endl;
- static int data[]= {1,2,3,4,5,6,7,8,9,10};
+ Vector::eltype data[10];
+ for (int loop= 0;  loop < 10;  ++loop) {
+    static int init[]= {1,2,3,4,5,6,7,8,9,10};
+    data[loop]= init[loop];
+    }
  Vector v1 (data, 10);
  if (verbose) {
     cout << "original: ";
     show (v1);
     }
- static int data2[]= {100,102,104};
+ Vector::eltype data2[3];
+ data2[0]=100;  data2[1]=102;  data2[2]=104;
  Vector v2 (data2, 3);
  v1.replace (4, 1, v2, 0,3);
  if (verbose) {
@@ -319,10 +418,15 @@ void sanity_replace()
 //  medium strength -- coverage tests
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
-void coverage_resize()
+template <typename Vector>
+void replace_tester<Vector>::coverage_resize()
  {
  cout << "==== Test 7 - coverage_resize" << endl;
- static int data[]= {1,2,3,4,5,6,7,8,9,10};
+ Vector::eltype data[10];
+ for (int loop= 0;  loop < 10;  ++loop) {
+    static int init[]= {1,2,3,4,5,6,7,8,9,10};
+    data[loop]= init[loop];
+    }
  Vector v1 (data, 10);
  if (verbose) {
     cout << "original: ";
@@ -363,10 +467,14 @@ void coverage_resize()
 //  Crunching super tests -- support infrastructure
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
-const int array_size= 20;
-Vector test_array[array_size];
-int* control_array[array_size];
-int length_array[array_size];
+template <typename Vector>
+Vector replace_tester<Vector>::test_array[array_size];
+
+template <typename Vector>
+int* replace_tester<Vector>::control_array[array_size];
+
+template <typename Vector>
+int replace_tester<Vector>::length_array[array_size];
 
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
@@ -392,7 +500,8 @@ void get_range (int count, int& start, int& len)
  
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
-void memorize (int i)
+template <>
+void replace_tester<Vector_int>::memorize (int i)
 // this records the value of a vector for later comparison
  {
  int*&p= control_array[i];
@@ -404,7 +513,22 @@ void memorize (int i)
 
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
-bool check_memory()
+template <>
+void replace_tester<Vector_object>::memorize (int i)
+// this records the value of a vector for later comparison
+ {
+ int*&p= control_array[i];
+ delete[] p;
+ const int len= length_array[i]= test_array[i].elcount();
+ p= new int[len];
+ for (int loop= 0;  loop < len;  ++loop)
+    p[loop]= test_array[i].get_at(loop);
+ }
+
+/* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
+
+template <typename Vector>
+bool replace_tester<Vector>::check_memory()
  {
  for (int loop= 0;  loop < array_size;  loop++) {
     const Vector& v= test_array[loop];  //must use const here, or
@@ -418,7 +542,8 @@ bool check_memory()
  
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
-void setup_population()
+template <typename Vector>
+void replace_tester<Vector>::setup_population()
  {
  int counter= 1;
  for (int loop= 5;  loop < array_size;  loop++) {
@@ -440,7 +565,19 @@ void setup_population()
 //  Crunching super tests -- test cases
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
-void validate_replace (int target, int delpos, int dellen, int donor, int copypos, int copylen)
+template <typename T>
+void showarray (const char* name, T array, int len)
+ {
+ cout << name << "= [ ";
+ for (int loop= 0;  loop < len;  ++loop)
+    cout << array[loop] << " ";
+ cout << "]" << endl;
+ }
+ 
+/* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
+
+template <typename Vector>
+void replace_tester<Vector>::validate_replace (int target, int delpos, int dellen, int donor, int copypos, int copylen)
  {
  const Vector& dest= test_array[target];
  const int* src= control_array[donor];
@@ -448,15 +585,31 @@ void validate_replace (int target, int delpos, int dellen, int donor, int copypo
  const int newlen= length_array[target] - dellen + copylen;
  if (dest.elcount() != newlen)  throw "length wrong";
  int pos= 0;
+
+ try {
  for (; pos < delpos; ++pos) {
     if (dest[pos] != old[pos])  throw "error in segment A";
     }
  int loop;
  for (loop= 0;  loop < copylen;  ++loop) {
-    if (dest[pos++] != src[copypos+loop])  throw "error in segment B";
+       if (dest[pos++] != src[copypos+loop])  {
+          cout << "dest[" << pos-1 << "] != src[" << copypos+loop << "]; " << dest[pos-1] << " vs " << src[copypos+loop];
+          throw "error in segment B";
+          }
     }
  for (; pos < newlen;  ++pos) {
-    if (dest[pos] != old[pos-copylen+dellen])  throw "error in segment C";
+       if (dest[pos] != old[pos-copylen+dellen])  {
+          cout << "dest[" << pos << "] != old[" << pos-copylen+dellen << "]; " << dest[pos] << " vs " << src[pos-copylen+dellen];
+          throw "error in segment C";
+          }
+       }
+    }
+ catch (...) {
+    cout <<    "; target= " << target << ", donor= " << donor << "\n";
+    showarray ("dest", dest.get_buffer(), newlen);
+    showarray ("src", src, length_array[donor]);
+    showarray ("old", old, length_array[target]);
+    throw;
     }
  // OK! passed all tests.
  memorize (target);
@@ -464,33 +617,101 @@ void validate_replace (int target, int delpos, int dellen, int donor, int copypo
  
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
-void crunching_replace (int iterations)
+template<>
+void replace_tester<Vector_int>::bannerout (int iterations)
  {
- cout << "==== Test 8 - crunching_replace with " << iterations << " iterations." << endl;
- for (int loop= 0;  loop < iterations;  loop++) {
+ cout << "==== Test 8a - crunching_replace on integer array with " << iterations << " iterations." << endl;
+ }
+
+template<>
+void replace_tester<Vector_object>::bannerout (int iterations)
+ {
+ cout << "==== Test 8b - crunching_replace on class array with " << iterations << " iterations." << endl;
+ }
+
+/* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
+
+template <typename Vector>
+void replace_tester<Vector>::crunching_replace (int iterations)
+ {
+ bannerout (iterations);
+ int shared= 0, notshared= 0, sameobject= 0;   // keep track of code paths tested.
+ int same_alloc_larger= 0, same_alloc_smaller=0 , same_alloc_same_size= 0;
+ int loop= 0;
+ int total_population= get_total_population();
+ const int population_point= 10*total_population;
+ try { 
+    for (;  loop < iterations;  loop++) {
     const int target= rand (array_size);
     int delpos, dellen;
     int elcount= test_array[target].elcount();
     get_range (elcount, delpos, dellen);
+       if (total_population < population_point) {
+          // bias it to grow.  normally shrinks though I'm not sure why.
+          if (dellen>=1)  {
+             dellen -= 1;
+             if (loop%2)  delpos += 1;
+             }
+          }
+       if ((loop & 0x1F) == 0)  total_population= get_total_population();
     const int doner= rand (array_size);
     int copypos, copylen;
     int donor_elcount= test_array[doner].elcount();
     get_range (donor_elcount, copypos, copylen);
+       // check which code path this test will use
+       if (target == doner)  ++sameobject;
+       classics::snoop_t snoop;
+       test_array[target].debug_snoop(snoop);
+       const void* old_storage= snoop.core->get_buffer();
+       const int old_elcount= snoop.core->elcount();
+       if (snoop.h2->is_unique()) {
+          ++notshared;
+          }
+       else {
+          ++shared;
+          }
     // OK, now do it.
     test_array[target].replace (delpos, dellen, test_array[doner], copypos, copylen);
     validate_replace (target, delpos, dellen, doner, copypos, copylen);
+       // more checking for coverage
+       test_array[target].debug_snoop(snoop);
+       const void* new_storage= snoop.core->get_buffer();
+       if (new_storage == old_storage) {  // resized without reallocated.
+          const int new_elcount= snoop.core->elcount();
+          if (new_elcount < old_elcount)  ++ same_alloc_smaller;
+          else if (new_elcount > old_elcount)  ++ same_alloc_larger;
+          else ++ same_alloc_same_size;
+          }
+       
+       // get more shared copies   
+       test_array[doner]= test_array[5];
+       memorize (doner);
+       }
+    }
+ catch (...) {
+    cout << "loop=" << loop << endl;
+    throw;
+    }
+ cout << "code path coverage: " << shared << " shared, " << notshared << " not shared, " << sameobject << " same object"<< endl;
+ cout << "\tnon-realloc: " << same_alloc_larger << " larger, " << same_alloc_smaller << " smaller, " << same_alloc_same_size << " same size." << endl;
+ if (shared == 0 || notshared == 0 || sameobject == 0) {
+    cout << "Testing error:  Not all paths tested!" << endl;
+    ++errorcount;
     }
  }
  
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
-void test_replace()
+template <typename Vector>
+void replace_tester<Vector>::test_replace()
  {
+ srand(1);
  try {
     sanity_replace();
     coverage_resize();
     setup_population();
     crunching_replace (1000000);
+    for (int loop=0;  loop<array_size;  ++loop)  test_array[loop].remove_all();
     }
  catch (const char* s) {
     ++errorcount;
@@ -510,7 +731,12 @@ int main (int argc, char* argv[])
     tester< classics::string> :: dotests();
     tester< classics::wstring> :: dotests();
     t5();
-    test_replace();
+    replace_tester<Vector_int>::test_replace();
+    replace_tester<Vector_object>::test_replace();
+    if (int_object::get_count() != 0) {
+       ++errorcount;
+       cout << "Error: int_object count is " << int_object::get_count() << ", expected zero." << endl;
+       }
     if (errorcount != 0) {
        cout << errorcount << " errors detected." << endl;
        return 10;

@@ -18,6 +18,7 @@ __declspec(dllimport) int __stdcall GetTextMetricsW (Dlugosz::ratwin::arg::arg32
 __declspec(dllimport) int __stdcall GetTextExtentPoint32A (Dlugosz::ratwin::arg::arg32, const char*, int, void*);
 __declspec(dllimport) Dlugosz::ratwin::arg::arg32 __stdcall SetTextColor (Dlugosz::ratwin::arg::arg32, Dlugosz::ratwin::arg::arg32);
 __declspec(dllimport) Dlugosz::ratwin::arg::arg32 __stdcall GetTextColor (Dlugosz::ratwin::arg::arg32);
+__declspec(dllimport) int __stdcall GetDialogBaseUnits();  // can't "cloak"
 }
 
 
@@ -97,6 +98,14 @@ inline ulong SetTextColor (types::HDC dc, color::COLORREF newcolor)
 inline ulong GetTextColor (types::HDC dc)
  {
  return reinterpret_cast<ulong>(::GetTextColor (reinterpret_cast<arg::arg32>(dc)));
+ }
+
+inline
+types::POINT GetDialogBaseUnits()
+// returns average character size in the system font.
+ {
+ unsigned long x= ::GetDialogBaseUnits();
+ return types::POINT (x&0xffff, x>>16);
  }
 
 }  //end text

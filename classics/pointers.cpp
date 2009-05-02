@@ -100,7 +100,7 @@ void lifetime::claim_owned_reference()
        been destroyed.
        */
     }
- if (inc_owned_count())
+ if (inc_owned_count_firstp())
     // 1st owner needs to hold.  That cancels out the releasing of this hold.
     // So, only release if this is not the first owner.
     dec_hold();

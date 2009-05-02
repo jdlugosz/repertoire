@@ -19,11 +19,11 @@ using std::endl;
 
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
-ratwin::types::HANDLE file_factory::Create (const filename_t& name) const
+ratwin::types::IO_HANDLE file_factory::Create (const filename_t& name) const
  {
  static enum { Yes, No, Maybe } Unicode= Maybe;
  unsigned long errorcode;
- ratwin::types::HANDLE handle;
+ ratwin::types::IO_HANDLE handle;
  switch (Unicode) {
     case Yes: {
        wstring s= name.text();

@@ -12,7 +12,7 @@ namespace ratwin {
 // The Perl script MacroCloak adds code after reading this.
 /* ## Macro_Cloak_Def (ratwin)
   S_OK S_FALSE E_NOINTERFACE E_UNEXPECTED CLASS_E_NOAGGREGATION E_OUTOFMEMORY CLASS_E_CLASSNOTAVAILABLE
-  E_NOTIMPL RPC_E_SERVERFAULT
+  E_NOTIMPL RPC_E_SERVERFAULT E_FAIL OLE_E_NOTRUNNING E_PENDING MK_E_NOSTORAGE MK_E_NOOBJECT MK_S_MONIKERALREADYREGISTERED
 */
 // ## BEGIN MacroCloak Generated Code
 #if defined (S_OK)
@@ -28,6 +28,12 @@ namespace ratwin {
 #undef CLASS_E_CLASSNOTAVAILABLE
 #undef E_NOTIMPL
 #undef RPC_E_SERVERFAULT
+#undef E_FAIL
+#undef OLE_E_NOTRUNNING
+#undef E_PENDING
+#undef MK_E_NOSTORAGE
+#undef MK_E_NOOBJECT
+#undef MK_S_MONIKERALREADYREGISTERED
 #endif
 // ## END Generated Code
 
@@ -83,14 +89,19 @@ static const HRESULT E_OUTOFMEMORY= reinterpret_cast<HRESULT>(0x8007000E);
 static const HRESULT CLASS_E_CLASSNOTAVAILABLE= reinterpret_cast<HRESULT>(0x80040111);
 static const HRESULT E_NOTIMPL= reinterpret_cast<HRESULT>(0x80004001);
 static const HRESULT RPC_E_SERVERFAULT= reinterpret_cast<HRESULT>(0x80010105); //"The server threw an exception."
+static const HRESULT E_FAIL= reinterpret_cast<HRESULT>(0x80004005); //"unspecified error"
+static const HRESULT OLE_E_NOTRUNNING= reinterpret_cast<HRESULT>(0x80040005); //"Need to run the object to perform this operation"
+static const HRESULT MK_E_NOSTORAGE=  reinterpret_cast<HRESULT>(0x800401EDL); //"Moniker does not refer to storage"
+static const HRESULT E_PENDING=reinterpret_cast<HRESULT>(0x8000000A);
+static const HRESULT MK_E_NOOBJECT= reinterpret_cast<HRESULT>(0x800401E5L); //"No object for moniker"
+static const HRESULT MK_S_MONIKERALREADYREGISTERED= reinterpret_cast<HRESULT>(0x000401E7L); //" Moniker is already registered in running object table"
+
 #if 0
 #define E_INVALIDARG                     _HRESULT_TYPEDEF_(0x80070057L)
 #define E_POINTER                        _HRESULT_TYPEDEF_(0x80004003L)
 #define E_HANDLE                         _HRESULT_TYPEDEF_(0x80070006L)
 #define E_ABORT                          _HRESULT_TYPEDEF_(0x80004004L)
-#define E_FAIL                           _HRESULT_TYPEDEF_(0x80004005L)
 #define E_ACCESSDENIED                   _HRESULT_TYPEDEF_(0x80070005L)
-#define E_PENDING                        _HRESULT_TYPEDEF_(0x8000000AL)
 
 #endif
 #if 0 // sort these out later...
@@ -212,15 +223,6 @@ static const HRESULT RPC_E_SERVERFAULT= reinterpret_cast<HRESULT>(0x80010105); /
 //  There is no connection for this connection ID
 //
 #define OLE_E_NOCONNECTION               _HRESULT_TYPEDEF_(0x80040004L)
-
-//
-// MessageId: OLE_E_NOTRUNNING
-//
-// MessageText:
-//
-//  Need to run the object to perform this operation
-//
-#define OLE_E_NOTRUNNING                 _HRESULT_TYPEDEF_(0x80040005L)
 
 //
 // MessageId: OLE_E_NOCACHE
@@ -859,15 +861,6 @@ static const HRESULT RPC_E_SERVERFAULT= reinterpret_cast<HRESULT>(0x80010105); /
 #define MK_E_SYNTAX                      _HRESULT_TYPEDEF_(0x800401E4L)
 
 //
-// MessageId: MK_E_NOOBJECT
-//
-// MessageText:
-//
-//  No object for moniker
-//
-#define MK_E_NOOBJECT                    _HRESULT_TYPEDEF_(0x800401E5L)
-
-//
 // MessageId: MK_E_INVALIDEXTENSION
 //
 // MessageText:
@@ -930,14 +923,6 @@ static const HRESULT RPC_E_SERVERFAULT= reinterpret_cast<HRESULT>(0x80010105); /
 //
 #define MK_E_NOINVERSE                   _HRESULT_TYPEDEF_(0x800401ECL)
 
-//
-// MessageId: MK_E_NOSTORAGE
-//
-// MessageText:
-//
-//  Moniker does not refer to storage
-//
-#define MK_E_NOSTORAGE                   _HRESULT_TYPEDEF_(0x800401EDL)
 
 //
 // MessageId: MK_E_NOPREFIX
@@ -1540,14 +1525,6 @@ static const HRESULT RPC_E_SERVERFAULT= reinterpret_cast<HRESULT>(0x80010105); /
 //
 #define MK_S_US                          _HRESULT_TYPEDEF_(0x000401E6L)
 
-//
-// MessageId: MK_S_MONIKERALREADYREGISTERED
-//
-// MessageText:
-//
-//  Moniker is already registered in running object table
-//
-#define MK_S_MONIKERALREADYREGISTERED    _HRESULT_TYPEDEF_(0x000401E7L)
 
 // ******************
 // FACILITY_WINDOWS
@@ -4582,6 +4559,12 @@ using ratwin::E_OUTOFMEMORY;
 using ratwin::CLASS_E_CLASSNOTAVAILABLE;
 using ratwin::E_NOTIMPL;
 using ratwin::RPC_E_SERVERFAULT;
+using ratwin::E_FAIL;
+using ratwin::OLE_E_NOTRUNNING;
+using ratwin::E_PENDING;
+using ratwin::MK_E_NOSTORAGE;
+using ratwin::MK_E_NOOBJECT;
+using ratwin::MK_S_MONIKERALREADYREGISTERED;
 #endif
 // ## END Generated Code
 

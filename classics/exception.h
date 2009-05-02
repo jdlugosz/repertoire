@@ -1,6 +1,6 @@
-// The Repertoire Project copyright 1999 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
+// The Repertoire Project copyright 2002 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: classics\exception.h
-// Revision: public build 6, shipped on 28-Nov-1999
+// Revision: post-public build 6 (25-June-2002 or later)
 
 #pragma once
 #if !defined DLUGOSZ_CLASSICS_ERROR_DEFINED
@@ -20,12 +20,16 @@ namespace classics {
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
 class exception : public std::exception {
+   mutable char* what_cache;
 protected:
    wstring S;
    void setup (const ustring& module, const ustring& name, const ustring& fname, int line);
 public:
    CLASSICS_EXPORT exception (const ustring& module, const ustring& name, const ustring& fname, int line);
-   virtual ~exception() {}
+   virtual ~exception() { delete[] what_cache; }
+   CLASSICS_EXPORT const char* what() const throw();  // std::exception standard (most primitive)
+   ustring What() const  // actually does the formatting work; produces a classics::wstring
+      { return report_function ? report_function(*this) : default_report_function(*this); }
    ustring value() const  { return S; }
    wstring& get_internal_data() { return S; }
    const wstring get_internal_data() const { return S; }
@@ -35,6 +39,8 @@ public:
    void operator+= (const ustring& val)  { S += wstring(val); }
    CLASSICS_EXPORT void operator() (const ustring& module, const ustring& name, const ustring& fname, int line);
    CLASSICS_EXPORT static void (*show_function)(const exception&);
+   CLASSICS_EXPORT static ustring (*report_function)(const exception&);
+   CLASSICS_EXPORT static ustring default_report_function (const exception&);
    CLASSICS_EXPORT static void default_show_function (const exception&);
    CLASSICS_EXPORT static void normal_setup (exception* self, const ustring& module, const ustring& name, const ustring& fname, int line);
    CLASSICS_EXPORT static void (*setup_hook) (exception* self, const ustring& module, const ustring& name, const ustring& fname, int line);

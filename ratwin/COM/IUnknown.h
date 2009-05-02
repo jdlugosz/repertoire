@@ -1,11 +1,12 @@
 // The Repertoire Project copyright 1999 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: ratwin\COM\IUnknown.h
-// Revision: public build 6, shipped on 28-Nov-1999
+// Revision: modified from public build 5, shipped on 8-April-1999
 
 #pragma once
 
 #include "ratwin\COM\HRESULT.h"
 #include "ratwin\COM\GUID.h"
+#include "classics\auto_COM_ptr.h"  // I had removed this, but the VC6 isn't doing an implicit cast.
 
 
 STARTWRAP
@@ -23,9 +24,17 @@ IUnknown {
 
 //#if (_MSC_VER >= 1200)  // VC6 or greater
    template <class Q>
-      HRESULT __stdcall QueryInterface (Q** pp)
+      inline HRESULT QueryInterface (Q** pp)
        {
        return QueryInterface(__uuidof(Q), (void**)pp);
+       }
+   // This second one should not be necessary, but VC6 is not doing an implicit conversion.
+   // perhaps it's ambiguous (T** or void**) but it's not giving that error.  Instead, it doesn't
+   // see the QueryInterface template at all!
+   template <class Q>
+      inline HRESULT QueryInterface (classics::auto_COM_ptr<Q>& result)
+       {
+       return QueryInterface(__uuidof(Q), result);
        }
 //#endif
 protected:

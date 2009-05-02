@@ -2,6 +2,8 @@
 // File: classics\string.h
 // Revision: updated
 
+// TODO:  Add unit test code, improve class and documentation, 32-bit form.
+
 #pragma once
 
 #include "classics\vararray.h"

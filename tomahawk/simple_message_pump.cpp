@@ -48,10 +48,10 @@ int simple_message_pump::mainloop()
  {
  ratwin::message::MSG msg;
  while ( GetMessage(msg) ) {
- if (msg.hwnd == 0)  thread_message (msg);
- else {
-    if (!pre_translate (msg)) {  // check IsDialog,  TranslateAccelerator
-       if (!translate_key_event(msg))  // Win32 TranslateMessage
+    if (msg.hwnd == 0)  thread_message (msg);
+    else {
+       if (!pre_translate (msg)) {  // check IsDialog,  TranslateAccelerator
+          translate_key_event(msg);  // Win32 TranslateMessage
           DispatchMessage(msg); 
           }
        }

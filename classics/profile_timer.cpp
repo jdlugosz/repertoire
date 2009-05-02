@@ -17,17 +17,17 @@ namespace classics {
 
 using ratwin::tasking::GetThreadTimes;
 using ratwin::GetSystemTimeAsFileTime;
-using ratwin::types::HANDLE;
+using ratwin::types::Thread_HANDLE;
 using ratwin::CloseHandle;
 
-HANDLE thread_pseudohandle= ratwin::tasking::GetCurrentThread();
-HANDLE process_pseudohandle= ratwin::tasking::GetCurrentProcess();
+Thread_HANDLE thread_pseudohandle= ratwin::tasking::GetCurrentThread();
+ratwin::types::HANDLE process_pseudohandle= ratwin::tasking::GetCurrentProcess();
 
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
-static HANDLE get_thread_handle (HANDLE original= thread_pseudohandle)
+static Thread_HANDLE get_thread_handle (Thread_HANDLE original= thread_pseudohandle)
  {
- HANDLE result;
+ Thread_HANDLE result;
  bool OK= ratwin::io::DuplicateHandle (process_pseudohandle, original, process_pseudohandle, result, 0, false, 2);
  if (!OK)  {
     classics::win_exception X ("Classics", __FILE__, __LINE__);
@@ -44,7 +44,7 @@ profile_timer::profile_timer()
 
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
-profile_timer::profile_timer (HANDLE desired_thread)
+profile_timer::profile_timer (Thread_HANDLE desired_thread)
  : User(0), Kernel(0), User_start(0), Kernel_start(0), Wall(0), Wall_start(0)
  {
  if (desired_thread == thread_pseudohandle)  desired_thread= get_thread_handle();

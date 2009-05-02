@@ -123,6 +123,9 @@ unsigned __int32 __stdcall crc32 (const void* buf, unsigned len, unsigned __int3
                 
                 push    edx
                 push    ecx
+                push    ebx
+                push    esi
+                push    edi
 
                 mov     esi,buf              ; 2nd arg: uch *buf
                 sub     eax,eax              ;> if (!buf)
@@ -191,6 +194,9 @@ loupe:                                       ;>     do {
 bail:                                        ;> }
                 not     eax                  ;> return ~c;
 fine:
+                pop     edi
+                pop     esi
+                pop     ebx
                 pop     ecx
                 pop     edx
 

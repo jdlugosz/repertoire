@@ -293,40 +293,9 @@ void* data_t::resize (int newsize, int newcapacity)
 
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
-void* data_t::prep_result (int newsize, int newcapacity)
-// This sets up the data_t with the specified size (of initialized elements) and
-// capacity (extra room, uninitialized).  It may reuse old space, so the values
-// of the elements may be their old values or may be default initialized, depending.
-// So, the elements are initialized (so you can use assignment to copy over them),
-// but you can't count on their actual values.  See also data_t::resize.
- {
- if (Capacity >= newcapacity) {
-    //already big enough, just reuse the same area
-    const int delta= Count - newsize;
-    if (delta < 0)  //add elements
-       initialize_elements (offset(Data,Count), -delta);
-    else //remove elements   
-       destroy_elements (offset(Data,newsize), delta);
-    Count= newsize;
-    }
- else {
-    void* newdata= ::operator new (newcapacity*Elsize);
-    destroy_elements (Data, Count);
-    ::operator delete (Data);
-    Data= newdata;
-    Count= newsize;
-    Capacity= newcapacity;
-    initialize_elements (Data, Count);
-    }
- return Data;   
- }
-
-/* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
-
 void data_t::splice_result (const void* old, int len, int pos, int dellen, const void* data, int datalen)
  {
  const int newsize= len - dellen + datalen;
- prep_result (0, newsize);
  Count= newsize;
  if (pos)  initialize_elements (access(0), old, pos);
  if (datalen)  initialize_elements (access(pos), data, datalen);
@@ -336,14 +305,47 @@ void data_t::splice_result (const void* old, int len, int pos, int dellen, const
 
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
+void data_t::splice_result_inplace (int pos, int lendel, const void* data, int datalen)
+ {
+ const int newsize= elcount() - lendel + datalen;
+ const bool growing= newsize > elcount();
+ if (growing) resize (newsize, elcapacity());  //resize first if growing
+ int last_part_len= newsize-(pos+datalen);
+ if (last_part_len)  copy_elements (access(pos+datalen), access(pos+lendel), last_part_len);
+ if (datalen) copy_elements (access(pos), data, datalen);
+ if (!growing) resize (newsize, elcapacity());  //resize last if shrinking
+ }
+ 
+ /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
+
+bool data_t::same_object (int pos, const void* data, int datalen) const
+ {
+ const void* dend= offset(data,datalen);
+ const void* Dend= offset (Data,Count);
+ const void* Begin= offset (Data,pos);  // OK to move from lower in this object to higher.
+ return ! (Dend < data || dend < Begin);  // one buffer is entirely before the other?
+ }
+
+/* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
+
 void nt_base::replace (int pos, int lendel, const void* data, int datalen)
+ // >> put into data_t class, pull in splice so as not to compute newsize twice.
  {
  // >> add range checking ...
- data_t& old= get_core();
- const int newsize= old.elcount() - lendel + datalen;
+ data_t* old;
+ bool shared= lazy_dup_core(old);
+ const int oldcount= old->elcount();
+ const int newsize= oldcount - lendel + datalen;
+ if (shared || newsize > old->elcapacity() || old->same_object(pos, data, datalen) ) {
+    // I have to make a copy.  Compose the result into the copy.
  data_t* core= create_core (newsize);
- core->splice_result (old.get_buffer(), old.elcount(), pos, lendel, data, datalen);
+    core->splice_result (old->get_buffer(), oldcount, pos, lendel, data, datalen);
  set_core (core);
+    }
+ else {
+    // I can modify the existing copy in-place
+    old->splice_result_inplace (pos, lendel, data, datalen);
+    }
  }
 
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */

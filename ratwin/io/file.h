@@ -57,15 +57,15 @@ namespace io {
 
 
 inline
-types::HANDLE CreateFile (const char* name, access_t access, sharing_t share, creation_t how, ulong even_more_flags)
+types::IO_HANDLE CreateFile (const char* name, access_t access, sharing_t share, creation_t how, ulong even_more_flags)
  {
- return reinterpret_cast<types::HANDLE> (::CreateFileA (reinterpret_cast<arg::carg32>(name), access, share, 0, how, even_more_flags, 0));
+ return reinterpret_cast<types::IO_HANDLE> (::CreateFileA (reinterpret_cast<arg::carg32>(name), access, share, 0, how, even_more_flags, 0));
  }
 
 inline
-types::HANDLE CreateFile (const wchar_t* name, access_t access, sharing_t share, creation_t how, ulong even_more_flags)
+types::IO_HANDLE CreateFile (const wchar_t* name, access_t access, sharing_t share, creation_t how, ulong even_more_flags)
  {
- return reinterpret_cast<types::HANDLE> (::CreateFileW (reinterpret_cast<arg::carg32>(name), access, share, 0, how, even_more_flags, 0));
+ return reinterpret_cast<types::IO_HANDLE> (::CreateFileW (reinterpret_cast<arg::carg32>(name), access, share, 0, how, even_more_flags, 0));
  }
 
 inline
@@ -118,7 +118,7 @@ ulong GetFileAttributes (const char* name)
  }
 
 inline
-__int64 GetFileSize (types::HANDLE h)
+__int64 GetFileSize (types::IO_HANDLE h)
  {
  union {
     __int64 result;
@@ -129,7 +129,7 @@ __int64 GetFileSize (types::HANDLE h)
  }
 
 inline
-bool GetFileTime (types::HANDLE h, __int64* create_time, __int64* access_time, __int64* write_time)
+bool GetFileTime (types::IO_HANDLE h, __int64* create_time, __int64* access_time, __int64* write_time)
  {
  return ::GetFileTime (reinterpret_cast<arg::arg32>(h), create_time, access_time, write_time);
  }

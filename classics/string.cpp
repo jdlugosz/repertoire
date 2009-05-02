@@ -1,6 +1,6 @@
-// The Repertoire Project copyright 1999 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
+// The Repertoire Project copyright 2003 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: classics\string.cpp
-// Revision: public build 6, shipped on 28-Nov-1999
+// Revision: post-public build 6
 
 #define CLASSICS_EXPORT __declspec(dllexport)
 #include "classics\string.h"
@@ -41,6 +41,24 @@ inline int compare_ (const wchar_t* a, const wchar_t* b, int len, bool case_sens
 // explicit instantiations
 template class generic_string<char>;
 template class generic_string<wchar_t>;
+
+/* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
+
+#if defined (ccfg_SUPPORT_WCHAR_AS_INT)
+// be friendly to programs who compiled without /Zc:wchar_t when Classics is compiled with it.
+
+   inline int len_ (const unsigned short* s)  { return s ? wcslen(reinterpret_cast<const wchar_t*>(s)) : 0; }
+
+   inline int compare_ (const unsigned short* a, const unsigned short* b, int len, bool case_sensitive)
+    {
+    #ifdef _DEBUG
+    if (len==0)  return 0;  // strncmp in debug RTL doesn't like zero-length.
+    #endif
+    return (case_sensitive ? wcsncmp : wcsnicmp) (reinterpret_cast<const wchar_t*>(a),reinterpret_cast<const wchar_t*>(b),len);
+    }
+
+   template class generic_string<unsigned short>;  // be friendly to programs who compiled without /Zc:wchar_t
+#endif
 
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 

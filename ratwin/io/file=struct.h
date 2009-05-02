@@ -244,8 +244,8 @@ enum move_flags {
    MOVEFILE_FAIL_IF_NOT_TRACKABLE=  0x00000020
    };
 
-const types::HANDLE INVALID_FILE= reinterpret_cast<types::HANDLE> (0xffffffff);
-const types::HANDLE INVALID_HANDLE_VALUE= reinterpret_cast<types::HANDLE> (0xffffffff);
+const types::IO_HANDLE INVALID_FILE= reinterpret_cast<types::IO_HANDLE> (0xffffffff);
+const types::IO_HANDLE INVALID_HANDLE_VALUE= reinterpret_cast<types::IO_HANDLE> (0xffffffff);
 /* Note: INVALID_HANDLE_VALUE is a misnomer, since it is not used for all kernel handles.  CreateFile
    uses it, but other handles, such as CreateMutex, return NULL on failure!  So INVALID_FILE
    is a better name for this purpose.

@@ -61,7 +61,7 @@ public:
     return a;
     }
    friend
-   inline dimensional<T,U> operator* (const T& b, dimensional<T,U> a)
+   inline dimensional<T,U> operator/ (const T& b, dimensional<T,U> a)
     {
     return b / a.value();
     }

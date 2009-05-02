@@ -19,7 +19,7 @@ STARTWRAP
 namespace ratwin {
 
 inline
-bool CloseHandle (types::HANDLE x)
+bool CloseHandle (types::Kernel_HANDLE x)
  { return ::CloseHandle (reinterpret_cast<arg::arg32>(x)); }
 
 // static const types::HANDLE INVALID_HANDLE_VALUE= reinterpret_cast<types::HANDLE>(-1);

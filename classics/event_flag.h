@@ -9,7 +9,7 @@
 #endif
 
 #include "ratwin\base.h"
-#include "classics\common.h"
+#include "classics\ustring.h"
 
 STARTWRAP
 namespace classics {
@@ -17,9 +17,14 @@ namespace classics {
 
 class event_flag {
    ratwin::types::Kernel_HANDLE H;
+   CLASSICS_EXPORT static ratwin::types::Kernel_HANDLE common_create (bool tp, bool initial_state, const ustring& name, const ratwin::types::SECURITY_ATTRIBUTES*);
 public:
    enum type { auto_reset= 0, manual_reset=1 };
-   CLASSICS_EXPORT event_flag (type tp, bool initial_state=false, const char* name= 0);
+   CLASSICS_EXPORT event_flag (type tp, bool initial_state=false);
+   event_flag (type tp, bool initial_state , const ustring& name)
+     : H(common_create (tp, initial_state, name, 0)) {}
+   event_flag (type tp, bool initial_state , const ustring& name, const ratwin::types::SECURITY_ATTRIBUTES& sa)
+     : H(common_create (tp, initial_state, name, &sa)) {}
    CLASSICS_EXPORT ~event_flag();
    ratwin::types::Kernel_HANDLE h() const { return H; }
    CLASSICS_EXPORT void set() const;

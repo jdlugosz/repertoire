@@ -63,7 +63,7 @@ struct PROPSHEETHEADER {
       const PROPSHEETPAGE<CharT>* ppsp;
       types::HPROPSHEETPAGE* phpage;
       };
-   unsigned (__stdcall* pfnCallback)(ratwin::types::HWND, unsigned uMsg, PROPSHEETPAGE*);
+   unsigned (__stdcall* pfnCallback)(ratwin::types::HWND, unsigned uMsg, PROPSHEETPAGE<CharT>*);
    union {
       types::HBITMAP hbmWatermark;
       const CharT* pszbmWatermark;

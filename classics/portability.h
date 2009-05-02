@@ -1,6 +1,6 @@
-// The Repertoire Project copyright 1999 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
+// The Repertoire Project copyright 2003 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: classics\portability.h
-// Revision: public build 6, shipped on 28-Nov-1999
+// Revision: post-public build 6
 
 #pragma once
 #if !defined PORTABILITY_INCLUDED
@@ -48,7 +48,15 @@
 #endif
 #endif  //_MSC_VER
 
-#ifndef _WCHAR_T_DEFINED
+#if _MSC_VER >= 1300  // reported by v7 (.NET)
+   #define ccfg_HAS_WCHAR_T
+      // wchar_t is a real type, not a typedef for unsigned short.
+      // overloading should work, etc.
+   #define ccfg_SUPPORT_WCHAR_AS_INT
+      // help client files compiled =without= the /Zc:wchar_t flag by providing ushort forms of signatures as well as wchar_t.
+#endif
+
+#if ! defined( _WCHAR_T_DEFINED) && ! defined(ccfg_HAS_WCHAR_T)
 typedef unsigned short wchar_t;
 #define _WCHAR_T_DEFINED
 #endif

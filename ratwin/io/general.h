@@ -25,33 +25,36 @@ namespace io {
 
 
 inline
-types::HANDLE GetStdHandle (StdHandle x)
- { return reinterpret_cast<types::HANDLE> (::GetStdHandle (reinterpret_cast<arg::arg32>(x))); }
+types::IO_HANDLE GetStdHandle (StdHandle x)
+ { return reinterpret_cast<types::IO_HANDLE> (::GetStdHandle (reinterpret_cast<arg::arg32>(x))); }
 
 inline
-bool ReadFile (types::HANDLE h, void* dest, ulong size, ulong& sizeread)
+bool ReadFile (types::IO_HANDLE h, void* dest, ulong size, ulong& sizeread)
  { return ::ReadFile (reinterpret_cast<arg::arg32>(h), dest, size, &sizeread, 0); }
 
 inline
-bool ReadFile (types::HANDLE h, void* dest, ulong size, OVERLAPPED& ov, COMPLETION_ROUTINE proc)
+bool ReadFile (types::IO_HANDLE h, void* dest, ulong size, OVERLAPPED& ov, COMPLETION_ROUTINE proc)
  { return ::ReadFileEx (reinterpret_cast<arg::arg32>(h), dest, size, &ov, reinterpret_cast<arg::arg32>(proc)); }
 
 inline
-bool WriteFile (types::HANDLE h, const void* src, ulong size, ulong& sizewritten)
+bool WriteFile (types::IO_HANDLE h, const void* src, ulong size, ulong& sizewritten)
  { return ::WriteFile (reinterpret_cast<arg::arg32>(h), src, size, &sizewritten, 0); }
 
 // options for DuplicateHandle
 const ulong DUPLICATE_CLOSE_SOURCE= 1;
 const ulong DUPLICATE_SAME_ACCESS= 2;
 
+template <typename T>
+// T is derived from KernelHandle.  The template assures the result is the same type as the input, with no casting by the user.
 inline
-bool DuplicateHandle (types::HANDLE srcproc, types::HANDLE srch, types::HANDLE destproc, types::HANDLE& desth,
-   ulong access, bool inherit, ulong options)
- { return ::DuplicateHandle (reinterpret_cast<arg::arg32>(srcproc), reinterpret_cast<arg::arg32>(srch), reinterpret_cast<arg::arg32>(destproc), &desth,
+bool DuplicateHandle (types::HANDLE srcproc, T srch, types::HANDLE destproc, T& desth, ulong access, bool inherit, ulong options)
+ {
+ types::Kernel_HANDLE source= srch;  // check this contstraint at compile-time.  An error here means T is not compatible.
+ return ::DuplicateHandle (reinterpret_cast<arg::arg32>(srcproc), reinterpret_cast<arg::arg32>(source), reinterpret_cast<arg::arg32>(destproc), &desth,
     access, inherit, options); }
 
 inline
-bool FlushFileBuffers (types::HANDLE file)
+bool FlushFileBuffers (types::IO_HANDLE file)
  { return ::FlushFileBuffers (reinterpret_cast<arg::arg32>(file)); }
 
 } //end io

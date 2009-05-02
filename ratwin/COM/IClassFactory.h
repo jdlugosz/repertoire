@@ -1,10 +1,11 @@
 // The Repertoire Project copyright 1999 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: ratwin\COM\IClassFactory.h
-// Revision: public build 6, shipped on 28-Nov-1999
+// Revision: modified from public build 5, shipped on 8-April-1999
 
 #pragma once
 
 #include "ratwin\COM\IUnknown.h"
+#include "classics\auto_COM_ptr.h"  // had removed this, but put it back.
 //#include "classics\flagword.h"
 
 STARTWRAP
@@ -21,6 +22,14 @@ IClassFactory : public IUnknown {
       /* [in] */ const IID& riid,
       /* [iid_is][out] */ void** ppvObject) = 0;
         
+   // simplified form - smart ptr, and "outer" is optional
+   // if I re-discover why this "simplified" form had been removed, deal with it.
+   template <typename Q>
+      inline HRESULT CreateInstance (classics::auto_COM_ptr<Q>& result, IUnknown* outer=0)
+       {
+       return CreateInstance (outer, __uuidof(Q), result);
+       }
+   
    virtual /* [local] */ HRESULT __stdcall LockServer (
       /* [in] */ int/*really bool*/ fLock) = 0;
         

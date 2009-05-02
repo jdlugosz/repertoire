@@ -21,23 +21,23 @@ namespace ratwin {
 namespace io {
 
 inline 
-types::HANDLE CreateMailslot (const wchar_t* name, unsigned message_size, unsigned timeout, const types::SECURITY_ATTRIBUTES& sa)
- { return reinterpret_cast<types::HANDLE> (::CreateMailslotW (name, message_size, timeout, reinterpret_cast<arg::carg32>(&sa)) ); }
+types::IO_HANDLE CreateMailslot (const wchar_t* name, unsigned message_size, unsigned timeout, const types::SECURITY_ATTRIBUTES& sa)
+ { return reinterpret_cast<types::IO_HANDLE> (::CreateMailslotW (name, message_size, timeout, reinterpret_cast<arg::carg32>(&sa)) ); }
 
 inline 
-types::HANDLE CreateMailslot (const char* name, unsigned message_size, unsigned timeout, const types::SECURITY_ATTRIBUTES& sa)
- { return reinterpret_cast<types::HANDLE> (::CreateMailslotA (name, message_size, timeout, reinterpret_cast<arg::carg32>(&sa)) ); }
+types::IO_HANDLE CreateMailslot (const char* name, unsigned message_size, unsigned timeout, const types::SECURITY_ATTRIBUTES& sa)
+ { return reinterpret_cast<types::IO_HANDLE> (::CreateMailslotA (name, message_size, timeout, reinterpret_cast<arg::carg32>(&sa)) ); }
 
 inline 
-types::HANDLE CreateMailslot (const wchar_t* name, unsigned message_size, unsigned timeout)
- { return reinterpret_cast<types::HANDLE> (::CreateMailslotW (name, message_size, timeout, 0) ); }
+types::IO_HANDLE CreateMailslot (const wchar_t* name, unsigned message_size, unsigned timeout)
+ { return reinterpret_cast<types::IO_HANDLE> (::CreateMailslotW (name, message_size, timeout, 0) ); }
 
 inline 
-types::HANDLE CreateMailslot (const char* name, unsigned message_size, unsigned timeout)
- { return reinterpret_cast<types::HANDLE> (::CreateMailslotA (name, message_size, timeout, 0) ); }
+types::IO_HANDLE CreateMailslot (const char* name, unsigned message_size, unsigned timeout)
+ { return reinterpret_cast<types::IO_HANDLE> (::CreateMailslotA (name, message_size, timeout, 0) ); }
 
 inline
-bool GetMailslotInfo (types::HANDLE h, unsigned* max_message_size, unsigned* next_size, unsigned* count, unsigned* timeout)
+bool GetMailslotInfo (types::IO_HANDLE h, unsigned* max_message_size, unsigned* next_size, unsigned* count, unsigned* timeout)
  { return ::GetMailslotInfo (reinterpret_cast<arg::arg32>(h), max_message_size, next_size, count, timeout); }
 
 } //end io

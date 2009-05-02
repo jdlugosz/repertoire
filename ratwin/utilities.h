@@ -20,7 +20,8 @@ __declspec(dllimport) unsigned long __stdcall FormatMessageA (unsigned long, con
 __declspec(dllimport) unsigned long __stdcall FormatMessageW (unsigned long, const void* lpSource, unsigned long, unsigned long, wchar_t*, unsigned long, Dlugosz::ratwin::arg::arg32);
 __declspec(dllimport) int __stdcall DebugActiveProcess (unsigned long dwProcessId);
 __declspec(dllimport) unsigned long __stdcall GetTickCount();   //not cloaked!
-__declspec(dllimport) int __stdcall MessageBeep (Dlugosz::ratwin::arg::arg32);
+// __declspec(dllimport) int __stdcall MessageBeep (Dlugosz::ratwin::arg::arg32);
+// MessageBeep moved to sound.h
 __declspec(dllimport) void __stdcall OutputDebugStringA (Dlugosz::ratwin::arg::carg32);
 __declspec(dllimport) void __stdcall OutputDebugStringW (Dlugosz::ratwin::arg::carg32);
 __declspec(dllimport) int __stdcall GetWindowsDirectoryA (void*, int);
@@ -28,10 +29,6 @@ __declspec(dllimport) int __stdcall GetWindowsDirectoryW (void*, int);
 __declspec(dllimport) int __stdcall GetSystemDirectoryA (void*, int);
 __declspec(dllimport) int __stdcall GetSystemDirectoryW (void*, int);
 
-
-// put these in with system info, later
-__declspec(dllimport) void __stdcall  GetSystemInfo (Dlugosz::ratwin::arg::arg32);
-__declspec(dllimport) int __stdcall GetVersionExA (Dlugosz::ratwin::arg::arg32);
 
 // file these elsewhere, later
 __declspec(dllimport) Dlugosz::ratwin::arg::arg32 __stdcall LoadLibraryExA (const char* lpLibFileName, Dlugosz::ratwin::arg::arg32 hFile, unsigned long dwFlags);
@@ -53,57 +50,7 @@ inline ushort HIWORD (ulong x) { return ushort(x >> 16); }
 inline ulong MAKELONG (ushort H, ushort L) { return L | (H<<16); }
 
 
-
-
-/////////////>>>>>>>>>>> shouldn't these be in sysinfo.h?
-struct SYSTEM_INFO {
-   unsigned short wProcessorArchitecture;
-   unsigned short wReserved;
-   unsigned long dwPageSize;
-   void* lpMinimumApplicationAddress;
-   void* lpMaximumApplicationAddress;
-   unsigned long dwActiveProcessorMask;
-   unsigned long dwNumberOfProcessors;
-   unsigned long dwProcessorType;
-   unsigned long dwAllocationGranularity;
-   unsigned short wProcessorLevel;
-   unsigned short wProcessorRevision;
-   };
-
-struct OSVERSIONINFO {
-   unsigned long dwOSVersionInfoSize;
-   unsigned long dwMajorVersion;
-   unsigned long dwMinorVersion;
-   unsigned long dwBuildNumber;
-   unsigned long dwPlatformId;
-   char szCSDVersion[ 128 ];     // Maintenance string for PSS usage
-   };
-
-enum {
-   VER_PLATFORM_WIN32s= 0,
-   VER_PLATFORM_WIN32_WINDOWS= 1,
-   VER_PLATFORM_WIN32_NT= 2,
-   };
-   
-inline
-void GetSystemInfo (SYSTEM_INFO& info)
- {
- ::GetSystemInfo (reinterpret_cast<arg::arg32>(&info));
- // future notes: make a whole module to encapsulate these attributes.
- }
-
-
-inline
-bool GetVersionEx (OSVERSIONINFO& info)
- {
- return ::GetVersionExA (reinterpret_cast<arg::arg32>(&info));
- }
-
-
-inline
-bool MessageBeep (unsigned options=0)
- { return ::MessageBeep (reinterpret_cast<arg::arg32>(options)); }
- 
+// note: SYSTEM_INFO, OSVERSIONINFO, GetSystemInfo, GetVersionEx moved from here to sysinfo.h
 
 inline
 void OutputDebugString (const char* string)

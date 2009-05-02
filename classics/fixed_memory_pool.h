@@ -29,9 +29,11 @@ public:
    CLASSICS_EXPORT void free (void*);
    CLASSICS_EXPORT void clean();
    int use_count;  //for auditing and leak detection
+   int cumulative_size;
    void (*callback)(int mode, void* p);
    void* get_nodelist() const  { return nodelist; }  //for debugging and testing only.
    CLASSICS_EXPORT bool check_address (const void*p) const;  //for debugging: verify p is part of this pool, not forign.
+   CLASSICS_EXPORT bool check_heap();  //for debugging: check the entire freelist.
    };
 
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
@@ -64,6 +66,9 @@ public:
    void operator delete (void* p)  { pool.free(p); }
    static int get_pool_use_count()  { return pool.use_count; }
    static bool check_address (const void* p)  { return pool.check_address(p); }
+#if _MSC_VER == 1200  //Microsoft v6.0
+   void operator= (const pool_mixin&) {}  // work-around compiler bug.
+#endif
    };
 
 template <typename T>
@@ -80,6 +85,9 @@ public:
    void operator delete (void* p);
    static int get_pool_use_count()  { return pool.use_count; }
    static bool check_address (const void* p)  { return pool.check_address(p); }
+#if _MSC_VER == 1200  //Microsoft v6.0
+      void operator= (const ts_pool_mixin&) {}  // work-around compiler bug.
+#endif
    };
 
 template <typename T>

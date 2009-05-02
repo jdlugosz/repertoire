@@ -3,7 +3,7 @@
 // Revision: new
 
 #pragma once
-#include "ratwin\controls\basic.h"
+#include "ratwin\controls\basic=struct.h"
 #include "ratwin\color=struct.h"
 
 STARTWRAP

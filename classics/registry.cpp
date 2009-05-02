@@ -6,7 +6,6 @@
 #include "classics\registry.h"
 #include "classics\exception.h"
 #include "ratwin\utilities.h"
-#include <iostream>  //for debugging
 using ratwin::types::HKEY;
 
 STARTWRAP
@@ -165,7 +164,7 @@ registry_key_init registry_key::open (const ustring& subkey)
 
 bool registry_key::key_exists (const ustring& keyname) const
  {
- HKEY out;
+ HKEY out= 0;  // initializer not needed, but get rid of compiler noise.
  long result;
  switch (uses_Unicode) {
     case Yes: {

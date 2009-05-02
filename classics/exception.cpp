@@ -1,6 +1,6 @@
-// The Repertoire Project copyright 2001 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
+// The Repertoire Project copyright 2002 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: classics\exception.cpp
-// Revision: post-public build 6
+// Revision: post-public build 6 (25-June-2002 or later)
 
 #define CLASSICS_EXPORT __declspec(dllexport)
 #include "classics\exception.h"
@@ -8,6 +8,7 @@
 #include "ratwin\utilities.h"
 #include "classics\string_marker.h"
 #include <iostream>
+#include <sstream>
 
 using std::endl;
 
@@ -20,6 +21,7 @@ static const char MODULE[]= "Classics";
 
 void (*exception::show_function)(const exception&) =0;
 void (*exception::setup_hook) (exception* self, const ustring& module, const ustring& name, const ustring& fname, int line) = &normal_setup;
+ustring (*exception::report_function)(const exception&) =0;
 
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
@@ -37,6 +39,7 @@ void exception::setup (const ustring& module, const ustring& name, const ustring
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
 exception::exception (const ustring& module, const ustring& name, const ustring& fname, int line)
+ : what_cache(0)
  {
  setup (module, name, fname, line);
  }
@@ -109,23 +112,48 @@ void exception::show() const
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
 void exception::default_show_function (const exception& err)
+// Send a formatted report to standard error and to the Debug stream.
  {
- using std::wcerr;  //sic, should be werr.
- wcerr << "Exception:\n";
+ wstring s= err.What();
+ std::wcerr << s;  // sic, should be werr.
+ const wchar_t* buffer= s.c_str();
+ ratwin::util::OutputDebugString (buffer);
+ }
+
+/* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
+
+ustring exception::default_report_function (const exception& err)
+ {
+ classics::basic_ostringstream<wchar_t> out;
+ out << "Exception:\n";
  iterator it (err);
  int stanza= 1;
  do {
-    wcerr << L"stanza #" << stanza << endl;
+    out << L"stanza #" << stanza << endl;
     const vararray<iterator::pair> values= it.get_all_values();
     const int valcount= values.elcount();
     for (int loop= 0;  loop < valcount;  loop++) {
        iterator::pair p= values[loop];
-       wcerr << p.key << L"=" << p.value << endl;
+       out << p.key << L"=" << p.value << endl;
        }
-    wcerr << it.get_text() << endl;
+    out << it.get_text() << endl;
     ++stanza;
     }  while (it.next());
- wcerr << "===== end exception =====" << endl;
+ out << "===== end exception =====" << endl;
+ return out.eject();
+ }
+
+/* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
+
+const char* exception::what() const throw()
+ {
+ classics::string s= What();
+ const int len= s.elcount();
+ delete[] what_cache;
+ what_cache= new char[1+len];
+ memcpy (what_cache, s.get_buffer(), len);
+ what_cache[len]= '\0';
+ return what_cache;
  }
 
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
@@ -148,12 +176,14 @@ static ustring format_message (int errorcode)
     if (retval==0 && ratwin::util::GetLastError()==win_exception::call_not_implemented_error)
        Unicode= false;
     else {
+       wbuffer[retval]= L'\0';  //??
        wstring s (wbuffer);
        return s;    //OK, got a result
        }
     }
  // use ANSI version instead
- ratwin::util::FormatMessage (0, errorcode, nbuffer, maxsize);
+ int retval= ratwin::util::FormatMessage (0, errorcode, nbuffer, maxsize);
+ nbuffer[retval]= '\0';
  string s (nbuffer);
  return s;
  }

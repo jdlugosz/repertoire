@@ -9,30 +9,14 @@
 
 #pragma once
 
-#if !defined CLASSICS_EXPORT
-#define CLASSICS_EXPORT __declspec(dllimport)
+#if _MSC_VER >= 1300 //v7.0 (.NET)
+   #include "MFC_CString_7.h"
+#else
+   #include "MFC_CString_5.h"
 #endif
-
-#include "classics\atomic_counter.h"
 
 STARTWRAP
 namespace classics {
-   
-/* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
-
-struct CStringData {
-   atomic_counter<long> nRefs;     // reference count
-   int nDataLength;
-   int nAllocLength;
-   void* data() { return 1+this; }
-   bool locked() const { return nRefs<0; }
-   static CStringData* create (int charcount, int charsize);
-   static CStringData* get_empty();
-   CLASSICS_EXPORT void release();
-   static void* assign (CStringData*, CStringData*, int charsize);
-   void set_data (const void* data, int startpos, int len, int charsize);
-   void* copy (int charsize);
-   };
 
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
@@ -42,8 +26,6 @@ protected:
    MFC_CString_ntbase (void* p) : Data(p) {}
    CStringData* get_header() const { return static_cast<CStringData*>(Data) -1; }
    ~MFC_CString_ntbase()  { get_header() -> release(); }
-public:
-   int length() const  { return get_header()->nDataLength; }
    };
    
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
@@ -63,11 +45,11 @@ public:
       { return static_cast<T*>(Data); }
    void set_data (const T* data, int startpos, int len)
       { get_header()-> set_data (data, startpos, len, sizeof(T)); }
+   int length() const  { return get_header()->length_in_chars (sizeof T); }
    };
 
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
 } // end of classics
 ENDWRAP
-
 

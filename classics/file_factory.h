@@ -46,7 +46,7 @@ public:
    void cant_fail()  { CanFail= false; }
    enum construct_mode_t { Read, ReadWrite };
    CLASSICS_EXPORT file_factory (construct_mode_t);
-   CLASSICS_EXPORT ratwin::types::HANDLE Create (const filename_t& name) const;
+   CLASSICS_EXPORT ratwin::types::IO_HANDLE Create (const filename_t& name) const;
    };
 
 

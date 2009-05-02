@@ -32,16 +32,16 @@ namespace ratwin {
 namespace io {
 
 inline
-types::HANDLE CreateFileMapping (types::HANDLE file, page_protection protection, __int64 size, const char* name=0)
+types::Kernel_HANDLE CreateFileMapping (types::IO_HANDLE file, page_protection protection, __int64 size, const char* name=0)
  {
  union {  __int64 whole; unsigned part[2]; };
  whole= size;
- return reinterpret_cast<types::HANDLE> (::CreateFileMappingA (reinterpret_cast<arg::arg32>(file), 0, protection, part[1], part[0], name) );
+ return reinterpret_cast<types::Kernel_HANDLE> (::CreateFileMappingA (reinterpret_cast<arg::arg32>(file), 0, protection, part[1], part[0], name) );
  }
 
 // all access is 0x000F001F
 inline
-void* MapViewOfFile (types::HANDLE mapper, view_access_t access, __int64 pos, long len)
+void* MapViewOfFile (types::Kernel_HANDLE mapper, view_access_t access, __int64 pos, long len)
  {
  union {  __int64 whole; unsigned part[2]; };
  whole= pos;

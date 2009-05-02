@@ -25,7 +25,7 @@ namespace WM_constants {
    WM_LBUTTONDOWN WM_LBUTTONUP WM_LBUTTONDBLCLK WM_RBUTTONDOWN WM_RBUTTONUP
    WM_RBUTTONDBLCLK WM_MBUTTONDOWN WM_MBUTTONUP WM_MBUTTONDBLCLK WM_MOUSELAST
    WM_USER WM_INITMENUPOPUP WM_INITMENU WM_ERASEBKGND WM_CTLCOLORSTATIC
-
+   WM_SYSCOLORCHANGE
 */
 // ## BEGIN MacroCloak Generated Code
 #if defined (WM_CREATE)
@@ -80,6 +80,7 @@ namespace WM_constants {
 #undef WM_INITMENU
 #undef WM_ERASEBKGND
 #undef WM_CTLCOLORSTATIC
+#undef WM_SYSCOLORCHANGE
 #endif
 // ## END Generated Code
 
@@ -96,6 +97,7 @@ enum messages {
    WM_QUIT=                0x0012,
    WM_QUERYOPEN=           0x0013,
    WM_ERASEBKGND=          0x0014,
+   WM_SYSCOLORCHANGE=      0x0015,
    WM_SETCURSOR=           0x0020,
    WM_DRAWITEM=            0x002B,
    WM_NOTIFY=              0x004E,
@@ -203,6 +205,7 @@ using ratwin::WM_constants::WM_INITMENUPOPUP;
 using ratwin::WM_constants::WM_INITMENU;
 using ratwin::WM_constants::WM_ERASEBKGND;
 using ratwin::WM_constants::WM_CTLCOLORSTATIC;
+using ratwin::WM_constants::WM_SYSCOLORCHANGE;
 #endif
 // ## END Generated Code
 

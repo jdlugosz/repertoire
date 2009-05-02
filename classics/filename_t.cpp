@@ -397,7 +397,7 @@ static ustring get_full_path_name (const ustring& u)
  if (Unicode) {
     wstring s= u;
     const wchar_t* p= s.c_str();
-    const int len= GetFullPathName (p, 0,0);  //len includes room for trailing nul.
+    const int len= GetFullPathName (p, 0, 0);  //len includes room for trailing nul.
     if (len==0) {
        int errorcode= ratwin::util::GetLastError();
        if (errorcode == win_exception::call_not_implemented_error)  {
@@ -410,19 +410,35 @@ static ustring get_full_path_name (const ustring& u)
     wchar_t* dest= const_cast<wchar_t*>(result.get_buffer());
     if (!GetFullPathName (p, len, dest))
        throw win_exception ("Classics", FNAME, __LINE__);
-    result.resize (len-1);  //remove the trailing nul
+	const int real_len= wcslen (dest);
+	// I expect real_len to be len-1, but sometimes it isn't!
+	// Apparently, it can ask for a buffer larger than it really needed.
+	if (real_len>=len) {
+	   classics::exception X ("Classics", "Internal Win32 Error", FNAME, __LINE__);
+	   X += "GetFullPathName appears to have returned bad data.";
+	   throw X;
+	   }
+    result.resize (real_len);  //remove the trailing nul
     return result;
     }
  ANSI: {
     string s= u;
     const char* p= s.c_str();
-    const int len= GetFullPathName (p, 0,0);
+    const int len= GetFullPathName (p, 0, 0);
     if (len==0)  throw win_exception ("Classics", FNAME, __LINE__);
     string result (len);
     char* dest= const_cast<char*>(result.get_buffer());
     if (!GetFullPathName (p, len, dest))
        throw win_exception ("Classics", FNAME, __LINE__);
-    result.resize (len-1);  //remove the trailing nul
+	const int real_len= strlen (dest);
+	// I expect real_len to be len-1, but sometimes it isn't!
+	// Apparently, it can ask for a buffer larger than it really needed.
+	if (real_len>=len) {
+	   classics::exception X ("Classics", "Internal Win32 Error", FNAME, __LINE__);
+	   X += "GetFullPathName appears to have returned bad data.";
+	   throw X;
+	   }
+    result.resize (real_len);  //remove the trailing nul
     return result;
     }
  }
@@ -433,7 +449,8 @@ filename_t PC_filesystem_t::fully_qualify (const filename_t& param) const
  {
  wstring result= get_full_path_name (param.text());
  PC_filesystem_t* self= const_cast<PC_filesystem_t*>(this);
- return self->directory(result);
+ // return self->directory(result);
+ return filename_t (result, cow<filename_t::filesystem_t>(self)); // JMD May 2002 -- why was it calling directory to add a slash?!
  }
 
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
@@ -870,7 +887,7 @@ __int64 PC_filesystem_t::timestamp (const filename_t& name) const
 // factory.set (ratwin::io::FILE_READ_ATTRIBUTES);
  factory.set (ratwin::io::ACCESS_ONLY);
  factory.set (ratwin::io::FILE_SHARE_READWRITE);
- ratwin::types::HANDLE h= factory.Create (name);
+ ratwin::types::IO_HANDLE h= factory.Create (name);
  __int64 write_time;
  bool retval= ratwin::io::GetFileTime (h, 0,0, &write_time);
  int errorcode= ratwin::util::GetLastError();
@@ -908,4 +925,3 @@ void filename_t::index_t::empty (int index)
 
 } //end namespace classics
 ENDWRAP
-

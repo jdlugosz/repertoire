@@ -509,7 +509,7 @@ int main (int argc, const char* argv[])
           E (argv[2]);
           break;
        default:
-          cout << "error: invalid argument" << endl;
+          cout << "error: invalid argument (chr " << int(*argv[1]) << ")" << endl;
           return 1;
        }
     }

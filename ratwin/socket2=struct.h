@@ -25,8 +25,9 @@ typedef ratwin::types::SOCKET SOCKET;
    WSAHOST_NOT_FOUND WSATRY_AGAIN WSANO_RECOVERY WSANO_DATA WSANO_ADDRESS
    FD_READ FD_WRITE FD_OOB FD_ACCEPT FD_CONNECT FD_CLOSE WSA_FLAG_OVERLAPPED AF_INET
    SOCK_STREAM SOCK_DGRAM SOCK_RAW SOCK_RDM SOCK_SEQPACKET SO_SNDBUF SO_RCVBUF
-   SOMAXCONN SOL_SOCKET INADDR_ANY _IOW FIONBIO WSADESCRIPTION_LEN WSASYS_STATUS_LEN
-   INVALID_SOCKET SOCKET_ERROR INADDR_NONE SD_RECEIVE SD_SEND SD_BOTH
+   SOMAXCONN SOL_SOCKET INADDR_ANY _IOW _IOR FIONBIO WSADESCRIPTION_LEN WSASYS_STATUS_LEN
+   INVALID_SOCKET SOCKET_ERROR INADDR_NONE SD_RECEIVE SD_SEND SD_BOTH FIONREAD FIOASYNC
+   SIOCSHIWAT SIOCGHIWAT SIOCSLOWAT SIOCGLOWAT SIOCATMARK
 */
 // ## BEGIN MacroCloak Generated Code
 #if defined (WSABASEERR)
@@ -115,6 +116,7 @@ typedef ratwin::types::SOCKET SOCKET;
 #undef SOL_SOCKET
 #undef INADDR_ANY
 #undef _IOW
+#undef _IOR
 #undef FIONBIO
 #undef WSADESCRIPTION_LEN
 #undef WSASYS_STATUS_LEN
@@ -124,6 +126,13 @@ typedef ratwin::types::SOCKET SOCKET;
 #undef SD_RECEIVE
 #undef SD_SEND
 #undef SD_BOTH
+#undef FIONREAD
+#undef FIOASYNC
+#undef SIOCSHIWAT
+#undef SIOCGHIWAT
+#undef SIOCSLOWAT
+#undef SIOCGLOWAT
+#undef SIOCATMARK
 #endif
 // ## END Generated Code
 
@@ -260,7 +269,20 @@ template<typename T>
 inline T _IOW (char x, unsigned y)
  { return 0x80000000|((sizeof(T)&0x7f)<<16)|(x<<8)|y; }
  
-static const unsigned long FIONBIO= _IOW<unsigned long>('f', 126); /* set/clear non-blocking i/o */
+// IO Controls
+template<typename T>
+inline T _IOR (char x, unsigned y)
+ { return 0x40000000|((sizeof(T)&0x7f)<<16)|(x<<8)|y; }
+ 
+static const unsigned long FIONBIO= _IOW<unsigned long>('f', 126); //set/clear non-blocking i/o
+static const unsigned long FIONREAD= _IOR<unsigned long>('f', 127); // get # bytes to read
+static const unsigned long FIOASYNC= _IOW<unsigned long>('f', 125); // set/clear async i/o
+
+static const unsigned long SIOCSHIWAT= _IOW<unsigned long>('s',  0);  // set high watermark
+static const unsigned long SIOCGHIWAT= _IOR<unsigned long>('s',  1);  // get high watermark
+static const unsigned long SIOCSLOWAT= _IOW<unsigned long>('s',  2);  // set low watermark
+static const unsigned long SIOCGLOWAT= _IOR<unsigned long>('s',  3);  // get low watermark
+static const unsigned long SIOCATMARK= _IOR<unsigned long>('s',  7);  // at oob mark?
 
 const int WSADESCRIPTION_LEN= 256;
 const int WSASYS_STATUS_LEN=  128;
@@ -397,6 +419,7 @@ using ratwin::socket2::SOMAXCONN;
 using ratwin::socket2::SOL_SOCKET;
 using ratwin::socket2::INADDR_ANY;
 using ratwin::socket2::_IOW;
+using ratwin::socket2::_IOR;
 using ratwin::socket2::FIONBIO;
 using ratwin::socket2::WSADESCRIPTION_LEN;
 using ratwin::socket2::WSASYS_STATUS_LEN;
@@ -406,6 +429,13 @@ using ratwin::socket2::INADDR_NONE;
 using ratwin::socket2::SD_RECEIVE;
 using ratwin::socket2::SD_SEND;
 using ratwin::socket2::SD_BOTH;
+using ratwin::socket2::FIONREAD;
+using ratwin::socket2::FIOASYNC;
+using ratwin::socket2::SIOCSHIWAT;
+using ratwin::socket2::SIOCGHIWAT;
+using ratwin::socket2::SIOCSLOWAT;
+using ratwin::socket2::SIOCGLOWAT;
+using ratwin::socket2::SIOCATMARK;
 #endif
 // ## END Generated Code
 

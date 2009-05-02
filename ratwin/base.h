@@ -44,7 +44,12 @@ namespace internal {
 
    struct HANDLE_struct {/*empty*/};
    struct Kernel_HANDLE_struct : public HANDLE_struct {/*empty*/};
-   struct SOCKET_struct : public Kernel_HANDLE_struct {/*empty*/};
+
+   // Specializations of HANDLE that are not present in WINDOWS.H
+   struct Thread_HANDLE_struct : public Kernel_HANDLE_struct {/*empty*/};
+   struct IO_HANDLE_struct : public Kernel_HANDLE_struct {/*empty*/};
+
+   struct SOCKET_struct : public IO_HANDLE_struct {/*empty*/};
    struct HWND_struct : public HANDLE_struct {/*empty*/};
    struct HGDIOBJ_struct : public HANDLE_struct {/*empty*/};
    struct HBITMAP_struct : public HGDIOBJ_struct {/*empty*/};
@@ -62,9 +67,6 @@ namespace internal {
    struct HDC_struct : public HANDLE_struct {/*empty*/};
    struct HRSRC_struct : public HANDLE_struct {/*empty*/};
 
-   // Specializations of HANDLE that are not present in WINDOWS.H
-   struct Thread_HANDLE_struct : public Kernel_HANDLE_struct {/*empty*/};
-
    // other handle-like things that don't map directly to Windows.H
    struct TLS_key_struct : public HANDLE_struct {/*empty*/};
    struct PROPSHEETPAGE_struct : public HANDLE_struct {/*empty*/};
@@ -72,6 +74,7 @@ namespace internal {
 
 typedef internal::HANDLE_struct* HANDLE;
 typedef internal::Kernel_HANDLE_struct* Kernel_HANDLE;
+typedef internal::IO_HANDLE_struct* IO_HANDLE;  // one that works with ReadFile, WriteFile, etc.
 typedef internal::SOCKET_struct* SOCKET;
 typedef internal::HWND_struct* HWND;
 typedef internal::HINSTANCE_struct* HINSTANCE;
@@ -123,7 +126,7 @@ struct SECURITY_ATTRIBUTES {
    };
 
 struct security_attributes : public SECURITY_ATTRIBUTES {
-   security_attributes() { nLength= sizeof(SECURITY_ATTRIBUTES); lpSecurityDescriptor=0; }
+   security_attributes() { nLength= sizeof(SECURITY_ATTRIBUTES); lpSecurityDescriptor=0; bInheritHandle=false; }
    };
 
 // idea:  (unsigned wMsg, long lEvent) can also be made strict

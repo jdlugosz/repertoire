@@ -31,13 +31,14 @@ mutex::mutex (bool blocked)
  
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
-mutex::mutex (const ustring& name, bool blocked)
+mutex::mutex (const ustring& name, bool blocked, ratwin::types::SECURITY_ATTRIBUTES* sap)
  :Name(name)
  {
  int errorcode;
  if (Unicode) {
     wstring s= name;
-    H= ratwin::tasking::CreateMutex (blocked, s.c_str());
+    if (sap)  H= ratwin::tasking::CreateMutex (blocked, s.c_str(), *sap);
+    else  H= ratwin::tasking::CreateMutex (blocked, s.c_str());
     errorcode= ratwin::util::GetLastError();
     if (!H) {
        if (errorcode == win_exception::call_not_implemented_error) {
@@ -50,7 +51,8 @@ mutex::mutex (const ustring& name, bool blocked)
  else {  //must be ANSI
     ANSI:
     string s= name;
-    H= ratwin::tasking::CreateMutex (blocked, s.c_str());
+    if (sap) H= ratwin::tasking::CreateMutex (blocked, s.c_str(), *sap);
+    else H= ratwin::tasking::CreateMutex (blocked, s.c_str());
     errorcode= ratwin::util::GetLastError();
     if (!H) {
        goto error;

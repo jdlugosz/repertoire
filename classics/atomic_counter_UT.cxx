@@ -17,6 +17,10 @@ using classics::ushort;
 using classics::byte;
 
 int passed_count= 0;
+int inconclusive_count= 0;
+const int total_count= 18;
+
+int XADD_collisions= 0;
 
 // configuration of threading tests
 const int hcount= 10;  //how many threads to make
@@ -50,7 +54,7 @@ void tester<T>::start()
  {
  int sequence_number= ++threads_started;  // unique number for each worker thread
  for (int loop= 0;  loop < loopcount;  loop++) {
-    ++counter;
+    counter.inc();
     ++control;
     ++counter;
     ++control;
@@ -62,7 +66,7 @@ void tester<T>::start()
     ++control;
     --counter;
     --control;
-    --counter;
+    counter.dec();
     --control;
     --counter;  //dec 3.  Net gain of +2.
     --control;
@@ -75,16 +79,48 @@ void tester<T>::start()
 template <typename T>
 void tester<T>::show_results(int count) const
  {
- cout << " count is " << long(counter) << ", control is " << long(control) << endl;
+ cout << " count is " << long(counter) << ", control is " << long(control);
  T result= 20000*count;
- cout << " expected result is " << long(result) << endl;
+ cout << ", expected result is " << long(result) << endl;
  if (result != counter)  cout << " ** FAILED **" << endl;
- else if (result == control)  cout << " ** INCONCLUSIVE **" << endl;
+ else if (result == control)  {
+    cout << " ** INCONCLUSIVE **" << endl;
+    ++inconclusive_count;
+    }
  else {
     cout << " PASSED" << endl;
     ++passed_count;
     }
  cout << "compare_and_swap showed " << collisions << " collisions detected." << endl;
+ XADD_collisions += collisions;
+ }
+ 
+/* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
+
+template <typename T>
+void incdec (T* =0)
+ {
+ // check semantics of dec().
+ classics::atomic_counter<T> id= 0;
+ id.inc();
+ ++id;
+ id++;
+ if (id != 3) {
+    cout << " ** FAILED semantics of incrementing" << endl;
+    return;
+    }
+ --id;
+ bool hitzero= id.dec();
+ if (id != 1 || hitzero) {
+    cout << " ** FAILED semantics of decrementing (case 1)" << endl;
+    return;
+    }
+ hitzero= id.dec();
+ if (id != 0 || !hitzero) {
+    cout << " ** FAILED semantics of decrementing (case 2)" << endl;
+    return;
+    }
+ ++passed_count;
  }
  
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
@@ -95,6 +131,7 @@ void testit (T* =0)
 // bug in Microsoft's compiler.
  {
  cout << "testing atomic_counter< " << typeid(T).name() << " >" << endl;
+ incdec<T>();
  ratwin::types::Kernel_HANDLE handles[hcount];
  tester<T> x;
  for (int loop= 0;  loop < hcount;  loop++) {
@@ -117,18 +154,20 @@ classics::atomic_counter<short>& mismatch_counter_short= (classics::atomic_count
 
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
+const int mismatch_loop_count= 10000;
+
 void mismatch::start()
  {
- for (int loop= 0;  loop < 10000;  loop++) {
-    ++mismatch_counter_short;
+ for (int loop= 0;  loop < mismatch_loop_count;  loop++) {
+    mismatch_counter_short++;
     ++mismatch_counter_short;
     --mismatch_counter_long;
-    ++mismatch_counter_short;
+    mismatch_counter_short.inc();
     ++mismatch_counter_short;
     ratwin::util::Sleep(1);
-    --mismatch_counter_long;
+    mismatch_counter_long--;
     ++mismatch_counter_short;
-    --mismatch_counter_long;
+    mismatch_counter_long.dec();
     }
  }
 
@@ -136,15 +175,27 @@ void mismatch::start()
 
 void mismatch::show_results(int count) const
  {
- cout << " counts are " << mismatch_counter_short << " and " << mismatch_counter_long << endl;
- short result= 20000*count;
- cout << " expected result is " << result << endl;
+ const short result= mismatch_loop_count*2*count;
+ const short hipart= mismatch_counter_long >> 16;
+ cout << " counts are " << mismatch_counter_short << " (expected " << result << ") and " << hipart << " (value vaires due to timing)" << endl;
+ if (hipart == 0) {
+    cout << " **INCONCLUSIVE** (not enough iterations?)" << endl;
+    ++inconclusive_count;
+    }
+ else if (result == mismatch_counter_short)  {
+    cout << " OK." << endl;
+    ++passed_count;
+    }
+ else cout << " ** FAILED **" << endl;
  }
  
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
 void nomatch()
  {
+ /* This technique is used to implement a "sticky zero" counter, used by the handle reference counting.
+    So, we better make sure it works as expected!
+ */
  cout << "testing mismatched counters" << endl;
  const int hcount= 4;  //how many threads to make
  ratwin::types::Kernel_HANDLE handles[hcount];
@@ -169,14 +220,22 @@ int main()
  testit<unsigned>();
  testit<char>();
  testit<byte>();
- if (passed_count == 8)  cout << "All tests successfully passed." << endl;
+ if (XADD_collisions == 0) {
+    cout << "Note: compare_and_swap never detected any collisions, so this is INCONCLUSIVE." << endl;
+    ++inconclusive_count;
+    }
+ else ++passed_count;
+ nomatch();
+ if (passed_count == total_count)  cout << "All tests successfully passed." << endl;
  else  {
  	cout << "some tests inconclusive or failed -- read log carefully." << endl;
  	cout << "Meaning of inconclusive: not using the atomic counter (the control case) didn't mess up,\n"
  		"so we can't prove that using the atomic counter fixed anything.\n" 
- 		"Try increasing the thread and loop count."<< endl;
+       "This happens on a single-CPU machine.  Test on a multi-CPU machine."<< endl;
+    cout << passed_count << " passed, " << inconclusive_count << " inconclusive, " << (total_count-(passed_count+inconclusive_count)) << " failed.\n";
+    if (passed_count + inconclusive_count == total_count)  return 0;
+    return passed_count + inconclusive_count == total_count ? 0 : 2;
  	}
- nomatch();
  return 0;
  }
 

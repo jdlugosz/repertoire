@@ -25,13 +25,14 @@ struct lifetime {
    ushort deleted;
    void clear() { owned_count= 0; unowned_count= 0; hold= -1;  deleted= true; }
    CLASSICS_EXPORT static lifetime* null();
-   bool inc_owned_count()  { return 1 != ++owned_count; }  //can detect 1st owner
-   void inc_unowned_count()  { ++unowned_count; }
-   bool dec_owned_count()  { return 0 == --owned_count; }
-   bool dec_unowned_count()  { return 0 == --unowned_count; }
+   void inc_owned_count()  { owned_count.inc(); }
+   bool inc_owned_count_firstp()  { return 1 != ++owned_count; }  //can detect 1st owner
+   void inc_unowned_count()  { unowned_count.inc(); }
+   bool dec_owned_count()  { return owned_count.dec(); }
+   bool dec_unowned_count()  { return unowned_count.dec(); }
    bool dec_hold()  { return -1 == --hold; }
    inline bool dec_hold_and_delete();
-   void inc_hold()  { ++hold; }
+   void inc_hold()  { hold.inc(); }
    bool is_unique() const  // !!  need to analyse threading issues
       { return owned_count == 1 && unowned_count == 0; }
    CLASSICS_EXPORT void check_no_baro();

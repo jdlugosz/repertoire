@@ -4,6 +4,8 @@
 
 #define CLASSICS_EXPORT __declspec(dllexport)
 
+#pragma warning (disable: 4018)
+
 #include "classics\new.h"
 #include "classics\ustring.h"
 #include "classics\string_ios.h"
@@ -118,6 +120,7 @@ struct std_string_support : public ustring::awareness_t {
     return s->size();
     }
  
+ 
    const void* read_data (const void* st, int start, int& len) const
     {
     const std::basic_string<T>* s= static_cast<const std::basic_string<T>*>(st);
@@ -129,6 +132,7 @@ struct std_string_support : public ustring::awareness_t {
     return start + s->data();
     }
  
+
    void write_data (void* st, int start, int len, const void* rawdata) const
     {
     std::basic_string<T>* s= static_cast<std::basic_string<T>*>(st);
@@ -222,14 +226,14 @@ literal_string_support<wchar_t>::literal_string_support()
 template<>
 int literal_string_support<char>::length (const void* st) const
  {
- const T* s= static_cast<const T*>(st);
+ const char* s= static_cast<const char*>(st);
  return strlen(s);
  }
 
 template<>
 literal_string_support<wchar_t>::length (const void* st) const
  {
- const T* s= static_cast<const T*>(st);
+ const wchar_t* s= static_cast<const wchar_t*>(st);
  return wcslen(s);
  }
 

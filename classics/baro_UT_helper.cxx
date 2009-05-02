@@ -8,6 +8,9 @@
 #include "ratwin\tasking\CriticalSection.h"
 #include "ratwin\utilities.h"
 #include "classics\exception.h"
+#if _MSC_VER == 1310
+   #pragma warning( disable : 4348 )  // Microsoft's std headers don't clean compile!
+#endif
 #include <iostream>
 
 using std::cout;
@@ -90,7 +93,7 @@ classics::atomic_counter<int> test_object::instances= 0;
 
 test_object::~test_object()
  {
- logit (log_t::destruct, get_lifetime_object());
+ logit (log_t::destruct, get_lifetime_object_for_unit_test());
  --instances; 
  }
 

@@ -106,12 +106,85 @@ void test4()
  
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
+struct staticbase
+ {
+ static int dummy;
+ };
+
+int staticbase::dummy= 0;
+
+static int sequence= 0;
+
+class member {
+public:
+   int val;
+   member (int x) : val (x) {}
+   void operator= (const member& other) { /* does not change value */ }
+   };
+   
+template <typename T>
+class testclass : public T {
+   member s1;
+   member s2;
+public:
+   testclass();
+   bool check();
+   };
+
+template <typename T>
+testclass<T>::testclass()
+ : s1(sequence), s2(sequence)
+ { ++sequence; }
+
+
+template <typename T>
+bool testclass<T>::check()
+ {
+ return (s1.val != s2.val);
+ }
+ 
+void test5()
+// test for mixin assignment bug
+ {
+ cout << "Test 5 -- mixin assignment compiler bug" << endl;
+ testclass<staticbase> v1;
+ testclass<staticbase> v2;
+ v1= v2;
+ if (v1.check()) {
+    bool workaround= true;
+    cout << "Note: Detected compiler bug!!\n";
+    testclass<classics::pool_mixin<double> > v3, v4;
+    v3= v4;
+    if (v3.check()) {
+       ++errorcount;
+       workaround= false;
+       cout << "Failed 5.1 (pool_mixin doesn't work-around compiler bug)\n";
+       }
+    testclass<classics::ts_pool_mixin<double> > v5, v6;
+    v5= v6;
+    if (v5.check()) {
+       ++errorcount;
+       workaround= false;
+       cout << "Failed 5.2 (ts_pool_mixin doesn't work-around compiler bug)\n";
+       }
+    if (workaround) {
+       cout << "pool_mixin and ts_pool_mixin work-around the compiler bug OK.\n";
+       }
+    }
+ else {
+    cout << "Did not detect compiler bug (great!)\n";
+    }
+ }
+ 
+/* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
+
 int main()
  {
  test1();
  test2();
  test3();
  test4();
+ test5();
  if (errorcount)  cout << "** There were " << errorcount << " errors detected." << endl;
  else cout << "All tests passed." << endl;
  return 0;

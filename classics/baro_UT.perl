@@ -1,8 +1,10 @@
-#!perl -w
+use warnings;
+
+my $helper= ($ARGV[0] || "baro_UT_helper.exe");
 
 print "Tests baro semantics by invoking baro_UT_helper.cxx and analysing the results.\n";
-open INFILE, "baro_UT_helper + |"
-   or die "Cannot spawn baro_UT_helper.  use current directory, put it on the PATH, or change this line. ";
+open INFILE, qq("$helper" + |)
+   or die "Cannot spawn baro_UT_helper.  Use current directory, put it on the PATH, give it as an argument, or change this line. ";
 $errorcount= 0;
 while (<INFILE>) {  #for each line of input
    my $thd;  #I don't use this value for anything.
@@ -33,5 +35,5 @@ while (<INFILE>) {  #for each line of input
    }
 print "$linenum records processed.\n";
 if ($errorcount==0) {   print "Looks OK.\n";   }
-else { print "no errors detected.\n"; }
+else { die "$errorcount errors detected.\n"; }
 

@@ -1,0 +1,28 @@
+// The Repertoire Project copyright 2002 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
+// File: ratwin\COM\IParseDisplayName.h
+// Revision: fresh
+
+#pragma once
+
+#include "ratwin\COM\IUnknown.h"
+
+STARTWRAP
+namespace ratwin {
+
+struct __declspec(uuid("0000000f-0000-0000-C000-000000000046")) IMoniker;
+struct __declspec(uuid("0000000e-0000-0000-C000-000000000046")) IBindCtx;
+
+struct __declspec(uuid("0000011a-0000-0000-C000-000000000046")) __declspec(novtable)
+IParseDisplayName : public IUnknown {
+   virtual HRESULT __stdcall ParseDisplayName (
+      /* [unique][in] */ const IBindCtx* pbc,
+      /* [in, string] */ const wchar_t* pszDisplayName,
+      /* [out] */ ulong* pchEaten,
+      /* [out] */ IMoniker** ppmkOut) = 0;
+
+   };
+
+}
+ENDWRAP
+
+

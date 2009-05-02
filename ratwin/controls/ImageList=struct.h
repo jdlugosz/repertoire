@@ -3,7 +3,7 @@
 // Revision: new
 
 #pragma once
-#include "ratwin\controls\basic.h"
+#include "ratwin\controls\basic=struct.h"
 
 STARTWRAP
 namespace ratwin {
@@ -19,11 +19,25 @@ namespace controls {
 /* ## Macro_Cloak_Def (ratwin::controls)
    ILC_COLOR ILC_COLORDDB ILC_COLOR4 ILC_COLOR8 ILC_COLOR16 ILC_COLOR24 ILC_COLOR32    
    IMAGE_BITMAP IMAGE_ICON IMAGE_CURSOR IMAGE_ENHMETAFILE
-
-
-
-
 */
+// ## BEGIN MacroCloak Generated Code
+#if defined (ILC_COLOR)
+// if one of these is defined, user included WINDOWS.H first.
+#pragma message ("WINDOWS.H was included before " __FILE__ ", changing macros to enums.")
+#define DIDTHAT_856a80c0_4ba5_11d4_8e10_0006296222ef      //remember for later.
+#undef ILC_COLOR
+#undef ILC_COLORDDB
+#undef ILC_COLOR4
+#undef ILC_COLOR8
+#undef ILC_COLOR16
+#undef ILC_COLOR24
+#undef ILC_COLOR32
+#undef IMAGE_BITMAP
+#undef IMAGE_ICON
+#undef IMAGE_CURSOR
+#undef IMAGE_ENHMETAFILE
+#endif
+// ## END Generated Code
 
 typedef types::internal::HIMAGELIST_struct* HIMAGELIST;
 
@@ -49,4 +63,20 @@ enum LoadImage_type {  // parameter for ImageList_LoadImage
 ENDWRAP
 
 // ## Macro_Cloak_After
+// ## BEGIN MacroCloak Generated Code
+#if defined DIDTHAT_856a80c0_4ba5_11d4_8e10_0006296222ef
+#undef DIDTHAT_856a80c0_4ba5_11d4_8e10_0006296222ef
+using ratwin::controls::ILC_COLOR;
+using ratwin::controls::ILC_COLORDDB;
+using ratwin::controls::ILC_COLOR4;
+using ratwin::controls::ILC_COLOR8;
+using ratwin::controls::ILC_COLOR16;
+using ratwin::controls::ILC_COLOR24;
+using ratwin::controls::ILC_COLOR32;
+using ratwin::controls::IMAGE_BITMAP;
+using ratwin::controls::IMAGE_ICON;
+using ratwin::controls::IMAGE_CURSOR;
+using ratwin::controls::IMAGE_ENHMETAFILE;
+#endif
+// ## END Generated Code
 

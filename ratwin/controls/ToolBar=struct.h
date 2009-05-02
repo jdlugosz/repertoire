@@ -5,7 +5,7 @@
 // See also ratwin\controls\ToolBar_stock_bitmaps=struct.h
 
 #pragma once
-#include "ratwin\controls\basic.h"
+#include "ratwin\controls\basic=struct.h"
 #include "ratwin\WM_constants.h"  // need NMHDR.  Should move that.
 
 STARTWRAP
@@ -40,26 +40,13 @@ namespace controls {
    BTNS_BUTTON BTNS_SEP BTNS_CHECK BTNS_GROUP BTNS_CHECKGROUP BTNS_DROPDOWN
    BTNS_AUTOSIZE BTNS_NOPREFIX BTNS_SHOWTEXT BTNS_WHOLEDROPDOWN
    TBSTYLE_EX_DRAWDDARROWS TBSTYLE_EX_MIXEDBUTTONS TBSTYLE_EX_HIDECLIPPEDBUTTONS
-
-
-
-
-
-   
+   TBN_FIRST TBN_DROPDOWN TBN_GETINFOTIP NMTBGETINFOTIP
    */
 // ## BEGIN MacroCloak Generated Code
-#if defined (TBSTYLE_BUTTON)
+#if defined (TBSTYLE_TOOLTIPS)
 // if one of these is defined, user included WINDOWS.H first.
 #pragma message ("WINDOWS.H was included before " __FILE__ ", changing macros to enums.")
 #define DIDTHAT_856a80c0_4ba5_11d4_8e10_0006296222ef      //remember for later.
-#undef TBSTYLE_BUTTON
-#undef TBSTYLE_SEP
-#undef TBSTYLE_CHECK
-#undef TBSTYLE_GROUP
-#undef TBSTYLE_CHECKGROUP
-#undef TBSTYLE_DROPDOWN
-#undef TBSTYLE_AUTOSIZE
-#undef TBSTYLE_NOPREFIX
 #undef TBSTYLE_TOOLTIPS
 #undef TBSTYLE_WRAPABLE
 #undef TBSTYLE_ALTDRAG
@@ -160,6 +147,30 @@ namespace controls {
 #undef TB_ADDBUTTONSW
 #undef TB_HITTEST
 #undef TB_SETDRAWTEXTFLAGS
+#undef TBIF_IMAGE
+#undef TBIF_TEXT
+#undef TBIF_STATE
+#undef TBIF_STYLE
+#undef TBIF_LPARAM
+#undef TBIF_COMMAND
+#undef TBIF_SIZE
+#undef BTNS_BUTTON
+#undef BTNS_SEP
+#undef BTNS_CHECK
+#undef BTNS_GROUP
+#undef BTNS_CHECKGROUP
+#undef BTNS_DROPDOWN
+#undef BTNS_AUTOSIZE
+#undef BTNS_NOPREFIX
+#undef BTNS_SHOWTEXT
+#undef BTNS_WHOLEDROPDOWN
+#undef TBSTYLE_EX_DRAWDDARROWS
+#undef TBSTYLE_EX_MIXEDBUTTONS
+#undef TBSTYLE_EX_HIDECLIPPEDBUTTONS
+#undef TBN_FIRST
+#undef TBN_DROPDOWN
+#undef TBN_GETINFOTIP
+#undef NMTBGETINFOTIP
 #endif
 // ## END Generated Code
 
@@ -266,6 +277,13 @@ struct NMTOOLBAR : public WM_constants::NMHDR {
    types::RECT rcButton;
    };
 
+template <typename CharT>
+struct NMTBGETINFOTIP : public WM_constants::NMHDR {
+   CharT* pszText;
+   int cchTextMax;
+   int iItem;
+   unsigned long lParam;
+   };
 
  enum Toolbar_Messages {
  // used with msg parameter of SendMessage to Toolbar windows
@@ -357,12 +375,16 @@ struct NMTOOLBAR : public WM_constants::NMHDR {
     TB_SETINSERTMARKCOLOR   ,
     TB_GETINSERTMARKCOLOR   ,
     TB_MAPACCELERATORW,    //(90) wParam == ch, lParam int * pidBtn
-
+    // requires v5.80 or later (i.e. IE5 must be installed)
+    TB_GETSTRINGW,  
+    TB_GETSTRINGA  ,
     };
 
 enum Toolbar_Notifications {
+   TBN_GETINFOTIPW=    0xfffffd31,
+   TBN_GETINFOTIPA=    0xfffffd32,
+   TBN_DROPDOWN=       0xfffffd3a,
    TBN_FIRST=       0xfffffd44,  // which is actually the largest Unsigned.  Strange MicroSoft.
-   TBN_DROPDOWN=    0xfffffd3a
    };
 
 
@@ -374,14 +396,6 @@ ENDWRAP
 // ## BEGIN MacroCloak Generated Code
 #if defined DIDTHAT_856a80c0_4ba5_11d4_8e10_0006296222ef
 #undef DIDTHAT_856a80c0_4ba5_11d4_8e10_0006296222ef
-using ratwin::controls::TBSTYLE_BUTTON;
-using ratwin::controls::TBSTYLE_SEP;
-using ratwin::controls::TBSTYLE_CHECK;
-using ratwin::controls::TBSTYLE_GROUP;
-using ratwin::controls::TBSTYLE_CHECKGROUP;
-using ratwin::controls::TBSTYLE_DROPDOWN;
-using ratwin::controls::TBSTYLE_AUTOSIZE;
-using ratwin::controls::TBSTYLE_NOPREFIX;
 using ratwin::controls::TBSTYLE_TOOLTIPS;
 using ratwin::controls::TBSTYLE_WRAPABLE;
 using ratwin::controls::TBSTYLE_ALTDRAG;
@@ -482,6 +496,30 @@ using ratwin::controls::TB_INSERTBUTTONW;
 using ratwin::controls::TB_ADDBUTTONSW;
 using ratwin::controls::TB_HITTEST;
 using ratwin::controls::TB_SETDRAWTEXTFLAGS;
+using ratwin::controls::TBIF_IMAGE;
+using ratwin::controls::TBIF_TEXT;
+using ratwin::controls::TBIF_STATE;
+using ratwin::controls::TBIF_STYLE;
+using ratwin::controls::TBIF_LPARAM;
+using ratwin::controls::TBIF_COMMAND;
+using ratwin::controls::TBIF_SIZE;
+using ratwin::controls::BTNS_BUTTON;
+using ratwin::controls::BTNS_SEP;
+using ratwin::controls::BTNS_CHECK;
+using ratwin::controls::BTNS_GROUP;
+using ratwin::controls::BTNS_CHECKGROUP;
+using ratwin::controls::BTNS_DROPDOWN;
+using ratwin::controls::BTNS_AUTOSIZE;
+using ratwin::controls::BTNS_NOPREFIX;
+using ratwin::controls::BTNS_SHOWTEXT;
+using ratwin::controls::BTNS_WHOLEDROPDOWN;
+using ratwin::controls::TBSTYLE_EX_DRAWDDARROWS;
+using ratwin::controls::TBSTYLE_EX_MIXEDBUTTONS;
+using ratwin::controls::TBSTYLE_EX_HIDECLIPPEDBUTTONS;
+using ratwin::controls::TBN_FIRST;
+using ratwin::controls::TBN_DROPDOWN;
+using ratwin::controls::TBN_GETINFOTIP;
+using ratwin::controls::NMTBGETINFOTIP;
 #endif
 // ## END Generated Code
 

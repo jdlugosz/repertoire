@@ -117,7 +117,7 @@ generic_string<CharT> basic_stringbuf<CharT>::eject()
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
 template <typename CharT>
-basic_stringbuf<CharT>::int_type basic_stringbuf<CharT>::overflow (int_type c)
+typename basic_stringbuf<CharT>::int_type basic_stringbuf<CharT>::overflow (int_type c)
  {
  int current_size= s.elcount();
  const int newsize= current_size + growsize;

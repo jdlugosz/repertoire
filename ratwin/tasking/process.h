@@ -11,6 +11,7 @@
 // DLL imports "cloaked" for overloading
 extern "C" {
 __declspec(dllimport) Dlugosz::ratwin::arg::arg32 __stdcall GetCurrentProcess();
+__declspec(dllimport) Dlugosz::ratwin::arg::arg32 __stdcall GetCurrentProcessId();
 __declspec(dllimport) unsigned long __stdcall GetModuleFileNameA (Dlugosz::ratwin::arg::arg32, char*, unsigned long);
 __declspec(dllimport) unsigned long __stdcall GetModuleFileNameW (Dlugosz::ratwin::arg::arg32, wchar_t*, unsigned long);
 __declspec(dllimport) int __stdcall CreateProcessA (
@@ -85,6 +86,10 @@ struct STARTUPINFO {
 inline
 types::HANDLE GetCurrentProcess()
  { return reinterpret_cast<types::HANDLE>(::GetCurrentProcess()); }
+
+inline
+unsigned GetCurrentProcessId()
+ { return reinterpret_cast<unsigned>(::GetCurrentProcessId()); }
 
 inline
 ulong GetModuleFileName (types::HMODULE module, char* outbuf, ulong outbufsize)

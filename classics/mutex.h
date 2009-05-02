@@ -23,7 +23,7 @@ public:
    void operator= (const mutex&);  //never defined
 public:
    CLASSICS_EXPORT mutex (bool blocked=false);
-   CLASSICS_EXPORT mutex (const ustring& name, bool blocked=false);
+   CLASSICS_EXPORT mutex (const ustring& name, bool blocked=false, ratwin::types::SECURITY_ATTRIBUTES* sa=0);
    CLASSICS_EXPORT ~mutex();
    void enter()  { wait(); }
    bool try_enter() { return wait(0); }

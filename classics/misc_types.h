@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include "ratwin\base.h"
+
 STARTWRAP
 namespace classics {
 

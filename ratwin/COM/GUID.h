@@ -1,6 +1,6 @@
 // The Repertoire Project copyright 1999 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: ratwin\COM\GUID.h
-// Revision: public build 6, shipped on 28-Nov-1999
+// Revision: post-public build 6, modified May 2002 or later
 
 #pragma once
 #include "ratwin\base.h"
@@ -11,6 +11,12 @@
 // specifically, the intrinsic __guid operator returns a ::_GUID value.
 #ifndef GUID_DEFINED
 #define GUID_DEFINED
+#if 0
+// This is the REAL structure of a GUID.  MS changed it, not showing
+// the bit-fields.  Because ATL and other code also uses aggregate
+// initializers rather than a MK_GUID macro or the compiler intrinsic,
+// I'm using MS's definition.  The original one is preserved here for
+// those who really want to know the details.
 struct _GUID {
    unsigned __int32      time_low;
    unsigned __int16      time_mid;
@@ -21,7 +27,17 @@ struct _GUID {
    unsigned __int8       clock_seq_low;
    unsigned __int8       node[6];
 };
-
+#else
+// changed to this form May 2002, will be in PB7.
+struct _GUID {
+   unsigned __int32      time_low;
+   unsigned __int16      time_mid;
+   unsigned __int16      time_hi_and_version;
+   unsigned __int8       clock_seq_hi_and_reserved;
+   unsigned __int8       clock_seq_low;
+   unsigned __int8       node[6];
+};
+#endif
 
 #endif /* GUID_DEFINED */
 
@@ -37,6 +53,7 @@ unsigned __stdcall CoCreateGuid (_GUID*);
 
 class GUID : public _GUID {
 public:
+   GUID() {}  // does nothing.
    GUID (const _GUID& x) : _GUID(x) {}  // implicit conversion
    inline int to_string (wchar_t* dest, int destsize) const;  //returns chars used including terminating NUL.
    inline void generate();

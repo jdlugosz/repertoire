@@ -1,6 +1,6 @@
 // The Repertoire Project copyright 1999 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: classics\auto_COM_ptr.h
-// Revision: public build 6, shipped on 28-Nov-1999
+// Revision: updated
 
 #pragma once
 
@@ -13,7 +13,6 @@ namespace classics {
 template <typename T>
 class auto_COM_ptr {
    T* p;
-   void operator= (const auto_COM_ptr&);  //never defined
 public:
    auto_COM_ptr() : p(0) {}
    ~auto_COM_ptr() { reset(); }
@@ -23,7 +22,8 @@ public:
    // repeat myself because...
    template<> auto_COM_ptr (const auto_COM_ptr& other)
       : p(other.get()) { if(p)  p->AddRef(); }
-   
+   void operator= (const auto_COM_ptr& other)
+      { if (p!=other.p)  { reset(other.p); if(p) p->AddRef(); } }
    void reset (T* newvalue=0) { if(p) p->Release(); p=newvalue; }
    T* get() const  { return p; }
    T* operator-> () const  { return p; }

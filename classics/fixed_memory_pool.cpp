@@ -1,11 +1,12 @@
 // The Repertoire Project copyright 2001 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: classics\fixed_memory_pool.cpp
-// Revision: post-public build 6
+// Revision: post-public build 6, updated 21 May 2004.
 
 #define CLASSICS_EXPORT __declspec(dllexport)
 
 #include "classics\new.h"
 #include "classics\fixed_memory_pool.h"
+#include "classics\exception.h"
 
 STARTWRAP
 namespace classics {
@@ -40,6 +41,7 @@ static_fixed_memory_pool::~static_fixed_memory_pool()
 
 void static_fixed_memory_pool::newchunk()
  {
+ cumulative_size += Chunksize;
  int blocksize= Recsize*Chunksize;
  int totalsize= blocksize + sizeof(chunk);  //note: alignment not considered.
  byte* top= static_cast<byte*>(new byte[totalsize]);
@@ -85,6 +87,15 @@ bool static_fixed_memory_pool::check_address (const void* p) const
 
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
  
+bool static_fixed_memory_pool::check_heap()
+ {
+ for (node* p= nodelist;  p;  p=p->next)
+    if (!check_address (p)) return false;
+ return true;  // all OK.
+ }
+
+/* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
+ 
 void* static_fixed_memory_pool::alloc (int size)
  {
  if (size != Recsize) {
@@ -94,7 +105,10 @@ void* static_fixed_memory_pool::alloc (int size)
        if (Chunksize == 0)  Chunksize= 16;  //use a meaningful default
        }
     else {  // a real error
-       // >> error throw goes here.
+       exception X ("Classics", "Invalid call", __FILE__, __LINE__);
+       // if you get this error, it probably means that a derived class is calling the operator new defined
+       // in a base class, and this code is only for objects that are all the same size.
+       throw X;
        }
     }
  if (!nodelist)  newchunk();  //repopulate the free list
@@ -133,6 +147,7 @@ void* ts_static_fixed_memory_pool::alloc (int size)
     // first time through.  Must self-initialize, because this may be used by
     // constructors before static variables are constructed.
     cs= new critical_section;
+    // >> but beware of race condition on (only) the first call.
     }
  critical_section::locker lock (*cs);
  return static_fixed_memory_pool::alloc (size);
@@ -142,11 +157,14 @@ void* ts_static_fixed_memory_pool::alloc (int size)
 
 void ts_static_fixed_memory_pool::free (void* p)
  {
+#if 0
  if (!cs) {
     // first time through.  Must self-initialize, because this may be used by
     // constructors before static variables are constructed.
     cs= new critical_section;
     }
+ // should not call free without calling alloc first!
+#endif
  critical_section::locker lock (*cs);
  static_fixed_memory_pool::free (p);
  }

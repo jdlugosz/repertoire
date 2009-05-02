@@ -45,19 +45,22 @@ public:
    void* iaccess (int index);  //internal access
    CLASSICS_EXPORT void* raccess (int index, int len);  // range access
    void* get_buffer() { return Data; }
+   const void* get_buffer() const { return Data; }
    void debug_print() const;
    void debug_snoop (snoop_t&) const;
    virtual data_t* clone() const =0;
    virtual data_t* clone_empty (int reserve) const =0;
    data_t* resize_duplicate (int newsize);
    int elcount() const  { return Count; }
+   int elcapacity() const { return Capacity; }
    CLASSICS_EXPORT void put (const void* data, int count, int startpos);
    CLASSICS_EXPORT void get (void* data, int count, int startpos) const;
    CLASSICS_EXPORT void truncate (int newsize);
    CLASSICS_EXPORT void reserve (int newsize);
-   CLASSICS_EXPORT virtual void* prep_result (int size, int capacity);
    CLASSICS_EXPORT virtual void* resize (int size, int capacity);
-   CLASSICS_EXPORT void splice_result (const void* old, int len, int pos, int dellen, const void* data, int datalen);
+   bool same_object (int pos, const void* data, int datalen) const;
+   void splice_result (const void* old, int len, int pos, int dellen, const void* data, int datalen);
+   void splice_result_inplace (int pos, int dellen, const void* data, int datalen);
    };
 
 //////////////////////////////////////////////////
@@ -103,7 +106,7 @@ void g_data_t<T>::initialize_elements (void* dest_raw, int count) const
  {
  T* dest= static_cast<T*>(dest_raw);
  for (int loop= 0;  loop < count;  loop++) {
-    new (dest++) T;
+    ::new (dest++) T();  // JMD 2-Sept-2003  Compilers before VC++7.1 initialized even without the () initializer on POD types.  Put in () to keep behavior of known initialization to zero.
     }
  }
 
@@ -113,7 +116,7 @@ void g_data_t<T>::initialize_elements (void* dest_raw, const void* src_raw, int 
  T* dest= static_cast<T*>(dest_raw);
  const T* src= static_cast<const T*>(src_raw);
  for (int loop= 0;  loop < count;  loop++) {
-    new (dest++) T (*src++);
+    ::new (dest++) T (*src++);
     }
  }
  
@@ -122,21 +125,42 @@ void g_data_t<T>::copy_elements (void* dest_raw, const void* src_raw, int count)
  {
  T* dest= static_cast<T*>(dest_raw);
  const T* src= static_cast<const T*>(src_raw);
+ if (dest < src) {  // in case they overlap...
+    // copy left-to-right
  for (int loop= 0;  loop < count;  loop++) {
     *dest++ = *src++;  //assignment
+    }
+ }
+ else {  // copy right-to-left
+    dest += count;
+    src += count;
+    for (int loop= 0;  loop < count;  loop++) {
+       *--dest = *--src;  // assignment
+       }
     }
  }
  
 template <class T>
 void g_data_t<T>::move_elements (void* dest_raw, void* src_raw, int count) const
  {
- // >> needs to handle overlapping elements!
  T* dest= static_cast<T*>(dest_raw);
  T* src= static_cast<T*>(src_raw);
+ if (dest < src) {  // in case they overlap...
+    // copy left-to-right
  for (int loop= 0;  loop < count;  loop++) {
-    new (dest++) T (*src);  //duplicate at new position
+       ::new (dest++) T (*src);  //duplicate at new position
     src->T::~T();  //destroy the old
     ++src;
+    }
+ }
+ else {  // copy right-to-left
+    dest += count;
+    src += count;
+    for (int loop= 0;  loop < count;  loop++) {
+       --src;
+       ::new (--dest) T (*src);  //duplicate at new position
+       src->T::~T();  //destroy the old
+       }
     }
  }
 
@@ -253,7 +277,7 @@ public:
    CLASSICS_EXPORT void debug_snoop (snoop_t& results) const  { data.debug_snoop(results); }
    void truncate (int newsize) { get_unique_core().truncate (newsize); }
    CLASSICS_EXPORT void resize (int newsize);
-   void reserve (int newsize) { get_core().reserve (newsize); }
+   void reserve (int new_capacity) { get_core().reserve (new_capacity); }
    int elcount() const { return get_core().elcount(); }
    void remove (int pos, int len=1)
       { replace (pos, len, 0,0); }
@@ -287,10 +311,13 @@ public:
       { nt_base::replace (pos, lendel, data, buflen); }
    void replace (int pos, int lendel, const vararray<T>& other, int frompos, int fromlen)
       { nt_base::replace (pos, lendel, other.raccess(frompos, fromlen), fromlen); }
+   void replace_all (const T* data, int datacount)  // like an assignment
+      { nt_base::replace (0, elcount(), data, datacount); }
    int append (const T& x)  { int pos= elcount(); replace (pos, 0, &x, 1); return pos; }
    void append (const vararray<T>& other, int frompos, int fromlen)
       { replace (elcount(), 0, other, frompos, fromlen); }
    int sorted_insert (const T& value, int (*compare)(const T&, const T&));
+   int sorted_insert (const T& value, int starting, int (*compare)(const T&, const T&));
    class iterator;
    };
 
@@ -338,6 +365,36 @@ int vararray<T>::sorted_insert (const T& value, int (*compare)(const T&, const T
  return loop+1;
  }
 
+template <typename T>
+int vararray<T>::sorted_insert (const T& value, int starting, int (*compare)(const T&, const T&))
+ {
+ if (starting >= elcount())  starting= elcount()-1;
+ else if (starting < 0)  starting= 0;
+ for (int loop= starting;  loop >= 0;  loop--)
+    if (compare (get_at(loop), value) <= 0)  break;
+ replace (loop+1, 0, &value, 1);
+ return loop+1;
+ }
+
+template <typename ElementT, typename KeyT>
+int binary_search (const vararray<ElementT>& A, const KeyT& searchkey, int (*compare)(const ElementT&, const KeyT&))
+// returns index of the element, or ~H if not found
+// H is where the element should be inserted.  (ones complement used instead of 2's complement to avoid "negative zero")
+ {
+ int low= -1;
+ int high= A.elcount();
+ for (;;) {
+    int mid= (high+low) >> 1;  // note: >>1 not the same as /2 for negative numbers!
+    if (mid == low)  return ~high;
+    int compr= compare(A.get_at(mid), searchkey);
+    if (compr==0)  return mid;  // found it!
+    if (compr > 0) // A[mid] is too high.  Look lower
+       high= mid;
+    else // must be <0.  A[mid] is too low.  Look higher
+       low= mid;
+    }
+ }
+
 //////////////////////////////////////////////////
 
 template <class T>
@@ -369,11 +426,11 @@ template <class T>
 g_data_t<T>* vararray_g<T>::make_the_empty()
  {
  static dynalloc_reservation<g_data_t<T> > placement;
- g_data_t<T>* p= new (placement) g_data_t<T>;
+ g_data_t<T>* p= ::new (placement) g_data_t<T>;
  static dynalloc_reservation<lifetime> life_placement;
  lifetime* life= ::new(life_placement) lifetime;
  life->clear();
- life->owned_count ++;
+ life->inc_owned_count();
  p->set_lifetime_object(life);
  return p;
  }
@@ -397,7 +454,7 @@ vararray_g<T>::vararray_g (int elcount, int capacity)
 
 template <class T>
 vararray_g<T>::vararray_g (const T* data, int elcount)
- : vararray<T> new (/*vararray_internal::*/g_data_t<T> (elcount, data))
+ : vararray<T> (new /*vararray_internal::*/g_data_t<T> (elcount, data))
  { }
 
 
@@ -434,9 +491,9 @@ s_data_t* vararray_s<T>::make_the_empty()
  static dynalloc_reservation<lifetime> life_placement;
  lifetime* life= ::new (life_placement) lifetime();
  static dynalloc_reservation<s_data_t> placement;
- s_data_t* p= new (placement) s_data_t (sizeof(T));
+ s_data_t* p= ::new (placement) s_data_t (sizeof(T));
  life->clear();
- life->owned_count ++;
+ life->inc_owned_count();
  p->set_lifetime_object(life);
  return p;
  }

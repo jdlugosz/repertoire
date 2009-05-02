@@ -23,20 +23,20 @@ namespace ratwin {
 namespace io {
 
 inline
-types::HANDLE
-CreateIoCompletionPort (types::HANDLE FileHandle, types::HANDLE ExistingCompletionPort, ulong CompletionKey, ulong NumberOfConcurrentThreads)
+types::Kernel_HANDLE
+CreateIoCompletionPort (types::IO_HANDLE FileHandle, types::Kernel_HANDLE ExistingCompletionPort, ulong CompletionKey, ulong NumberOfConcurrentThreads)
  {
- return reinterpret_cast<types::HANDLE>( ::CreateIoCompletionPort(reinterpret_cast<arg::arg32>(FileHandle), reinterpret_cast<arg::arg32>(ExistingCompletionPort), CompletionKey, NumberOfConcurrentThreads) );
+ return reinterpret_cast<types::Kernel_HANDLE>( ::CreateIoCompletionPort(reinterpret_cast<arg::arg32>(FileHandle), reinterpret_cast<arg::arg32>(ExistingCompletionPort), CompletionKey, NumberOfConcurrentThreads) );
  }
 
 inline
-bool GetQueuedCompletionStatus (types::HANDLE CompletionPort, ulong& NumberOfBytesTransferred, ulong& CompletionKey, OVERLAPPED** Overlapped, ulong Milliseconds)
+bool GetQueuedCompletionStatus (types::Kernel_HANDLE CompletionPort, ulong& NumberOfBytesTransferred, ulong& CompletionKey, OVERLAPPED** Overlapped, ulong Milliseconds)
  {
  return ::GetQueuedCompletionStatus (reinterpret_cast<arg::arg32>(CompletionPort), &NumberOfBytesTransferred, &CompletionKey, reinterpret_cast<arg::arg32>(Overlapped), Milliseconds);
  }
 
 inline
-bool PostQueuedCompletionStatus (types::HANDLE CompletionPort, ulong NumberOfBytesTransferred, ulong CompletionKey, OVERLAPPED* Overlapped)
+bool PostQueuedCompletionStatus (types::Kernel_HANDLE CompletionPort, ulong NumberOfBytesTransferred, ulong CompletionKey, OVERLAPPED* Overlapped)
  {
  return ::PostQueuedCompletionStatus (reinterpret_cast<arg::arg32>(CompletionPort), NumberOfBytesTransferred, CompletionKey, reinterpret_cast<arg::arg32>(Overlapped));
  }

@@ -56,7 +56,7 @@ public:
    TOMAHAWK_EXPORT virtual int pre_translate_message (const ratwin::message::MSG& msg); // 0:no clue, 1:done&ate it, 2:done&proceed
    TOMAHAWK_EXPORT virtual void on_attach();  // called when hooked.
    TOMAHAWK_EXPORT long call_old_wndproc (ratwin::message::sMSG& msg);
-   ratwin::types::HWND window_handle() { return WindowHandle; }
+   ratwin::types::HWND window_handle() const { return WindowHandle; }
    TOMAHAWK_EXPORT void set_window_handle (ratwin::types::HWND);
    TOMAHAWK_EXPORT virtual void report_error (const classics::exception&);
    };

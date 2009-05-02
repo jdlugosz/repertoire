@@ -3,7 +3,7 @@ Microsoft Developer Studio Workspace File, Format Version 6.00
 
 ###############################################################################
 
-Project: "atomic_counter_UT"=.\classics\atomic_counter_UT.dsp - Package Owner=<4>
+Project: "atomic_counter_UT"=".\classics\atomic_counter_UT.dsp" - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -18,7 +18,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "atomic_counter_benchmark"=.\classics\atomic_counter_benchmark.dsp - Package Owner=<4>
+Project: "atomic_counter_benchmark"=".\classics\atomic_counter_benchmark.dsp" - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -33,7 +33,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "atomic_read_test"=.\classics\atomic_read_test.dsp - Package Owner=<4>
+Project: "atomic_read_test"=".\classics\atomic_read_test.dsp" - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -48,7 +48,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "baro_UT_helper"=.\classics\baro_UT_helper.dsp - Package Owner=<4>
+Project: "baro_UT_helper"=".\classics\baro_UT_helper.dsp" - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -63,14 +63,10 @@ Package=<4>
 
 ###############################################################################
 
-Project: "classics"=.\classics\classics.dsp - Package Owner=<4>
+Project: "classics"=".\classics\classics.dsp" - Package Owner=<4>
 
 Package=<5>
 {{{
-    begin source code control
-    "$/repertoire/classics", DAAAAAAA
-    ..\classics
-    end source code control
 }}}
 
 Package=<4>
@@ -82,7 +78,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "closure_UT"=.\Classics\closure_UT.dsp - Package Owner=<4>
+Project: "closure_UT"=".\Classics\closure_UT.dsp" - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -97,7 +93,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "crc32_UT"=.\classics\crc32_UT.dsp - Package Owner=<4>
+Project: "crc32_UT"=".\classics\crc32_UT.dsp" - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -112,7 +108,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "dimensional_UT"=.\classics\dimensional_UT.dsp - Package Owner=<4>
+Project: "dimensional_UT"=".\classics\dimensional_UT.dsp" - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -127,7 +123,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "exception_UT"=.\classics\exception_UT.dsp - Package Owner=<4>
+Project: "exception_UT"=".\classics\exception_UT.dsp" - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -142,7 +138,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "filename_t_UT"=.\classics\filename_t_UT.dsp - Package Owner=<4>
+Project: "filename_t_UT"=".\classics\filename_t_UT.dsp" - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -157,7 +153,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "fixed_memory_pool_UT"=.\classics\fixed_memory_pool_UT.dsp - Package Owner=<4>
+Project: "fixed_memory_pool_UT"=".\classics\fixed_memory_pool_UT.dsp" - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -172,7 +168,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "flagword_UT"=.\classics\flagword_UT.dsp - Package Owner=<4>
+Project: "flagword_UT"=".\classics\flagword_UT.dsp" - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -187,7 +183,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "handle_UT"=.\classics\handle_UT.dsp - Package Owner=<4>
+Project: "handle_UT"=".\classics\handle_UT.dsp" - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -202,7 +198,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "memory_pool_benchmark"=.\Classics\memory_pool_benchmark.dsp - Package Owner=<4>
+Project: "memory_pool_benchmark"=".\Classics\memory_pool_benchmark.dsp" - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -217,14 +213,10 @@ Package=<4>
 
 ###############################################################################
 
-Project: "ratwin"=.\ratwin\ratwin.dsp - Package Owner=<4>
+Project: "message_tap_demo"=".\Tomahawk\message_tap_demo.dsp" - Package Owner=<4>
 
 Package=<5>
 {{{
-    begin source code control
-    "$/repertoire/ratwin", PAAAAAAA
-    ..\ratwin
-    end source code control
 }}}
 
 Package=<4>
@@ -232,23 +224,17 @@ Package=<4>
     Begin Project Dependency
     Project_Dep_Name classics
     End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name tomahawk
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name ratwin
+    End Project Dependency
 }}}
 
 ###############################################################################
 
-Project: "ratwin_static"=.\ratwin\ratwin_static.dsp - Package Owner=<4>
-
-Package=<5>
-{{{
-}}}
-
-Package=<4>
-{{{
-}}}
-
-###############################################################################
-
-Project: "registry_UT"=.\Classics\registry_UT.dsp - Package Owner=<4>
+Project: "ratwin"=".\ratwin\ratwin.dsp" - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -263,7 +249,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "shellrun"=.\ratwin\shellrun.dsp - Package Owner=<4>
+Project: "ratwin_static"=".\ratwin\ratwin_static.dsp" - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -275,22 +261,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "string_ios_UT"=.\classics\string_ios_UT.dsp - Package Owner=<4>
-
-Package=<5>
-{{{
-}}}
-
-Package=<4>
-{{{
-    Begin Project Dependency
-    Project_Dep_Name classics
-    End Project Dependency
-}}}
-
-###############################################################################
-
-Project: "tomahawk"=.\Tomahawk\tomahawk.dsp - Package Owner=<4>
+Project: "registry_UT"=".\Classics\registry_UT.dsp" - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -305,7 +276,19 @@ Package=<4>
 
 ###############################################################################
 
-Project: "ustring_CString_UT"=.\classics\ustring_CString_UT.dsp - Package Owner=<4>
+Project: "shellrun"=".\ratwin\shellrun.dsp" - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "string_ios_UT"=".\classics\string_ios_UT.dsp" - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -320,7 +303,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "ustring_UT"=.\classics\ustring_UT.dsp - Package Owner=<4>
+Project: "tomahawk"=".\Tomahawk\tomahawk.dsp" - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -335,7 +318,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "vararray_UT"=.\classics\vararray_UT.dsp - Package Owner=<4>
+Project: "ustring_CString_UT"=".\classics\ustring_CString_UT.dsp" - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -350,7 +333,37 @@ Package=<4>
 
 ###############################################################################
 
-Project: "virtual_key_UT"=.\Classics\virtual_key_UT.dsp - Package Owner=<4>
+Project: "ustring_UT"=".\classics\ustring_UT.dsp" - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name classics
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "vararray_UT"=".\classics\vararray_UT.dsp" - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name classics
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "virtual_key_UT"=".\Classics\virtual_key_UT.dsp" - Package Owner=<4>
 
 Package=<5>
 {{{

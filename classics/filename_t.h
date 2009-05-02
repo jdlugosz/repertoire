@@ -1,4 +1,4 @@
-// The Repertoire Project copyright 1999 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
+// The Repertoire Project copyright 2003 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: classics\filename_t.h
 // Revision: post-public build 6
 
@@ -169,7 +169,7 @@ public:
    virtual filename_t fully_qualify (const filename_t&) const =0;
    CLASSICS_EXPORT virtual filename_t directory (const ustring&) const;
    virtual void assure_path_exists (filename_t) const =0;
-   virtual int dotname (const ustring&) const;
+   CLASSICS_EXPORT virtual int dotname (const ustring&) const;
    virtual int stringcompare (const ustring& left, const ustring& right) const =0;
    CLASSICS_EXPORT virtual bool stringmatch (const ustring& left, const ustring& right) const;
    CLASSICS_EXPORT virtual filename_t temp_directory() const;

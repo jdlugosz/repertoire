@@ -21,6 +21,7 @@ __declspec(dllimport) int __stdcall SetBkMode (Dlugosz::ratwin::arg::arg32, int)
 __declspec(dllimport) Dlugosz::ratwin::arg::arg32 __stdcall CreateSolidBrush (Dlugosz::ratwin::arg::arg32);
 __declspec(dllimport) Dlugosz::ratwin::arg::arg32 __stdcall GetStockObject (Dlugosz::ratwin::arg::arg32);
 __declspec(dllimport) unsigned long __stdcall GetSysColor (Dlugosz::ratwin::arg::arg32);
+__declspec(dllimport) int __stdcall GetSysColorBrush (Dlugosz::ratwin::arg::arg32);
 __declspec(dllimport) unsigned long __stdcall SetBkColor (Dlugosz::ratwin::arg::arg32, unsigned long);
 __declspec(dllimport) int __stdcall ReleaseDC (Dlugosz::ratwin::arg::arg32, Dlugosz::ratwin::arg::arg32);
 __declspec(dllimport) Dlugosz::ratwin::arg::arg32 __stdcall GetDC (Dlugosz::ratwin::arg::arg32);
@@ -152,6 +153,9 @@ enum system_color {
 
 inline unsigned long GetSysColor (system_color color)
  { return ::GetSysColor (reinterpret_cast<arg::arg32>(color)); }
+
+inline types::HBRUSH GetSysColorBrush (system_color color)
+ { return reinterpret_cast<types::HBRUSH>( ::GetSysColorBrush (reinterpret_cast<arg::arg32>(color)) ); }
 
 inline unsigned long SetBkColor (types::HDC dc, unsigned long color)
  { return ::SetBkColor (reinterpret_cast<arg::arg32>(dc), color); }

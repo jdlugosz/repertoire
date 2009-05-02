@@ -3,6 +3,7 @@
 // Revision: post-public build 6
 
 #pragma once
+// Note: these are static.  Link with ratwin_static.lib when using these members.
 
 #include "ratwin\COM\HRESULT.h"
 

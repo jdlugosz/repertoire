@@ -1,4 +1,4 @@
-// The Repertoire Project copyright 2001 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
+// The Repertoire Project copyright 2002 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: classics\ustring.h
 // Revision: post-public build 6
 
@@ -11,6 +11,8 @@
 #include "classics\string.h"
 #include "classics\std_forward_declare.h"
 #include "classics\MFC_CString.h"
+
+class _bstr_t;  // defined in <COMUTIL.H>
 
 STARTWRAP
 namespace classics {
@@ -45,6 +47,7 @@ public:
    CLASSICS_EXPORT ustring (const wstring&);
    CLASSICS_EXPORT ustring (const std::string&);
    CLASSICS_EXPORT ustring (const std::wstring&);
+   CLASSICS_EXPORT ustring (const ::_bstr_t&);
    CLASSICS_EXPORT void construct (const MFC_CString<char>&);
    CLASSICS_EXPORT void construct (const MFC_CString<wchar_t>&);
    CLASSICS_EXPORT operator string() const;
@@ -53,6 +56,7 @@ public:
    CLASSICS_EXPORT operator std::wstring() const;
    CLASSICS_EXPORT operator MFC_CString<char>() const;
    CLASSICS_EXPORT operator MFC_CString<wchar_t>() const;
+   CLASSICS_EXPORT operator ::_bstr_t() const;
    CLASSICS_EXPORT static void* convert (const awareness_t* dest, const awareness_t* src, const void* p, void* placement=0);
    #if defined __AFX_H__
       inline operator ::CString() const;
@@ -68,6 +72,7 @@ CLASSICS_EXPORT const ustring::awareness_t* get_string_awareness (const std::str
 CLASSICS_EXPORT const ustring::awareness_t* get_string_awareness (const std::wstring*);
 CLASSICS_EXPORT const ustring::awareness_t* get_string_awareness (const MFC_CString<char>*);
 CLASSICS_EXPORT const ustring::awareness_t* get_string_awareness (const MFC_CString<wchar_t>*);
+CLASSICS_EXPORT const ustring::awareness_t* get_string_awareness (const ::_bstr_t*);
 // ... others
 
 template<typename T>

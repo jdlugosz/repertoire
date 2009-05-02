@@ -1,6 +1,6 @@
 // The Repertoire Project copyright 2001 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: ratwin\socket2.h
-// Revision: 
+// Revision:  updated 3-August-2003 or later
 
 #pragma once
 #if defined RATWIN_NoGlobals
@@ -25,7 +25,7 @@ int __stdcall getsockopt (::Dlugosz::ratwin::arg::arg32 s, int level, int optnam
 /**/ unsigned long __stdcall htonl (unsigned long hostlong);
 unsigned short __stdcall htons (unsigned short hostshort);
 /**/ unsigned long __stdcall inet_addr (const char * cp);
-//char * __stdcall inet_ntoa (struct in_addr in);
+char * __stdcall inet_ntoa (::Dlugosz::ratwin::arg::arg32 s);
 ::Dlugosz::ratwin::arg::arg32 __stdcall gethostbyname (::Dlugosz::ratwin::arg::carg32);
 int __stdcall gethostname (::Dlugosz::ratwin::arg::arg32, int namelen);
 int __stdcall listen (::Dlugosz::ratwin::arg::arg32 s, int backlog);
@@ -85,7 +85,17 @@ inline unsigned short htons (ushort hostshort)
  { return ::htons (hostshort); }
  
 unsigned long inet_addr (const char* cp);
-//char * inet_ntoa (struct in_addr in);
+
+inline char * inet_ntoa (const sockaddr* address)
+/*  This is friendlier than the Windows original because it takes the whole sockaddr.
+This code assumes an IP4 address without checking the family.
+*/
+   {
+   const sockaddr_in* A= reinterpret_cast<const sockaddr_in*>(address):
+   const unsigned __int32* addr32= reinterpret_cast<const unsigned __int32*>(A->ipaddr);
+   return ::inet_ntoa (reinterpret_cast<arg::arg32>( *addr32 ));
+   }
+   
 inline int listen (SOCKET s, int backlog)
   { return ::listen (reinterpret_cast<arg::arg32>(s), backlog); }
 unsigned long ntohl (ulong netlong);

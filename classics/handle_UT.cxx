@@ -670,6 +670,7 @@ void test8()
     ++errorcount;
     cout << "** FAILED **"<< endl;
     }
+ classics::lifetime::pool.callback= 0;  // revoke test8_callback
  }
 
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
@@ -684,6 +685,7 @@ int main (int argc, char* argv[])
     //classics::lifetime::pool.callback= callback;
     // un-comment above line for additional verboseness in troubleshooting
 //    classics::lifetime::pool.callback= fmp_friendly_callback;  // another one.
+// note: test8 uses a callback as part of the test.  May need to disable test8 if using these global callbacks.
     // all "perminant" lifetime objects are created by this point, so now note how many.
     usecount=  classics::lifetime::get_pool_use_count();
     test2();
@@ -698,6 +700,8 @@ int main (int argc, char* argv[])
     check_leaks();
     #if !defined NOTHREAD
        test7();
+    #else
+     cout << "test 7 -- theading test disabled." << endl;
        #endif
     test8();
     check_leaks();

@@ -32,15 +32,15 @@ namespace ratwin {
 namespace io {
 
 inline
-bool CreatePipe (types::HANDLE& read, types::HANDLE& write, ulong size)
+bool CreatePipe (types::IO_HANDLE& read, types::IO_HANDLE& write, ulong size)
  { return ::CreatePipe (reinterpret_cast<arg::arg32>(&read), reinterpret_cast<arg::arg32>(&write), 0, size); }
 
 inline
-bool CreatePipe (types::HANDLE& read, types::HANDLE& write, const types::SECURITY_ATTRIBUTES& sa, ulong size)
+bool CreatePipe (types::IO_HANDLE& read, types::IO_HANDLE& write, const types::SECURITY_ATTRIBUTES& sa, ulong size)
  { return ::CreatePipe (reinterpret_cast<arg::arg32>(&read), reinterpret_cast<arg::arg32>(&write), &sa, size); }
 
 inline
-ratwin::types::HANDLE CreateNamedPipe (
+ratwin::types::IO_HANDLE CreateNamedPipe (
     const char* name,
     ulong open_mode,
     ulong pipe_mode,
@@ -50,9 +50,9 @@ ratwin::types::HANDLE CreateNamedPipe (
     ulong default_time_out,
     void* SecurityAttributes
     )
- { return reinterpret_cast<ratwin::types::HANDLE>(::CreateNamedPipeA (name, open_mode, pipe_mode, max_instances, out_buffer_size, in_buffer_size, default_time_out, 0)); }
+ { return reinterpret_cast<ratwin::types::IO_HANDLE>(::CreateNamedPipeA (name, open_mode, pipe_mode, max_instances, out_buffer_size, in_buffer_size, default_time_out, 0)); }
 
-inline bool ConnectNamedPipe (types::HANDLE h, OVERLAPPED* ov)
+inline bool ConnectNamedPipe (types::IO_HANDLE h, OVERLAPPED* ov)
  { return ::ConnectNamedPipe (reinterpret_cast<arg::arg32>(h), ov); }
 
 

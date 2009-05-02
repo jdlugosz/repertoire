@@ -9,7 +9,14 @@
 #pragma once
 #include "classics\string.h"
 #include "classics\exception.h"
-#include <iostream>
+#if _MSC_VER == 1310
+   #pragma warning (push)
+   #pragma warning( disable : 4348 )  // Microsoft's std headers don't clean compile!
+   #include <iostream>
+   #pragma warning (pop)
+#else   // no big deal.
+   #include <iostream>
+#endif
 
 STARTWRAP
 namespace classics {
@@ -108,6 +115,18 @@ class generic_Fmt : public basic_ostringstream<CharT> {
 public:
    generic_Fmt (generic_string<CharT>& S) : S (S, alias) {}
    ~generic_Fmt()  { S += eject(); }
+#if ! defined _MSC_VER || _MSC_VER >= 1310
+// leave these lines out of VC++ prior to 7.1.  Lines are in by default on new configurations.
+   using basic_ostringstream<CharT>::operator<<;
+   template <class T>
+      std::basic_ostream<CharT>& operator<< (T object)
+         { return ::std::operator<< (*this, object); }
+   // shouldn't the following need 'template<>' before them?  The explicit specialization seems to be ignored!  Doing it this way works on VC++7.1.
+   std::basic_ostream<CharT>& operator<< (const string& object)
+      { return ::classics::operator<< (*this, object); }
+   std::basic_ostream<CharT>& operator<< (const wstring& object)
+      { return ::classics::operator<< (*this, object); }
+#endif
    };
 
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */

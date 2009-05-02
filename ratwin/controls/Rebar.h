@@ -4,7 +4,7 @@
 
 #pragma once
 #if defined RATWIN_NoGlobals
-   #error contains globals.
+   #error ratwin\controls\Rebar.h contains globals.  Include Rebar=struct.h instead.
 #endif
 
 #include "ratwin\controls\Rebar=struct.h"
@@ -14,11 +14,13 @@ STARTWRAP
 namespace ratwin {
 namespace controls {
 
+inline
 bool InsertBand (types::HWND window, REBARBANDINFO<char>& info, int position=-1)
  {
  return ratwin::window::SendMessage (window, RB_INSERTBANDA, position, &info);
  }
 
+inline
 bool InsertBand (types::HWND window, REBARBANDINFO<wchar_t>& info, int position=-1)
  {
  return ratwin::window::SendMessage (window, RB_INSERTBANDW, position, &info);

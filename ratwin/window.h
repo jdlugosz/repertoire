@@ -57,6 +57,8 @@ __declspec(dllimport) int __stdcall MoveWindow (Dlugosz::ratwin::arg::arg32, int
 __declspec(dllimport) unsigned long __stdcall CallWindowProcA (Dlugosz::ratwin::arg::arg32, ratwin::message::sMSG);
 __declspec(dllimport) int __stdcall SetWindowTextA (Dlugosz::ratwin::arg::arg32, const char*);
 __declspec(dllimport) int __stdcall SetWindowTextW (Dlugosz::ratwin::arg::arg32, const wchar_t*);
+__declspec(dllimport) int __stdcall GetWindowTextA (Dlugosz::ratwin::arg::arg32, char*, int);
+__declspec(dllimport) int __stdcall GetWindowTextW (Dlugosz::ratwin::arg::arg32, wchar_t*, int);
 __declspec(dllimport) int __stdcall EnableWindow (Dlugosz::ratwin::arg::arg32, int);
 __declspec(dllimport) int __stdcall GetClientRect (Dlugosz::ratwin::arg::arg32, void*);
 __declspec(dllimport) int __stdcall GetWindowRect (Dlugosz::ratwin::arg::arg32, void*);
@@ -271,6 +273,18 @@ bool SetWindowText (types::HWND wnd, const char* text)
 inline
 bool SetWindowText (types::HWND wnd, const wchar_t* text)
   { return ::SetWindowTextW (reinterpret_cast<arg::arg32>(wnd), text); }
+
+inline
+int GetWindowText (types::HWND wnd, char* dest, int destlen)
+  {
+  return ::GetWindowTextA (reinterpret_cast<arg::arg32>(wnd), dest, destlen);
+  }
+
+inline
+int GetWindowText (types::HWND wnd, wchar_t* dest, int destlen)
+  {
+  return ::GetWindowTextW (reinterpret_cast<arg::arg32>(wnd), dest, destlen);
+  }
 
 inline
 int EnableWindow (types::HWND wnd, bool enable)

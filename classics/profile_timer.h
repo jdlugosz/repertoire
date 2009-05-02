@@ -12,7 +12,7 @@ STARTWRAP
 namespace classics {
 
 class profile_timer {
-   ratwin::types::HANDLE thread;
+   ratwin::types::Thread_HANDLE thread;
    __int64 User;
    __int64 Kernel;
    __int64 Wall;
@@ -21,7 +21,7 @@ class profile_timer {
    __int64 Wall_start;
 public:
    CLASSICS_EXPORT profile_timer();
-   CLASSICS_EXPORT profile_timer (ratwin::types::HANDLE thread);
+   CLASSICS_EXPORT profile_timer (ratwin::types::Thread_HANDLE thread);
    CLASSICS_EXPORT profile_timer (const profile_timer&);
    CLASSICS_EXPORT profile_timer& operator= (const profile_timer&);
    CLASSICS_EXPORT ~profile_timer();

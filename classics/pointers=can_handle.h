@@ -14,6 +14,7 @@ class can_handle {
    void operator= (const can_handle&);  //never defined
 public:
    CLASSICS_EXPORT lifetime* get_lifetime_object() const;
+   lifetime* get_lifetime_object_for_unit_test() const { return reinterpret_cast<lifetime*>(~cloaked_Lifetime); }
    inline void set_lifetime_object (lifetime* p) const { cloaked_Lifetime= ~reinterpret_cast<unsigned>(p); p->deleted=0; }
    can_handle() : cloaked_Lifetime(~0) {}
    can_handle (const can_handle&) : cloaked_Lifetime(~0) {}

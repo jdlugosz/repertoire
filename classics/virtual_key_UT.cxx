@@ -3,6 +3,9 @@
 // Revision: public build 5, shipped on 8-April-1999
 
 #include "classics\virtual_key.h"
+#if _MSC_VER == 1310
+   #pragma warning( disable : 4348 )  // Microsoft's std headers don't clean compile!
+#endif
 #include <iostream>
 #include "classics\string_ios.h"
 #include "ratwin\io\console.h"
