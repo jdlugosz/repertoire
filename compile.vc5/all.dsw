@@ -1,0 +1,277 @@
+Microsoft Developer Studio Workspace File, Format Version 5.00
+# WARNING: DO NOT EDIT OR DELETE THIS WORKSPACE FILE!
+
+###############################################################################
+
+Project: "atomic_counter_UT"=.\classics\atomic_counter_UT.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name classics
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "atomic_counter_benchmark"=.\classics\atomic_counter_benchmark.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name classics
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "atomic_read_test"=.\classics\atomic_read_test.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "baro_UT_helper"=.\classics\baro_UT_helper.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name classics
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "classics"=.\classics\classics.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+    begin source code control
+    "$/repertoire/classics", DAAAAAAA
+    ..\classics
+    end source code control
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "dimensional_UT"=.\classics\dimensional_UT.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name classics
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "exception_UT"=.\classics\exception_UT.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name classics
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "filename_t_UT"=.\classics\filename_t_UT.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name classics
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "fixed_memory_pool_UT"=.\classics\fixed_memory_pool_UT.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name classics
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "flagword_UT"=.\classics\flagword_UT.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name classics
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "handle_UT"=.\classics\handle_UT.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name classics
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "ratwin"=.\ratwin\ratwin.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+    begin source code control
+    "$/repertoire/ratwin", PAAAAAAA
+    ..\ratwin
+    end source code control
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name classics
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "string_ios_UT"=.\classics\string_ios_UT.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name classics
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "tomahawk"=.\tomahawk\tomahawk.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name classics
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name ratwin
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "ustring_CString_UT"=.\classics\ustring_CString_UT.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name classics
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "ustring_UT"=.\classics\ustring_UT.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name classics
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "vararray_UT"=.\classics\vararray_UT.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name classics
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Global:
+
+Package=<5>
+{{{
+}}}
+
+Package=<3>
+{{{
+}}}
+
+###############################################################################
+
