@@ -110,6 +110,7 @@ struct hsoft {
    };
 
 typedef unsigned short ATOM;
+typedef unsigned short LCID;
 
 typedef classics::generic_2D_point<int> POINT;
 

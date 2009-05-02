@@ -25,6 +25,7 @@ class message_parliament : public virtual HWND_vpapa {
    classics::critical_section listlock;
 protected:
    ratwin::window::WNDPROC_sig OldWndProc;
+public:
    class listlocker_t : public classics::critical_section::locker {
    public:
       listlocker_t (message_parliament& x) : locker(x.listlock) {}
@@ -43,7 +44,6 @@ protected:
       operator bool() const { return record; }
       bool operator! () const { return ! operator bool(); }
       };
-public:
    TOMAHAWK_EXPORT void add (const commission&);
    TOMAHAWK_EXPORT locked_commission add (minister*, message_range);
    TOMAHAWK_EXPORT locked_commission add (minister*, message_range, classics::schedule_t, int id= 0);

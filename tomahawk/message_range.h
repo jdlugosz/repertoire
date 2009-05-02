@@ -15,6 +15,7 @@ public:
    unsigned high;
    message_range() : low(~0), high(0) {}
    TOMAHAWK_EXPORT message_range& operator<< (unsigned item);
+   bool contains (unsigned x) const { return x >= low && x <= high; }
    };
 
 }

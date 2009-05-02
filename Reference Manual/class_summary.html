@@ -1097,12 +1097,19 @@ header: window=struct.h
 namespace: ratwin::window
 usage: main API</P>
 <P>
-This is the same as a WNDPROC, except it is declared to take a <A HREF="#sMSG" class="code">sMSG</A>
+This is the same as a <code>WNDPROC</code>, except it is declared to take a <A HREF="#sMSG" class="code">sMSG</A>
 structure instead of four separate arguments.</P>
 <PRE class="code">
 typedef long (__stdcall* WNDPROC_2)(message::sMSG);
 </PRE>
 
+<H2 id="WNDPROC_sig">WNDPROC_sig</H2>
+<P class="ib">library: ratwin
+header: window=struct.h
+namespace: ratwin::window
+usage: main API</P>
+<P>This is a type that abstracts out the actual signature used for a WndProc.  It can be either a <code>WNDPROC</code> or
+a <code>WNDPROC_2</code>.</P>
 
 <HR id="Ws">
 <H2><A NAME="wstring">wstring</A></H2>

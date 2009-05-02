@@ -29,14 +29,34 @@ message_parliament::~message_parliament()
 
 long message_parliament::handle_message (ratwin::message::sMSG& msg)
  {
+ restart:
+ int status;
  handle_message_return_code= 0;
- int status= 0;  // nothing happened yet.
-         // bit 1 means 'handled'.
-
- // >>> will iterate over commissions
-// return handle_message_return_code;
-//        if anyone reported handling it.
-
+ status= 0;  // nothing happened yet.
+      // bit 1 means 'handled'.
+ // iterate over all commissions
+ for (classics::iterator<commission> it (commission_list); it;  ++it) {
+    int step= 0;  // for use in error reporting.
+    try {
+       commission& commish= *it;
+       if ((status&1) && !(commish.schedule&0x00010000))  continue;  // don't call this one if message already handled.
+       if (commish.rangefunc && !commish.rangefunc(msg.message))  continue;  // not meant for me.
+       if (!commish.range.contains (msg.message))  continue;  // not meant for me.
+       ++step;
+       classics::handle<minister> M (commish.appointed_minister);
+       ++step;
+       minister::administer_result_t result= M->administer_message (msg, commish.id, status, this);
+       // >> act on result
+       status |= result;
+       }
+    catch (minister::traversal command) {
+       if (command == minister::Restart)  goto restart;
+       // command == minister::Cancel drops out
+       }
+    // >> will log/alert but continue with next minister.
+    // >> but handle my baro resolution separately.
+    catch (...) { /* ... */ }
+    }
  if (status & 1)  return handle_message_return_code;
  // Last Ditch handling.  This mechanism (parliament) did not handle it.
  if (OldWndProc)
@@ -92,7 +112,8 @@ message_parliament::locked_commission message_parliament::add (minister* m, mess
  commission temp;
  temp.appointed_minister= m;
  temp.range= range;
- int index= ~ classics::binary_search (commission_list, temp.schedule, &commission::comparekey);
+ int index= classics::binary_search (commission_list, temp.schedule, &commission::comparekey);
+ if (index < 0)  index= ~index;
  // >> Well?  Need a special kind of insert on vararray in order to get the special savings.
  // That is, "move" rather than "copy" the new elements.
  commission_list.replace (index, 0, &temp, 1);

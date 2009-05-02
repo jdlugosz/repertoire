@@ -1,6 +1,6 @@
 // The Repertoire Project copyright 2006 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: ratwin\COM\HRESULT.h
-// Revision: public build 9, shipped on 18-Oct-2006
+// Revision: post-public build 9
 
 #pragma once
 
@@ -48,6 +48,9 @@ namespace internal {
       };
 
 
+#pragma warning (push)
+#pragma warning (disable: 4311 4312)
+
    struct HRESULT_struct {
       // no data.  This is not at all a normal class!!!
    private:
@@ -74,9 +77,9 @@ inline
 HRESULT mk_HRESULT (int s, int f, int i)
  {
  union {
-    internal::hr_xxx record; 
+    internal::hr_xxx record;
     HRESULT hr;
-    } x = {i,f,0,s};  
+    } x = {i,f,0,s};
  return x.hr;
  }
 
@@ -95,6 +98,8 @@ static const HRESULT MK_E_NOSTORAGE=  reinterpret_cast<HRESULT>(0x800401EDL); //
 static const HRESULT E_PENDING=reinterpret_cast<HRESULT>(0x8000000A);
 static const HRESULT MK_E_NOOBJECT= reinterpret_cast<HRESULT>(0x800401E5L); //"No object for moniker"
 static const HRESULT MK_S_MONIKERALREADYREGISTERED= reinterpret_cast<HRESULT>(0x000401E7L); //" Moniker is already registered in running object table"
+
+#pragma warning (pop)
 
 #if 0
 #define E_INVALIDARG                     _HRESULT_TYPEDEF_(0x80070057L)
@@ -338,7 +343,7 @@ static const HRESULT MK_S_MONIKERALREADYREGISTERED= reinterpret_cast<HRESULT>(0x
 // MessageText:
 //
 //  Not able to perform the operation because object is not given storage yet
-//  
+//
 //
 #define OLE_E_NOSTORAGE                  _HRESULT_TYPEDEF_(0x80040012L)
 
@@ -758,7 +763,7 @@ static const HRESULT MK_S_MONIKERALREADYREGISTERED= reinterpret_cast<HRESULT>(0x
 // MessageText:
 //
 //  There was an error in a Windows GDI call while converting the DIB to a bitmap.
-//  
+//
 //
 #define CONVERT10_E_STG_DIB_TO_BITMAP    _HRESULT_TYPEDEF_(0x800401C6L)
 
@@ -3668,7 +3673,7 @@ static const HRESULT MK_S_MONIKERALREADYREGISTERED= reinterpret_cast<HRESULT>(0x
 // MessageText:
 //
 //  OSS Certificate encode/decode error code base
-//  
+//
 //  See asn1code.h for a definition of the OSS runtime errors. The OSS
 //  error values are offset by CRYPT_E_OSS_ERROR.
 //
@@ -3716,7 +3721,7 @@ static const HRESULT MK_S_MONIKERALREADYREGISTERED= reinterpret_cast<HRESULT>(0x
 // MessageText:
 //
 //  Jet error code base
-//  
+//
 //  See jet.h for a definition of the Jet runtime errors.
 //  Negative Jet error values are masked to three digits and offset by CERTDB_E_JET_ERROR.
 //

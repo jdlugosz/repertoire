@@ -23,6 +23,7 @@ struct commission_data {
    bool (*rangefunc)(unsigned);
    classics::schedule_t schedule;
    int id;
+   commission_data() : rangefunc(0), schedule(classics::Normal), id(0) {}
    };
 }
 
