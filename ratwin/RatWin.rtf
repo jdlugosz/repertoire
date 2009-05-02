@@ -1,0 +1,33 @@
+{\rtf1\ansi \deff4\deflang1033{\fonttbl{\f4\froman\fcharset0\fprq2 Times New Roman;}}{\colortbl;\red0\green0\blue0;\red0\green0\blue255;\red0\green255\blue255;\red0\green255\blue0;\red255\green0\blue255;\red255\green0\blue0;
+\red255\green255\blue0;\red255\green255\blue255;\red0\green0\blue128;\red0\green128\blue128;\red0\green128\blue0;\red128\green0\blue128;\red128\green0\blue0;\red128\green128\blue0;\red128\green128\blue128;\red192\green192\blue192;}{\stylesheet{\widctlpar 
+\f4 \snext0 Normal;}{\*\cs10 \additive Default Paragraph Font;}{\s15\sa120\widctlpar \f4 \sbasedon0\snext15 Body Text;}}{\info{\author John M. Dlugosz}{\operator John M. Dlugosz}{\creatim\yr1996\mo9\dy7\hr19\min51}{\revtim\yr1996\mo9\dy7\hr20\min17}
+{\version4}{\edmins25}{\nofpages2}{\nofwords562}{\nofchars3206}{\*\company At Home}{\vern57431}}\widowctrl\ftnbj\aenddoc\formshade \fet0\sectd \linex0\endnhere {\*\pnseclvl1\pnucrm\pnstart1\pnindent720\pnhang{\pntxta .}}{\*\pnseclvl2
+\pnucltr\pnstart1\pnindent720\pnhang{\pntxta .}}{\*\pnseclvl3\pndec\pnstart1\pnindent720\pnhang{\pntxta .}}{\*\pnseclvl4\pnlcltr\pnstart1\pnindent720\pnhang{\pntxta )}}{\*\pnseclvl5\pndec\pnstart1\pnindent720\pnhang{\pntxtb (}{\pntxta )}}{\*\pnseclvl6
+\pnlcltr\pnstart1\pnindent720\pnhang{\pntxtb (}{\pntxta )}}{\*\pnseclvl7\pnlcrm\pnstart1\pnindent720\pnhang{\pntxtb (}{\pntxta )}}{\*\pnseclvl8\pnlcltr\pnstart1\pnindent720\pnhang{\pntxtb (}{\pntxta )}}{\*\pnseclvl9\pnlcrm\pnstart1\pnindent720\pnhang
+{\pntxtb (}{\pntxta )}}\pard\plain \widctlpar \f4 RatWin is copyright 1996 by John M. Dlugosz.  Use freely in code with attribution.
+\par 
+\par \pard\plain \s15\sa120\widctlpar \f4 RatWin, is a set of Rationalized Windows header files.
+\par In a nutshell, I don't like having a monolithic header file.  It drags in a ridiculous
+ amount of stuff I don't need, compiles slowly, and overuses macros.  I've been bitten by macros a time or two.  The "NO" symbols for leaving stuff out is silly.  Instead of a page or two of #define's before i
+ncluding <windows.h> to leave stuff out, I should say things to bring stuff in.  Furthermore, <windows.h> doesn't always compile if you define a bunch of NO symbols!  To top it off, the stuff shows a C heritage which is less than ideal for C++.
+\par My concept is to repackage the include files.  It uses namespaces, so you must explicitly ask for the symbols you want.  It uses lots of small header files that are independent of each other, so you can include just what you need.  
+It has strict type checking that makes the <windows.h> STRICT mode look untyped by comparison.  And best of all, {\b no macros}!  The only use of #define is for the include-file interlock symbol to prevent multiple inclusions.
+\par The charter is to repackage the existing API, not design a new API.  So, the function names and other symbol names are unchanged, even though a lot of the prefixes are unnecessary thanks to the better scoping being employed.  Some of
+ the functions have overloaded forms, default arguments, or missing arguments, use strong types, add const, and change pointers to references.  But there are no big semantic changes.
+\par Any functions that are "extras" in this respect will be in a nested namespace called "ext".  This
+ includes helper objects that give constructor/destructor semantics to things, helper functions that are too different in meaning from the Win32 API, and other extensions.  These are used sparingly, since for the most part such improve
+ments belong in a different library or object system, which itself might {\i use} ratwin.  Ratwin is not an improved API except for minor changes to turn C into C++.
+\par I don't want to do (possibly automated) large-scale conversions of <windows.h> items.  Instead, I want to do just what I need, so everything in there has been tested and used in a real situation.  This applies not only to insuring correct translations
+, but tests the usability and packaging concepts.  As it grows, I will certainly alter the organization.
+\par Contributions are welcome.  If you fix things or add more items, use a /*changed*/ or /*added*/ ... /*end added*/ comment so I can spot it to integrate into the next version.
+\par This is an early proof-of-concept version.  I did winsock by itself a while back, and have just started applying it to Windows code in general.
+\par The file base.h contains common things needed by the other files, and also defines some common types.  Many of the Hxxxx handle types are ref
+erenced in multiple "modules", so I started out by making these common in order to reduce the coupling between modules.  Other types that really are used only in one module are found in that module.
+\par For "Isa" relationships among the Hxxxx types, I use inheritance.  So, everything "is a" HANDLE.  This will actually use multiple inheritance when I get to that point, since the relationship is complex.  The inability to model this complex type system in 
+C is probably why the existing "STRICT" mode punts at so many points.
+\par Right now I'm using "cloaked" declarations to import the actual functions.  They are cloaked because at least one argument is of a special type that will never actually be used anywhere.  This way you will never match it when resolving overloading.  Meanw
+hile, the C++ style functions call these global ones, using typecasts and inline code.  I'll change this as soon as I learn enough about DLL's to devise a better way.  In the meantime, I'm sidestepping the limitations of this technique.
+\par Enjoy.
+\par \emdash John
+\par 
+\par }

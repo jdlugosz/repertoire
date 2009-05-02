@@ -1,6 +1,6 @@
-// The Repertoire Project copyright 1998 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
+// The Repertoire Project copyright 1999 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: classics\filename_t.h
-// Revision: public build 4, shipped on 29-Aug-98
+// Revision: public build 5, shipped on 8-April-1999
 
 #pragma once
 #if !defined CLASSICS_EXPORT
@@ -210,6 +210,7 @@ public:
    CLASSICS_EXPORT void remove (const filename_t&, bool strict) const;
    // features unique to this derived class
    CLASSICS_EXPORT virtual ustring fold_case (const ustring&) const;
+   CLASSICS_EXPORT static void move_file (const filename_t& dest, const filename_t& src);   // new: add to docs.
    };
 
 //=============

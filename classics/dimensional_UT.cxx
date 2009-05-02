@@ -1,16 +1,18 @@
-// The Repertoire Project copyright 1998 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
+// The Repertoire Project copyright 1999 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: classics\dimensional_UT.cxx
-// Revision: public build 4, shipped on 29-Aug-98
+// Revision: public build 5, shipped on 8-April-1999
 #include <iostream>
 #include "classics\dimensional.h"
 using std::cout;
 using std::endl;
 
-extern const int timebase= 1;
+extern int timebase= 1;
+  // I want to say "const int timebase" but VC6 doesn't like it.
 typedef classics::dimensional<int,&timebase> time;
 const time millisecond= time::unit();
 
-extern const double distbase= 1.0;
+extern double distbase= 1.0;
+  // I want to say "const double distbase" but VC6 doesn't like it.
 typedef classics::dimensional<double, &distbase> distance;
 const distance meter= distance::unit();
 

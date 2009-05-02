@@ -1,6 +1,6 @@
-// The Repertoire Project copyright 1998 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
+// The Repertoire Project copyright 1999 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: ratwin\io\general.h
-// Revision: public build 4, shipped on 29-Aug-98
+// Revision: public build 5, shipped on 8-April-1999
 
 
 #pragma once
@@ -15,6 +15,7 @@ __declspec(dllimport) int __stdcall ReadFile (Dlugosz::ratwin::arg::arg32, void*
 __declspec(dllimport) int __stdcall WriteFile (Dlugosz::ratwin::arg::arg32, const void*, unsigned long, unsigned long*, void*);
 __declspec(dllimport) int __stdcall DuplicateHandle (Dlugosz::ratwin::arg::arg32, Dlugosz::ratwin::arg::arg32, Dlugosz::ratwin::arg::arg32, void*, unsigned long, int, unsigned long);
 __declspec(dllimport) int __stdcall ReadFileEx (Dlugosz::ratwin::arg::arg32, void*, unsigned long, void*, Dlugosz::ratwin::arg::arg32);
+__declspec(dllimport) int __stdcall FlushFileBuffers (Dlugosz::ratwin::arg::arg32);
 }
 
 
@@ -32,7 +33,8 @@ inline
 bool ReadFile (types::HANDLE h, void* dest, ulong size, ulong& sizeread)
  { return ::ReadFile (reinterpret_cast<arg::arg32>(h), dest, size, &sizeread, 0); }
 
-inline ReadFile (types::HANDLE h, void* dest, ulong size, OVERLAPPED& ov, COMPLETION_ROUTINE proc)
+inline
+bool ReadFile (types::HANDLE h, void* dest, ulong size, OVERLAPPED& ov, COMPLETION_ROUTINE proc)
  { return ::ReadFileEx (reinterpret_cast<arg::arg32>(h), dest, size, &ov, reinterpret_cast<arg::arg32>(proc)); }
 
 inline
@@ -49,10 +51,12 @@ bool DuplicateHandle (types::HANDLE srcproc, types::HANDLE srch, types::HANDLE d
  { return ::DuplicateHandle (reinterpret_cast<arg::arg32>(srcproc), reinterpret_cast<arg::arg32>(srch), reinterpret_cast<arg::arg32>(destproc), &desth,
     access, inherit, options); }
 
+inline
+bool FlushFileBuffers (types::HANDLE file)
+ { return ::FlushFileBuffers (reinterpret_cast<arg::arg32>(file)); }
 
 } //end io
 
 }
 ENDWRAP
 #endif
-

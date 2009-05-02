@@ -1,6 +1,6 @@
-// The Repertoire Project copyright 1998 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
+// The Repertoire Project copyright 1999 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: classics\atomic_counter.cpp
-// Revision: public build 4, shipped on 29-Aug-98
+// Revision: public build 5, shipped on 8-April-1999
 
 #define CLASSICS_EXPORT __declspec(dllexport)
 #include "classics\atomic_counter.h"
@@ -36,7 +36,7 @@ __declspec(naked) short __fastcall Xadd (volatile short*, int)
 __declspec(naked) char __fastcall Xadd (volatile char*, int)
  {
  __asm {
-    lock add byte ptr [ECX], DL
+    lock xadd byte ptr [ECX], DL
     mov AL, DL
     ret
     }

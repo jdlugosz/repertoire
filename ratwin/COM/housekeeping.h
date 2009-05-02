@@ -1,15 +1,19 @@
-// The Repertoire Project copyright 1998 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
+// The Repertoire Project copyright 1999 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: ratwin\COM\housekeeping.h
-// Revision: public build 4, shipped on 29-Aug-98
+// Revision: public build 5, shipped on 8-April-1999
 
 #pragma once
 
 #include "ratwin\COM\HRESULT.h"
 #include "classics\flagword.h"
+#include "ratwin\COM\GUID.h"
+#include "ratwin\COM\IUnknown.h"
 
 extern "C" {
 __declspec(dllimport) long __stdcall CoInitializeEx (void*, Dlugosz::ratwin::arg::arg32);
 __declspec(dllimport) void __stdcall CoUninitialize();
+__declspec(dllimport) long __stdcall CoRegisterClassObject (Dlugosz::ratwin::arg::carg32, Dlugosz::ratwin::arg::arg32, unsigned long dwClsContext, unsigned long flags, unsigned long* lpdwRegister);
+__declspec(dllimport) long __stdcall CoRevokeClassObject (Dlugosz::ratwin::arg::arg32);
 }
 
 
@@ -42,6 +46,20 @@ void CoUninitialize()
  ::CoUninitialize();
  }
 
+inline
+HRESULT
+CoRegisterClassObject (const CLSID& clsid, IUnknown* pUnk, unsigned long& result)
+ {
+ return HRESULT( ::CoRegisterClassObject (reinterpret_cast<arg::carg32>(&clsid), reinterpret_cast<arg::arg32>(pUnk), 4, 1, &result) );
+ }
+
+inline
+HRESULT
+CoRevokeClassObject (unsigned long cookie)
+ {
+ return HRESULT( ::CoRevokeClassObject (reinterpret_cast<arg::arg32>(cookie)) );
+ }
+ 
 }
 ENDWRAP
 

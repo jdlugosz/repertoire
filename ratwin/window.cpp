@@ -1,6 +1,6 @@
-// The Repertoire Project copyright 1998 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
+// The Repertoire Project copyright 1999 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: ratwin\window.cpp
-// Revision: public build 4, shipped on 29-Aug-98
+// Revision: public build 5, shipped on 8-April-1999
 
 #define RATWIN_EXPORT __declspec(dllexport)
 
@@ -9,7 +9,6 @@
 #include "ratwin\color.h"
 #include "ratwin\utilities.h"
 #include "ratwin\WM_constants.h"
-#include "classics\string.h"
 
 STARTWRAP
 namespace ratwin {
@@ -57,6 +56,7 @@ types::HWND CreateWindowEx (ulong moreflags, const char* lpClassName, const char
     0, 0, util::get_Instance(), 0);
  }
 
+#if 0
 classics::string GetClassName (types::HWND hwnd)
  {
  // There does not seem to be a way to find out the length of the ClassName.
@@ -69,6 +69,7 @@ classics::string GetClassName (types::HWND hwnd)
  if (len==0)  throw "error in get_WC_name";
  return buf;
  }
+#endif
 
 }}
 ENDWRAP

@@ -1,6 +1,6 @@
-// The Repertoire Project copyright 1998 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
+// The Repertoire Project copyright 1999 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: classics\string.cpp
-// Revision: public build 4, shipped on 29-Aug-98
+// Revision: public build 5, shipped on 8-April-1999
 
 #define CLASSICS_EXPORT __declspec(dllexport)
 #include "classics\string.h"
@@ -13,8 +13,8 @@ namespace classics {
 
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
-inline int len_ (const char* s)  { return strlen(s); }
-inline int len_ (const wchar_t* s)  { return wcslen(s); }
+inline int len_ (const char* s)  { return s ? strlen(s) : 0; }
+inline int len_ (const wchar_t* s)  { return s ? wcslen(s) : 0; }
 
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 

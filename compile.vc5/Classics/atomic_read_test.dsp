@@ -1,6 +1,6 @@
 # Microsoft Developer Studio Project File - Name="atomic_read_test" - Package Owner=<4>
 # Microsoft Developer Studio Generated Build File, Format Version 5.00
-# ** created by perl script **
+# ** DO NOT EDIT **
 
 # TARGTYPE "Win32 (x86) Console Application" 0x0103
 
@@ -17,8 +17,10 @@ CFG=atomic_read_test - Win32 Debug
 !MESSAGE 
 !MESSAGE Possible choices for configuration are:
 !MESSAGE 
-!MESSAGE "atomic_read_test - Win32 Release" (based on "Win32 (x86) Console Application")
-!MESSAGE "atomic_read_test - Win32 Debug" (based on "Win32 (x86) Console Application")
+!MESSAGE "atomic_read_test - Win32 Release" (based on\
+ "Win32 (x86) Console Application")
+!MESSAGE "atomic_read_test - Win32 Debug" (based on\
+ "Win32 (x86) Console Application")
 !MESSAGE 
 
 # Begin Project
@@ -66,7 +68,7 @@ LINK32=link.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /Gm /GX /Zi /Od /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /c
-# ADD CPP /nologo /MDd /W3 /Gm /GR /GX /Zi /Od /I "...." /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /FD /ZI /c
+# ADD CPP /nologo /MDd /W3 /Gm /GR /GX /Zi /Od /I "..\.." /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /FD /ZI /c
 # SUBTRACT CPP /YX
 # ADD BASE RSC /l 0x409 /d "_DEBUG"
 # ADD RSC /l 0x409 /d "_DEBUG"

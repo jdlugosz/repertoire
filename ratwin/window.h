@@ -1,13 +1,13 @@
-// The Repertoire Project copyright 1998 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
+// The Repertoire Project copyright 1999 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: ratwin\window.h
-// Revision: public build 4, shipped on 29-Aug-98
+// Revision: public build 5, shipped on 8-April-1999
 
 #pragma once
 #if !defined RATWIN_WINDOW_INCLUDED
 #define RATWIN_WINDOW_INCLUDED
 
 #include "ratwin\base.h"
-#include "classics\string.h"
+//#include "classics\string.h"
 
 // DLL imports "cloaked" for overloading
 extern "C" {
@@ -447,7 +447,7 @@ inline
 int GetClassName (types::HWND wnd, char* buf, int buflen)
  { return ::GetClassNameA (reinterpret_cast<arg::arg32>(wnd), buf, buflen); }
 
-RATWIN_EXPORT classics::string GetClassName (types::HWND hwnd);
+//RATWIN_EXPORT classics::string GetClassName (types::HWND hwnd);
 
 struct SCROLLINFO {
     unsigned    cbSize;

@@ -1,6 +1,6 @@
-// The Repertoire Project copyright 1998 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
+// The Repertoire Project copyright 1999 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: ratwin\io\file.h
-// Revision: public build 4, shipped on 29-Aug-98
+// Revision: public build 5, shipped on 8-April-1999
 
 #pragma once
 #if !defined RATWIN_IO_FILE_INCLUDED
@@ -29,6 +29,7 @@ __declspec(dllimport) int __stdcall RemoveDirectoryW (Dlugosz::ratwin::arg::carg
 __declspec(dllimport) int __stdcall GetShortPathNameA (Dlugosz::ratwin::arg::carg32, Dlugosz::ratwin::arg::arg32, unsigned long);
 __declspec(dllimport) int __stdcall GetShortPathNameW (Dlugosz::ratwin::arg::carg32, Dlugosz::ratwin::arg::arg32, unsigned long);
 __declspec(dllimport) Dlugosz::ratwin::arg::arg32 __stdcall FindFirstFileW (Dlugosz::ratwin::arg::carg32, void*);
+__declspec(dllimport) Dlugosz::ratwin::arg::arg32 __stdcall FindFirstFileA (Dlugosz::ratwin::arg::carg32, void*);
 __declspec(dllimport) int __stdcall FindClose (Dlugosz::ratwin::arg::arg32);
 __declspec(dllimport) unsigned long __stdcall GetTempPathW (unsigned long, Dlugosz::ratwin::arg::arg32);
 __declspec(dllimport) unsigned long __stdcall GetTempPathA (unsigned long, Dlugosz::ratwin::arg::arg32);
@@ -210,6 +211,12 @@ inline
 types::HANDLE FindFirstFile (const wchar_t* name, WIN32_FIND_DATA<wchar_t>& result)
  {
  return reinterpret_cast<types::HANDLE>( ::FindFirstFileW (reinterpret_cast<arg::carg32>(name), &result) );
+ }
+
+inline
+types::HANDLE FindFirstFile (const char* name, WIN32_FIND_DATA<char>& result)
+ {
+ return reinterpret_cast<types::HANDLE>( ::FindFirstFileA (reinterpret_cast<arg::carg32>(name), &result) );
  }
 
 inline

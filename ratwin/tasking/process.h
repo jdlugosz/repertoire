@@ -1,6 +1,6 @@
-// The Repertoire Project copyright 1998 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
+// The Repertoire Project copyright 1999 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: ratwin\tasking\process.h
-// Revision: public build 4, shipped on 29-Aug-98
+// Revision: public build 5, shipped on 8-April-1999
 
 #pragma once
 #if !defined RATWIN_TASKING_PROCESS_INCLUDED
@@ -12,6 +12,7 @@
 extern "C" {
 __declspec(dllimport) Dlugosz::ratwin::arg::arg32 __stdcall GetCurrentProcess();
 __declspec(dllimport) unsigned long __stdcall GetModuleFileNameA (Dlugosz::ratwin::arg::arg32, char*, unsigned long);
+__declspec(dllimport) unsigned long __stdcall GetModuleFileNameW (Dlugosz::ratwin::arg::arg32, wchar_t*, unsigned long);
 __declspec(dllimport) int __stdcall CreateProcessA (
     const char* lpApplicationName,
     char* lpCommandLine,
@@ -88,6 +89,10 @@ types::HANDLE GetCurrentProcess()
 inline
 ulong GetModuleFileName (types::HMODULE module, char* outbuf, ulong outbufsize)
  { return ::GetModuleFileNameA (reinterpret_cast<arg::arg32>(module), outbuf, outbufsize); }
+
+inline
+ulong GetModuleFileName (types::HMODULE module, wchar_t* outbuf, ulong outbufsize)
+ { return ::GetModuleFileNameW (reinterpret_cast<arg::arg32>(module), outbuf, outbufsize); }
 
 inline
 bool CreateProcess (

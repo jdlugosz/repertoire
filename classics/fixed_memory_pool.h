@@ -1,6 +1,6 @@
-// The Repertoire Project copyright 1998 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
+// The Repertoire Project copyright 1999 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: classics\fixed_memory_pool.h
-// Revision: public build 4, shipped on 29-Aug-98
+// Revision: public build 5, shipped on 8-April-1999
 
 #pragma once
 #if !defined CLASSICS_EXPORT
@@ -48,7 +48,7 @@ public:
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
 // Important Note:
-// The pool mixin idea does work (see memory_pool_benchmark.cxx and test22.cxx)
+// The pool mixin idea does work (see memory_pool_benchmark.cxx and fixed_memory_pool_UT.cxx)
 // but because of how the template works (each DLL contains its own copy
 // of the `pool` static member), it won't correctly span DLL's.  That's
 // why I'm not using it inside Classics!  These only work if all calls to the specialized

@@ -1,6 +1,6 @@
-// The Repertoire Project copyright 1998 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
+// The Repertoire Project copyright 1999 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: classics\atomic_counter.h
-// Revision: public build 4, shipped on 29-Aug-98
+// Revision: public build 5, shipped on 8-April-1999
 
 #pragma once
 
@@ -54,6 +54,8 @@ namespace internal {
       { return Xexchange ((volatile short*)p, newvalue); }
    inline ulong Xexchange (volatile ulong* p, int newvalue)
       { return Xexchange ((volatile long*)p, newvalue); }
+   inline byte Xexchange (volatile byte* p, int newvalue)
+      { return Xexchange ((volatile char*)p, newvalue); }
 } // end of internal
 
 

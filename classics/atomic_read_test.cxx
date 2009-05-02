@@ -1,10 +1,11 @@
-// The Repertoire Project copyright 1998 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
+// The Repertoire Project copyright 1999 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: classics\atomic_read_test.cxx
-// Revision: public build 4, shipped on 29-Aug-98
+// Revision: public build 5, shipped on 8-April-1999
 
 // The purpose of this test is to find out whether reading a machine
 // word is atomic on a multi-CPU machine.
 
+#include "classics\new.h"
 #include "classics\thread.h"
 #include "ratwin\tasking\CriticalSection.h"
 #include "ratwin\utilities.h"

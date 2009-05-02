@@ -1,6 +1,6 @@
-// The Repertoire Project copyright 1998 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
+// The Repertoire Project copyright 1999 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: ratwin\utilities.h
-// Revision: public build 4, shipped on 29-Aug-98
+// Revision: public build 5, shipped on 8-April-1999
 
 #pragma once
 #if !defined RATWIN_utilities_INCLUDED
@@ -10,6 +10,7 @@
 
 extern "C" {
 __declspec(dllimport) int __stdcall MessageBoxA (Dlugosz::ratwin::arg::arg32 hWnd, const char* lpText, const char* lpCaption, unsigned uType);
+__declspec(dllimport) int __stdcall MessageBoxW (Dlugosz::ratwin::arg::arg32 hWnd, const wchar_t* lpText, const wchar_t* lpCaption, unsigned uType);
 __declspec(dllimport) int __cdecl wsprintfA (char* dest, const char* format ...);
 __declspec(dllimport) Dlugosz::ratwin::arg::arg32 __stdcall GetModuleHandleA (Dlugosz::ratwin::arg::carg32);
 __declspec(dllimport) unsigned long __stdcall GetLastError();
@@ -94,6 +95,14 @@ int MessageBox (types::HWND parent, const char* text, const char* caption, unsig
 inline
 int MessageBox (const char* text, const char* caption, unsigned options=0)
  { return ::MessageBoxA (0, text, caption, options); }
+
+inline
+int MessageBox (types::HWND parent, const wchar_t* text, const wchar_t* caption, unsigned options=0)
+ { return ::MessageBoxW (reinterpret_cast<arg::arg32>(parent), text, caption, options); }
+ 
+inline
+int MessageBox (const wchar_t* text, const wchar_t* caption, unsigned options=0)
+ { return ::MessageBoxW (0, text, caption, options); }
 
 inline 
 types::HINSTANCE GetModuleHandle (const char* module_name= 0)

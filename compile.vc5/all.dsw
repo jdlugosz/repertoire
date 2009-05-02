@@ -41,6 +41,9 @@ Package=<5>
 
 Package=<4>
 {{{
+    Begin Project Dependency
+    Project_Dep_Name classics
+    End Project Dependency
 }}}
 
 ###############################################################################
@@ -72,6 +75,21 @@ Package=<5>
 
 Package=<4>
 {{{
+}}}
+
+###############################################################################
+
+Project: "crc32_UT"=.\classics\crc32_UT.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name classics
+    End Project Dependency
 }}}
 
 ###############################################################################
@@ -195,24 +213,6 @@ Package=<4>
 {{{
     Begin Project Dependency
     Project_Dep_Name classics
-    End Project Dependency
-}}}
-
-###############################################################################
-
-Project: "tomahawk"=.\tomahawk\tomahawk.dsp - Package Owner=<4>
-
-Package=<5>
-{{{
-}}}
-
-Package=<4>
-{{{
-    Begin Project Dependency
-    Project_Dep_Name classics
-    End Project Dependency
-    Begin Project Dependency
-    Project_Dep_Name ratwin
     End Project Dependency
 }}}
 

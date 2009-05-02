@@ -1,6 +1,6 @@
-// The Repertoire Project copyright 1998 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
+// The Repertoire Project copyright 1999 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: classics\exception.cpp
-// Revision: public build 4, shipped on 29-Aug-98
+// Revision: public build 5, shipped on 8-April-1999
 
 #define CLASSICS_EXPORT __declspec(dllexport)
 #include "classics\exception.h"
@@ -93,8 +93,8 @@ void exception::default_show_function (const exception& err)
  int stanza= 1;
  do {
     wcerr << L"stanza #" << stanza << endl;
-    vararray<iterator::pair> values= it.get_all_values();
-    static int valcount= values.elcount();
+    const vararray<iterator::pair> values= it.get_all_values();
+    const int valcount= values.elcount();
     for (int loop= 0;  loop < valcount;  loop++) {
        iterator::pair p= values[loop];
        wcerr << p.key << L"=" << p.value << endl;
@@ -108,13 +108,35 @@ void exception::default_show_function (const exception& err)
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
-void win_exception::translate_errorcode()
+const int win_exception::call_not_implemented_error= 120;
+
+/* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
+
+static ustring format_message (int errorcode)
  {
  const int maxsize= 1024;
- wchar_t buffer[maxsize];
- ratwin::util::FormatMessage (0, errorcode, buffer, maxsize);
+ union {
+    wchar_t wbuffer[maxsize];
+    char nbuffer[maxsize];
+    };
+ static bool Unicode= true;
+ if (Unicode) {
+    int retval= ratwin::util::FormatMessage (0, errorcode, wbuffer, maxsize);
+    if (retval==0 && ratwin::util::GetLastError()==win_exception::call_not_implemented_error)
+       Unicode= false;
+    else return wbuffer;    //OK, got a result
+    }
+ // use ANSI version instead
+ ratwin::util::FormatMessage (0, errorcode, nbuffer, maxsize);
+ return nbuffer;
+ }
+ 
+/* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
+
+void win_exception::translate_errorcode()
+ {
  wFmt(S) << L"GetLastError() reports " << errorcode
-    << L", " << buffer << endl;
+    << L", " << wstring(format_message(errorcode)) << endl;
  }
 
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */

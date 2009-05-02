@@ -1,2 +1,3 @@
 vssver2.scc
-compile.vc5/mssccprj.scc
+compile.vc?/mssccprj.scc
+compile.vc?/*/mssccprj.scc

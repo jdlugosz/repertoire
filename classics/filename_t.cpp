@@ -1,9 +1,10 @@
-// The Repertoire Project copyright 1998 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
+// The Repertoire Project copyright 1999 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: classics\filename_t.cpp
-// Revision: public build 4, shipped on 29-Aug-98
+// Revision: public build 5, shipped on 8-April-1999
 
 #define CLASSICS_EXPORT __declspec(dllexport)
 
+#include "classics\new.h"
 #include "classics\filename_t.h"
 #include "classics\string_ios.h"  //for formatting error messages
 #include "ratwin\io\file.h"
@@ -360,6 +361,31 @@ PC_filesystem_t::PC_filesystem_t()
  
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
+static ratwin::types::HANDLE findfirst (const wstring& s, ulong& attributes)
+ {
+ using namespace ratwin::io;
+ static bool Unicode= true;
+ if (Unicode) {
+    WIN32_FIND_DATA<wchar_t> result;
+    ratwin::types::HANDLE search_handle= FindFirstFile (s.c_str(), result);
+    attributes= result.FileAttributes;
+    if (search_handle == ratwin::INVALID_HANDLE_VALUE) {
+       int errorcode= ratwin::util::GetLastError();
+       if (errorcode == win_exception::call_not_implemented_error)  Unicode= false;
+       else return search_handle;
+       }
+    }
+ // must be ANSI
+ ustring u= s;
+ string ns= u;
+ WIN32_FIND_DATA<char> result;
+ ratwin::types::HANDLE search_handle= FindFirstFile (ns.c_str(), result);
+ attributes= result.FileAttributes;
+ return search_handle;
+ }
+ 
+/* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
+
 bool PC_filesystem_t::exists (const filename_t& filename) const
  {
  using namespace ratwin::io;
@@ -374,26 +400,58 @@ bool PC_filesystem_t::exists (const filename_t& filename) const
        }
     name.resize (name.elcount()-1);  // FindFirstFile doesn't want trailing backslash
     }
- WIN32_FIND_DATA<wchar_t> result;
- ratwin::types::HANDLE search_handle= FindFirstFile (name.c_str(), result);
+ ulong attributes;
+ ratwin::types::HANDLE search_handle= findfirst (name, attributes);
  if (search_handle == ratwin::INVALID_HANDLE_VALUE)  return false;
  FindClose (search_handle);
- bool is_directory= FILE_ATTRIBUTE_DIRECTORY&result.FileAttributes;
+ bool is_directory= FILE_ATTRIBUTE_DIRECTORY&attributes;
  return is_directory == want_directory;
+ }
+ 
+/* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
+
+static ustring get_full_path_name (const ustring& u)
+ {
+ using ratwin::io::GetFullPathName;
+ static bool Unicode= true;
+ if (Unicode) {
+    wstring s= u;
+    const wchar_t* p= s.c_str();
+    const int len= GetFullPathName (p, 0,0);  //len includes room for trailing nul.
+    if (len==0) {
+       int errorcode= ratwin::util::GetLastError();
+       if (errorcode == win_exception::call_not_implemented_error)  {
+          Unicode= false;
+          goto ANSI;
+          }
+       else throw win_exception ("Classics", FNAME, __LINE__, errorcode);
+       }
+    wstring result (len);
+    wchar_t* dest= const_cast<wchar_t*>(result.get_buffer());
+    if (!GetFullPathName (p, len, dest))
+       throw win_exception ("Classics", FNAME, __LINE__);
+    result.resize (len-1);  //remove the trailing nul
+    return result;
+    }
+ ANSI: {
+    string s= u;
+    const char* p= s.c_str();
+    const int len= GetFullPathName (p, 0,0);
+    if (len==0)  throw win_exception ("Classics", FNAME, __LINE__);
+    string result (len);
+    char* dest= const_cast<char*>(result.get_buffer());
+    if (!GetFullPathName (p, len, dest))
+       throw win_exception ("Classics", FNAME, __LINE__);
+    result.resize (len-1);  //remove the trailing nul
+    return result;
+    }
  }
  
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
 filename_t PC_filesystem_t::fully_qualify (const filename_t& param) const
  {
- using ratwin::io::GetFullPathName;
- wstring param_text= param.text();
- const wchar_t* input= param_text.c_str();
- const int len= GetFullPathName (input, 0,0);  //len includes room for trailing nul.
- wstring result (len);
- wchar_t* dest= const_cast<wchar_t*>(result.get_buffer());
- GetFullPathName (input, len, dest);
- result.resize (len-1);  //remove the trailing nul
+ wstring result= get_full_path_name (param.text());
  PC_filesystem_t* self= const_cast<PC_filesystem_t*>(this);
  return self->directory(result);
  }
@@ -552,17 +610,18 @@ void PC_filesystem_t::splitup_name (filename_t::index_t*, const wstring&) const
 
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
-static wstring convert_to_lower (const wstring& input)
+template <typename T>
+generic_string<T> convert_to_upper (const generic_string<T>& input)
  {
  // you think this would be simple... just call LCMapString.  But no,
  // Microsoft makes everything so complicated that you have to wrap
  // even a simple function call just to make it robust enough.
  int size= input.elcount();
- if (size == 0)  return wstring();
+ if (size == 0)  return generic_string<T>();
  for (;;) {
-    wstring output (size+1);
-    wchar_t* buf= const_cast<wchar_t*>(output.get_buffer());
-    static const flagword<ratwin::LCMAP_flags> flags= ratwin::LCMAP_LOWERCASE;
+    generic_string<T> output (size+1);
+    T* buf= const_cast<T*>(output.get_buffer());
+    static const flagword<ratwin::LCMAP_flags> flags= ratwin::LCMAP_UPPERCASE;
     int result= ratwin::LCMapString (flags, input.get_buffer(), input.elcount(), buf, size);
     if (result == 0) {
        // can't tell the difference between a correct empty string and
@@ -589,15 +648,29 @@ static wstring convert_to_lower (const wstring& input)
 
 ustring PC_filesystem_t::fold_case (const ustring& s) const
  {
- return convert_to_lower (s);
+ static int state= 0;  //don't know yet
+ if (state==0) { //don't know yet
+    try {
+       wstring result= convert_to_upper (wstring(s));
+       state= 2;  //Wide worked OK.
+       return result;
+       }
+    catch (win_exception& X) {
+       if (X.errorcode == win_exception::call_not_implemented_error)  state= 1;  //Must be Narrow
+       else throw;  //keep going...
+       }
+    }
+ // faster without the extra try block.
+ if (state==1)  return convert_to_upper (string(s));
+ else return convert_to_upper (wstring(s));
  }
 
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
 bool PC_filesystem_t::stringmatch (const ustring& left, const ustring& right) const
  {
- wstring L= convert_to_lower (left);
- wstring R= convert_to_lower (right);
+ wstring L= fold_case (left);
+ wstring R= fold_case (right);
  return L==R;
  }
  
@@ -651,19 +724,72 @@ filename_t PC_filesystem_t::temp_directory() const
 void PC_filesystem_t::remove (const filename_t& filename, bool strict) const
  {
  bool is_directory= filename.name_count()==0;
- wstring name= filename.text();
- const bool b= is_directory ?
-    /* directory */ ratwin::io::RemoveDirectory (name.c_str()) :
-    /* plain file */ ratwin::io::DeleteFile (name.c_str());
- if (!b) {  //failure
-    ulong last_error= ratwin::util::GetLastError();
-    if (!strict && last_error==2)  return;
+ static bool Unicode= true;
+ int errorcode;
+ if (Unicode) {
+    wstring name= filename.text();
+    const bool b= is_directory ?
+       /* directory */ ratwin::io::RemoveDirectory (name.c_str()) :
+       /* plain file */ ratwin::io::DeleteFile (name.c_str());
+    if (!b) {  //failure
+       errorcode= ratwin::util::GetLastError();
+       if (errorcode == win_exception::call_not_implemented_error)  Unicode= false;
+       else goto error;
+       }
+    else return;  //OK.
+    }
+ // must be ANSI
+    {
+    string name= filename.text();
+    const bool b= is_directory ?
+       /* directory */ ratwin::io::RemoveDirectory (name.c_str()) :
+       /* plain file */ ratwin::io::DeleteFile (name.c_str());
+    if (!b)  errorcode= ratwin::util::GetLastError();
+    else return;
+    }
+
+ error:
+    if (!strict && (errorcode==2 || errorcode==3))  return;
     // the value 2 was discovered emperically.  The Win32API docs
     // do not specify actual error codes on particular failures.
-    win_exception X ("Classics", FNAME, __LINE__, last_error);
-    wFmt (X) << L"Error deleting " << (is_directory ? L"directory \"":L"file \"") << name << "\".";
+    win_exception X ("Classics", FNAME, __LINE__, errorcode);
+    wFmt (X) << L"Error deleting " << (is_directory ? L"directory \"":L"file \"") << wstring(filename.text()) << "\".";
     throw X;
+ }
+
+/* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
+
+void PC_filesystem_t::move_file (const filename_t& dest, const filename_t& src)
+ {
+ static bool Unicode= true;
+ int errorcode;
+ if (Unicode) {
+    wstring Dest= dest.text();
+    wstring Src= src.text();
+    const bool b= ratwin::io::MoveFile (Src.c_str(),Dest.c_str());
+    if (!b) {
+       errorcode= ratwin::util::GetLastError();
+       if (errorcode == win_exception::call_not_implemented_error)  Unicode= false;
+       else goto error;
+       }
+    else return;  //OK.
     }
+ // must be ANSI
+    {
+    string Dest= dest.text();
+    string Src= src.text();
+    const bool b= ratwin::io::MoveFile (Src.c_str(),Dest.c_str());
+    if (!b) {
+       errorcode= ratwin::util::GetLastError();
+       goto error;
+       }
+    else return;  //OK.
+    }
+ error:
+    win_exception X ("Classics", FNAME, __LINE__, errorcode);
+    wFmt (X) << L"Error renaming \"" << wstring(src.text()) << "\" to \""
+       << wstring (dest.text()) << "\".";
+    throw X;
  }
 
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */

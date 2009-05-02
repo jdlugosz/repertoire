@@ -20,8 +20,6 @@ CFG=classics - Win32 Release
 !MESSAGE "classics - Win32 Release" (based on\
  "Win32 (x86) Dynamic-Link Library")
 !MESSAGE "classics - Win32 Debug" (based on "Win32 (x86) Dynamic-Link Library")
-!MESSAGE "classics - Win32 Release_w_Debug" (based on\
- "Win32 (x86) Dynamic-Link Library")
 !MESSAGE 
 
 # Begin Project
@@ -56,8 +54,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /machine:I386
-# ADD LINK32 kernel32.lib user32.lib advapi32.lib /nologo /subsystem:windows /dll /machine:I386 /out:"..\Release/Dlugosz Repertoire Classics.vc5{pb4}.dll"
-# SUBTRACT LINK32 /debug
+# ADD LINK32 kernel32.lib user32.lib advapi32.lib ole32.lib /nologo /subsystem:windows /dll /debug /machine:I386 /out:"..\Release/Dlugosz Repertoire Classics.vc5{pb5}.dll"
 
 !ELSEIF  "$(CFG)" == "classics - Win32 Debug"
 
@@ -83,35 +80,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /debug /machine:I386
-# ADD LINK32 kernel32.lib user32.lib advapi32.lib /nologo /subsystem:windows /dll /incremental:no /debug /machine:I386 /out:"..\Debug/Dlugosz Repertoire Classics.vc5.debug{pb4}.dll"
-
-!ELSEIF  "$(CFG)" == "classics - Win32 Release_w_Debug"
-
-# PROP BASE Use_MFC 0
-# PROP BASE Use_Debug_Libraries 0
-# PROP BASE Output_Dir "Release_w_Debug"
-# PROP BASE Intermediate_Dir "Release_w_Debug"
-# PROP BASE Target_Dir ""
-# PROP Use_MFC 0
-# PROP Use_Debug_Libraries 0
-# PROP Output_Dir "..\Release_w_Debug"
-# PROP Intermediate_Dir ".\Release_w_Debug"
-# PROP Ignore_Export_Lib 0
-# PROP Target_Dir ""
-# ADD BASE CPP /nologo /MD /W3 /GR /GX /O2 /I "..\.." /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /FD /c
-# SUBTRACT BASE CPP /YX
-# ADD CPP /nologo /MD /W3 /GR /GX /Zi /Ot /Oi /Oy /Ob1 /I "..\.." /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /FD /c
-# SUBTRACT CPP /Ox /YX
-# ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /win32
-# ADD MTL /nologo /D "NDEBUG" /mktyplib203 /win32
-# ADD BASE RSC /l 0x409 /d "NDEBUG"
-# ADD RSC /l 0x409 /d "NDEBUG"
-BSC32=bscmake.exe
-# ADD BASE BSC32 /nologo
-# ADD BSC32 /nologo
-LINK32=link.exe
-# ADD BASE LINK32 /nologo /subsystem:windows /dll /machine:I386 /out:"..\Release\classics.dll"
-# ADD LINK32 /nologo /subsystem:windows /dll /debug /machine:I386 /out:"..\Release_w_Debug/Dlugosz Repertoire Classics.vc5.reldebug{pb3+}.dll"
+# ADD LINK32 kernel32.lib user32.lib advapi32.lib ole32.lib /nologo /subsystem:windows /dll /incremental:no /debug /machine:I386 /out:"..\Debug/Dlugosz Repertoire Classics.vc5.debug{pb5}.dll"
 
 !ENDIF 
 
@@ -119,22 +88,12 @@ LINK32=link.exe
 
 # Name "classics - Win32 Release"
 # Name "classics - Win32 Debug"
-# Name "classics - Win32 Release_w_Debug"
 # Begin Group "Source Files"
 
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;hpj;bat;for;f90"
 # Begin Source File
 
 SOURCE=..\..\classics\APC_server.cpp
-
-!IF  "$(CFG)" == "classics - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "classics - Win32 Debug"
-
-!ELSEIF  "$(CFG)" == "classics - Win32 Release_w_Debug"
-
-!ENDIF 
-
 # End Source File
 # Begin Source File
 
@@ -147,8 +106,6 @@ SOURCE=..\..\classics\atomic_counter.cpp
 !ELSEIF  "$(CFG)" == "classics - Win32 Debug"
 
 # ADD CPP /Zi
-
-!ELSEIF  "$(CFG)" == "classics - Win32 Release_w_Debug"
 
 !ENDIF 
 
@@ -165,23 +122,16 @@ SOURCE=..\..\classics\chain.cpp
 
 # ADD CPP /Zi
 
-!ELSEIF  "$(CFG)" == "classics - Win32 Release_w_Debug"
-
 !ENDIF 
 
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\classics\crc32.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\classics\critical_section.cpp
-
-!IF  "$(CFG)" == "classics - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "classics - Win32 Debug"
-
-!ELSEIF  "$(CFG)" == "classics - Win32 Release_w_Debug"
-
-!ENDIF 
-
 # End Source File
 # Begin Source File
 
@@ -195,23 +145,12 @@ SOURCE=..\..\classics\debug.cpp
 
 # ADD CPP /Zi
 
-!ELSEIF  "$(CFG)" == "classics - Win32 Release_w_Debug"
-
 !ENDIF 
 
 # End Source File
 # Begin Source File
 
 SOURCE=..\..\classics\event_flag.cpp
-
-!IF  "$(CFG)" == "classics - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "classics - Win32 Debug"
-
-!ELSEIF  "$(CFG)" == "classics - Win32 Release_w_Debug"
-
-!ENDIF 
-
 # End Source File
 # Begin Source File
 
@@ -225,23 +164,16 @@ SOURCE=..\..\classics\exception.cpp
 
 # ADD CPP /Zi
 
-!ELSEIF  "$(CFG)" == "classics - Win32 Release_w_Debug"
-
 !ENDIF 
 
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\classics\file_factory.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\classics\filename_t.cpp
-
-!IF  "$(CFG)" == "classics - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "classics - Win32 Debug"
-
-!ELSEIF  "$(CFG)" == "classics - Win32 Release_w_Debug"
-
-!ENDIF 
-
 # End Source File
 # Begin Source File
 
@@ -255,36 +187,24 @@ SOURCE=..\..\classics\fixed_memory_pool.cpp
 
 # ADD CPP /Zi
 
-!ELSEIF  "$(CFG)" == "classics - Win32 Release_w_Debug"
-
 !ENDIF 
 
 # End Source File
 # Begin Source File
 
 SOURCE=..\..\classics\inst_count.cpp
-
-!IF  "$(CFG)" == "classics - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "classics - Win32 Debug"
-
-!ELSEIF  "$(CFG)" == "classics - Win32 Release_w_Debug"
-
-!ENDIF 
-
 # End Source File
 # Begin Source File
 
 SOURCE=..\..\classics\MFC_CString.cpp
+# End Source File
+# Begin Source File
 
-!IF  "$(CFG)" == "classics - Win32 Release"
+SOURCE=..\..\classics\misc_API.cpp
+# End Source File
+# Begin Source File
 
-!ELSEIF  "$(CFG)" == "classics - Win32 Debug"
-
-!ELSEIF  "$(CFG)" == "classics - Win32 Release_w_Debug"
-
-!ENDIF 
-
+SOURCE=..\..\classics\new.cpp
 # End Source File
 # Begin Source File
 
@@ -298,23 +218,16 @@ SOURCE=..\..\classics\pointers.cpp
 
 # ADD CPP /Zi
 
-!ELSEIF  "$(CFG)" == "classics - Win32 Release_w_Debug"
-
 !ENDIF 
 
 # End Source File
 # Begin Source File
 
 SOURCE=..\..\classics\profile_timer.cpp
+# End Source File
+# Begin Source File
 
-!IF  "$(CFG)" == "classics - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "classics - Win32 Debug"
-
-!ELSEIF  "$(CFG)" == "classics - Win32 Release_w_Debug"
-
-!ENDIF 
-
+SOURCE=..\..\classics\registry.cpp
 # End Source File
 # Begin Source File
 
@@ -327,8 +240,6 @@ SOURCE=..\..\classics\string.cpp
 !ELSEIF  "$(CFG)" == "classics - Win32 Debug"
 
 # ADD CPP /Zi
-
-!ELSEIF  "$(CFG)" == "classics - Win32 Release_w_Debug"
 
 !ENDIF 
 
@@ -345,36 +256,16 @@ SOURCE=..\..\classics\string_ios.cpp
 
 # ADD CPP /Zi
 
-!ELSEIF  "$(CFG)" == "classics - Win32 Release_w_Debug"
-
 !ENDIF 
 
 # End Source File
 # Begin Source File
 
 SOURCE=..\..\classics\string_marker.cpp
-
-!IF  "$(CFG)" == "classics - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "classics - Win32 Debug"
-
-!ELSEIF  "$(CFG)" == "classics - Win32 Release_w_Debug"
-
-!ENDIF 
-
 # End Source File
 # Begin Source File
 
 SOURCE=..\..\classics\ustring.cpp
-
-!IF  "$(CFG)" == "classics - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "classics - Win32 Debug"
-
-!ELSEIF  "$(CFG)" == "classics - Win32 Release_w_Debug"
-
-!ENDIF 
-
 # End Source File
 # Begin Source File
 
@@ -388,23 +279,12 @@ SOURCE=..\..\classics\vararray.cpp
 
 # ADD CPP /Zi
 
-!ELSEIF  "$(CFG)" == "classics - Win32 Release_w_Debug"
-
 !ENDIF 
 
 # End Source File
 # Begin Source File
 
 SOURCE=..\..\classics\win_handle.cpp
-
-!IF  "$(CFG)" == "classics - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "classics - Win32 Debug"
-
-!ELSEIF  "$(CFG)" == "classics - Win32 Release_w_Debug"
-
-!ENDIF 
-
 # End Source File
 # End Group
 # Begin Group "Header Files"

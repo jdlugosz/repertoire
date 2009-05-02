@@ -1,6 +1,6 @@
-// The Repertoire Project copyright 1998 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
+// The Repertoire Project copyright 1999 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: ratwin\base.h
-// Revision: public build 4, shipped on 29-Aug-98
+// Revision: public build 5, shipped on 8-April-1999
 
 #pragma once
 #if !defined RATWIN_BASE_INCLUDED
@@ -50,6 +50,7 @@ namespace internal {
    struct HGDIOBJ_struct : public HANDLE_struct {/*empty*/};
    struct HBITMAP_struct : public HGDIOBJ_struct {/*empty*/};
    struct HBRUSH_struct : public HGDIOBJ_struct {/*empty*/};
+   struct HKEY_struct : public HANDLE_struct {/*empty*/};
       // pen, font, and region are also derived from GDIOBJ
    struct HMENU_struct : public HANDLE_struct {/*empty*/};
    struct HICON_struct : public HANDLE_struct {/*empty*/};
@@ -78,6 +79,7 @@ typedef internal::HCURSOR_struct* HCURSOR;
 typedef internal::HBRUSH_struct* HBRUSH;
 typedef internal::HRSRC_struct* HRSRC;
 typedef internal::TLS_key_struct* TLS_key;
+typedef internal::HKEY_struct* HKEY;
 
 typedef unsigned short ATOM;
 

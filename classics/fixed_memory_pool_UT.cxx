@@ -1,9 +1,10 @@
-// The Repertoire Project copyright 1998 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
+// The Repertoire Project copyright 1999 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: classics\fixed_memory_pool_UT.cxx
-// Revision: public build 4, shipped on 29-Aug-98
+// Revision: public build 5, shipped on 8-April-1999
 
 // test of the fixed_memory_pool
 
+#include "classics\new.h"
 #include "classics\fixed_memory_pool.h"
 #include <iostream>
 using std::cout;
