@@ -1,5 +1,10 @@
 vssver2.scc
 compile.vc*/mssccprj.scc
 compile.vc*/*/mssccprj.scc
+compile.vc71/*.ncb
+compile.vc71/*.suo
 compile.vc*/debug/
 compile.vc*/release/
+compile.vc*/*/Debug/
+compile.vc*/*/release/
+compile.vc*/*/CLR Release/

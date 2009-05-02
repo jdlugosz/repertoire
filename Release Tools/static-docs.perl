@@ -51,8 +51,12 @@ sub htmlCheck
  writeout ($fname, $s);
  }
 
-
-htmlCheck ("$baseDir\\footer.html");
-htmlCheck ("$baseDir\\static.html");
-system qq(zip -urD9X "Repertoire Documentation.zip" * -x "Repertoire Documentation.zip vssver.scc");
+chdir ("$baseDir");
+htmlCheck ("footer.html");
+htmlCheck ("page_footer.html");
+htmlCheck ("page_banner.html");
+htmlCheck ("static.html");
+my $command= qq(zip -urD9X "..\\Repertoire Documentation.zip" * -x *vssver.scc);
+print ($command, "\n");
+system ($command);
 

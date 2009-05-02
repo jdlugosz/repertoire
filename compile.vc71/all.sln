@@ -137,6 +137,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "first_parliament", "Tomahaw
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mouse_minister", "Tomahawk\mouse_minister.vcproj", "{8D181223-5BDE-42F5-8904-4F42A4D6122D}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SourceCodeControl) = preSolution
 		SccNumberOfProjects = 2
@@ -319,6 +323,12 @@ Global
 		{18334F41-362C-4605-BC2A-63980ADA7676}.Debug.Build.0 = Debug|Win32
 		{18334F41-362C-4605-BC2A-63980ADA7676}.Release.ActiveCfg = Release|Win32
 		{18334F41-362C-4605-BC2A-63980ADA7676}.Release.Build.0 = Release|Win32
+		{8D181223-5BDE-42F5-8904-4F42A4D6122D}.CLR Release.ActiveCfg = CLR Release|Win32
+		{8D181223-5BDE-42F5-8904-4F42A4D6122D}.CLR Release.Build.0 = CLR Release|Win32
+		{8D181223-5BDE-42F5-8904-4F42A4D6122D}.Debug.ActiveCfg = Debug|Win32
+		{8D181223-5BDE-42F5-8904-4F42A4D6122D}.Debug.Build.0 = Debug|Win32
+		{8D181223-5BDE-42F5-8904-4F42A4D6122D}.Release.ActiveCfg = Release|Win32
+		{8D181223-5BDE-42F5-8904-4F42A4D6122D}.Release.Build.0 = Release|Win32
 		{8D181223-5BDE-42F5-8904-4F42A4D6122D}.CLR Release.ActiveCfg = CLR Release|Win32
 		{8D181223-5BDE-42F5-8904-4F42A4D6122D}.CLR Release.Build.0 = CLR Release|Win32
 		{8D181223-5BDE-42F5-8904-4F42A4D6122D}.Debug.ActiveCfg = Debug|Win32

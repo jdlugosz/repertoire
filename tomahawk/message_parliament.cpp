@@ -1,6 +1,6 @@
-// The Repertoire Project copyright 2006 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
-// File: tomahawk\message_tap.cpp
-// Revision: public build 9, shipped on 18-Oct-2006
+// The Repertoire Project copyright 2007 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
+// File: tomahawk\message_parliament.cpp
+// Revision: post-public build 9
 
 #define TOMAHAWK_EXPORT __declspec(dllexport)
 #include "tomahawk\message_parliament.h"
@@ -30,24 +30,26 @@ message_parliament::~message_parliament()
 long message_parliament::handle_message (ratwin::message::sMSG& msg)
  {
  restart:
- int status;
+ minister::traversal_state state;
+ state.parliament= this;
  handle_message_return_code= 0;
- status= 0;  // nothing happened yet.
+ state.status= 0;  // nothing happened yet.
       // bit 1 means 'handled'.
  // iterate over all commissions
  for (classics::iterator<commission> it (commission_list); it;  ++it) {
     int step= 0;  // for use in error reporting.
     try {
        commission& commish= *it;
-       if ((status&1) && !(commish.schedule&0x00010000))  continue;  // don't call this one if message already handled.
+       if ((state.status&1) && !(commish.schedule&0x00010000))  continue;  // don't call this one if message already handled.
        if (commish.rangefunc && !commish.rangefunc(msg.message))  continue;  // not meant for me.
        if (!commish.range.contains (msg.message))  continue;  // not meant for me.
        ++step;
        classics::handle<minister> M (commish.appointed_minister);
        ++step;
-       minister::administer_result_t result= M->administer_message (msg, commish.id, status, this);
+       state.current= &commish;
+       minister::administer_result_t result= M->administer_message (msg, state);
        // >> act on result
-       status |= result;
+       state.status |= result;
        }
     catch (minister::traversal command) {
        if (command == minister::Restart)  goto restart;
@@ -57,7 +59,7 @@ long message_parliament::handle_message (ratwin::message::sMSG& msg)
     // >> but handle my baro resolution separately.
     catch (...) { /* ... */ }
     }
- if (status & 1)  return handle_message_return_code;
+ if (state.status & 1)  return handle_message_return_code;
  // Last Ditch handling.  This mechanism (parliament) did not handle it.
  if (OldWndProc)
     return ratwin::window::CallWindowProc<wchar_t> (OldWndProc, msg);

@@ -6,6 +6,7 @@
 
 #include "classics\common.h"
 #include "classics\2D_point.h"
+#include "classics\rect.h"
 
 #if !defined RATWIN_EXPORT
 #define RATWIN_EXPORT __declspec(dllimport)
@@ -114,13 +115,15 @@ typedef unsigned short LCID;
 
 typedef classics::generic_2D_point<int> POINT;
 
+/*
 struct RECT {
    long left;
    long top;
    long right;
    long bottom;
    };
-
+*/
+typedef classics::generic_rect<int> RECT;
 
 struct SECURITY_ATTRIBUTES {
    ulong nLength;

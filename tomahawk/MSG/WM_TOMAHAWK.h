@@ -14,7 +14,7 @@ struct WM_TOMAHAWK_msg : public ratwin::message::MSG_base {
    short param1;
    long param2;
    enum codes {
-      pre_translate_message
+      pre_translate_message, reset_minister, mouse_button
       };
    codes notification_code() const { return static_cast<codes>(SubCode); }
    TOMAHAWK_EXPORT static unsigned get_TOMAHAWK_id();
