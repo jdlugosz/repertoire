@@ -41,13 +41,13 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/MACHINE:I386"
-				OutputFile="..\Debug/Dlugosz Repertoire Classics.vc71.debug{pb6+6}.dll"
+				OutputFile="..\Debug/Dlugosz Repertoire Classics.vc71.debug{pb8}.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"
 				GenerateDebugInformation="TRUE"
-				ProgramDatabaseFile=".\..\Debug/Dlugosz Repertoire Classics.vc71.debug{pb6+6}.pdb"
+				ProgramDatabaseFile=".\..\Debug/Dlugosz Repertoire Classics.vc71.debug{pb8}.pdb"
 				SubSystem="2"
-				ImportLibrary=".\..\Debug/Dlugosz Repertoire Classics.vc71.debug{pb6+6}.lib"/>
+				ImportLibrary=".\..\Debug/Dlugosz Repertoire Classics.vc71.debug{pb8}.lib"/>
 			<Tool
 				Name="VCMIDLTool"
 				PreprocessorDefinitions="_DEBUG"
@@ -90,7 +90,7 @@
 				EnableIntrinsicFunctions="TRUE"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="TRUE"
-				OptimizeForProcessor="2"
+				OptimizeForProcessor="3"
 				AdditionalIncludeDirectories="..\.."
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS"
 				RuntimeLibrary="2"
@@ -104,20 +104,20 @@
 				ProgramDataBaseFileName=".\Release/"
 				WarningLevel="3"
 				SuppressStartupBanner="TRUE"
-				DebugInformationFormat="0"
+				DebugInformationFormat="3"
 				CompileAs="0"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/MACHINE:I386"
-				OutputFile="..\Release/Dlugosz Repertoire Classics.vc71{pb6+6}.dll"
+				OutputFile="..\Release/Dlugosz Repertoire Classics.vc71{pb8}.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"
 				GenerateDebugInformation="TRUE"
-				ProgramDatabaseFile=".\..\Release/Dlugosz Repertoire Classics.vc71{pb6+6}.pdb"
-				SubSystem="2"
-				ImportLibrary=".\..\Release/Dlugosz Repertoire Classics.vc71{pb6+6}.lib"/>
+				ProgramDatabaseFile=".\..\Release/Dlugosz Repertoire Classics.vc71{pb8}.pdb"
+				SubSystem="0"
+				ImportLibrary=".\..\Release/Dlugosz Repertoire Classics.vc71{pb8}.lib"/>
 			<Tool
 				Name="VCMIDLTool"
 				PreprocessorDefinitions="NDEBUG"
@@ -152,7 +152,8 @@
 			IntermediateDirectory="CLR Release"
 			ConfigurationType="2"
 			UseOfMFC="0"
-			ATLMinimizesCRunTimeLibraryUsage="FALSE">
+			ATLMinimizesCRunTimeLibraryUsage="FALSE"
+			ManagedExtensions="FALSE">
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
@@ -178,13 +179,13 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/MACHINE:I386"
-				OutputFile="..\Release/Dlugosz Repertoire Classics.vc71{pb6+6}.dll"
+				OutputFile="..\Release/Dlugosz Repertoire Classics.vc71{pb8}.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"
 				GenerateDebugInformation="TRUE"
-				ProgramDatabaseFile=".\..\Release/Dlugosz Repertoire Classics.vc71{pb6+6}.pdb"
+				ProgramDatabaseFile=".\..\Release/Dlugosz Repertoire Classics.vc71{pb8}.pdb"
 				SubSystem="2"
-				ImportLibrary=".\..\Release/Dlugosz Repertoire Classics.vc71{pb6+6}.lib"/>
+				ImportLibrary=".\..\Release/Dlugosz Repertoire Classics.vc71{pb8}.lib"/>
 			<Tool
 				Name="VCMIDLTool"
 				PreprocessorDefinitions="NDEBUG"
@@ -255,13 +256,25 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\..\classics\closure.cpp">
+				RelativePath="..\..\classics\closure-=-MSonPC.cpp">
+				<FileConfiguration
+					Name="CLR Release|Win32"
+					ExcludedFromBuild="TRUE">
+					<Tool
+						Name="VCCLCompilerTool"/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\..\classics\copy_semantics.cpp">
 			</File>
 			<File
 				RelativePath="..\..\classics\crc32.cpp">
 			</File>
 			<File
 				RelativePath="..\..\classics\critical_section.cpp">
+			</File>
+			<File
+				RelativePath="..\..\classics\data_t.cpp">
 			</File>
 			<File
 				RelativePath="..\..\classics\debug.cpp">

@@ -1,6 +1,6 @@
-// The Repertoire Project copyright 2001 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
-// File: Dependant_Libs\Repertoire\ratwin\window=struct.h
-// Revision: post-public build 6
+// The Repertoire Project copyright 2006 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
+// File: ratwin\window=struct.h
+// Revision: public build 8, shipped on 11-July-2006
 
 #pragma once
 #include "ratwin\message=struct.h"

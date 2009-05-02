@@ -1,6 +1,6 @@
-// The Repertoire Project copyright 1999 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
-// File: tomahawk\message_tap.h
-// Revision: public build 6, shipped on 28-Nov-1999
+// The Repertoire Project copyright 2006 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
+// File: old tomahawk\message_tap.h
+// Revision: public build 8, shipped on 11-July-2006
 
 /* A "message tap" is the mechanism for converting Windows messages
    into object member function calls.  This whole thing is encapsulated,

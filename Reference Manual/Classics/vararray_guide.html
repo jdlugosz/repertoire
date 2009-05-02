@@ -1,19 +1,20 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"  "http://www.w3.org/TR/html4/loose.dtd">
 <HTML>
 <HEAD>
 <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=windows-1252">
-<TITLE>vararray User's Guide</TITLE>
+<TITLE>vararray User’s Guide</TITLE>
+<META http-equiv="Content-Script-Type" content="text/javascript">
+<SCRIPT type= "text/javascript" src="../helpers.js"></SCRIPT>
 <LINK REL=STYLESHEET HREF="../info.css" TYPE="text/css">
+<SCRIPT type="text/javascript">
+   checkframe ("vararray_index.html");
+</SCRIPT>
 </HEAD>
 
 <BODY>
-<!-- Standard banner at top of Reper file -->
-<P CLASS="banner">This document is one section of The Repertoire Reference, found at
-      <A HREF="http://www.dlugosz.com/Repertoire/refman/mainframe.html" TARGET="_top">http://www.dlugosz.com/Repertoire/refman/mainframe.html</A>.<BR>
-       Copyright 2004 by <A HREF="mailto:john&#x40;dlugosz.com">John M. Dlugosz</A>.
-    </P> 
-<A NAME="toptop"></A>
-<!-- end of standard banner -->
-<H1>vararray Users Guide</H1>
+<IFRAME id="page_banner" src="../page_banner.html" scrolling="no"></IFRAME>
+
+<H1 id="toptop">vararray User’s Guide</H1>
 <P>The vararray template is a collection modeled on a variable sized array.</P>
 <P>See also the <A HREF="vararray_index.html" TARGET="index">member reference index</A>.</P>
 
@@ -23,33 +24,35 @@ and iterators don’t have problems with changes to the collection.  The collectio
 and lazy copying built in, so arrays can be efficiently passed or returned by value, and there are
 never any “lifetime” issues to worry about.</P>
 
+<H2>Contents</H2>
 <UL>
-Read about:</P>
-<LI><A HREF="#1">Two Flavors: _s and _g</A>
-<LI><A HREF="#2">Creation</A>
-<LI><A HREF="#3">Access to Array Elements</A>
-<LI><A HREF="#4">Assignment and Copying</A>
-<LI><A HREF="#5">Reference Counting — COW or alias</A>
-<LI><A HREF="#6">Splicing — insert, remove, append, etc.</A>
-<LI><A HREF="#7">Iterators</A>
-<LI><A HREF="#8">Capacity, Size, and Reserving Room</A>
+<LI><A HREF="#x1">Two Flavors: _s and _g</A>
+<LI><A HREF="#x2">Creation</A>
+<LI><A HREF="#x3">Access to Array Elements</A>
+<LI><A HREF="#x4">Assignment and Copying</A>
+<LI><A HREF="#x5">Reference Counting — COW or alias</A>
+<LI><A HREF="#x6">Splicing — insert, remove, append, etc.</A>
+<LI><A HREF="#x7">Iterators</A>
+<LI><A HREF="#x8">Capacity, Size, and Reserving Room</A>
 </UL>
 
-<A NAME="1"><H2>Two Flavors: _s and _g</H2></A>
-The vararray template comes in two flavors:  <code>vararray_s</code> and <code>vararray_g</code>.  The only difference is in the 
+<H2 id="x1">Two Flavors: _s and _g</H2>
+<P>The vararray template comes in two flavors:  <code>vararray_s</code> and <code>vararray_g</code>.  The only difference is in the 
 constructors, and the bulk of the implementation is inherited from the vararray (no suffix) base class.</P>
 
 <P>The <code>vararray_g</code> is the <I>general</I> form.  It treats elements properly, invoking the constructors, destructors, and 
 copy assignment as individual elements are created, destroyed, or moved.  You can use <code>vararray_g</code> for any element
 type, even when the element has constructors, destructors, assignment operators, or virtual functions.</P>
 
-<P>The <code>vararray_s</code> is a <I>special</I> or <I>small</I> form.  It uses <code>memcpy()</code> to move elements around, so is only 
+<P>The <code>vararray_s</code> is a <I>special</I> or <I>small</I> form.  It uses <code>memcpy</code> 
+to move elements around, so is only 
 suitable for elements that are primitive types or simple C-like structures.  That is, no destructor or constructor is 
 invoked on the individual elements.  There are two advantages to useing the _s form:  It is more efficient, and it 
 doesn’t generate unique code for each instantiation.</P>
 
-<P>So, using <code>vararray_g</code> is always correct.
-<PRE>
+<P>Using <code>vararray_g</code> is always correct, as it works for any type.</P>
+
+<PRE class="code">
 class C {
 public:
    C();
@@ -58,30 +61,31 @@ public:
    virtual void foo();
    };
    
-vararray_g&lt;C&gt; clist;  //OK
-vararray_g&lt;int&gt; ilist;  //also OK.
+vararray_g&lt;C&gt; clist;  <I>//OK</I>
+vararray_g&lt;int&gt; ilist;  <I>//also OK.</I>
 </PRE>
 
-Note that like with regular arrays, there has to be a default constructor on the element type.  The <code>vararray_g&lt;C&gt;</code> will 
+<P>Note that like with regular arrays, there has to be a default constructor on the element type.  The <code>vararray_g&lt;C&gt;</code> will 
 use the default constructor to build or enlarge the array, the destructor when removing elements, and the proper 
 assignment operator when writing or reading elements.</P>
 
-<P>You can optionally use a <code>vararray_s</code> for simple types.
-<PRE>
-vararray_s&lt;C&gt; clist;  //wrong!
-vararray_s&lt;int&gt; ilist;  //OK.
+<P>You can optionally use a <code>vararray_s</code> for simple types.</P>
+<PRE class="code">
+vararray_s&lt;C&gt; clist;  <I>//wrong!</I>
+vararray_s&lt;int&gt; ilist;  <I>//OK.</I>
 </PRE>
 
+<P><IMG src="../images/caution.png" style="height:2em" ALIGN="right" ALT="caution" TITLE="This icon indicates special instructions or pitfalls.">
 The <code>vararray_s&lt;C&gt;</code> will not initialize elements when the array is created or enlarged, will not call destructors when 
-the array shrinks or is destroyed, and will use <code>memcpy()</code> to read and write elements.  For the <code>vararray_s&lt;int&gt;</code>, this
-behavior is not a problem.</P>
+the array shrinks or is destroyed, and will use <code>memcpy</code> to read and write elements.  
+For the <code>vararray_s&lt;int&gt;</code>, this is just fine.  For <code>vararray_s&lt;C&gt;</code>,
+this is incorrect as objects of class <code>C</code> expect to be constructed, destructed, and assigned properly.</P>
 
 <P>The difference is only in the constructors.  So you must define variables of the desired flavor, but you can use a 
 plain <code>vararray</code> for references to <code>vararray</code>s of either flavor.</P>
 
-<PRE>
-<A name="sum example 1">
-int sum (const vararray&lt;int&gt;& A)</A>
+<PRE id="sum_example_1" class="code">
+int sum (const <B>vararray&lt;int&gt;&amp;</B> A)
  {
   int total= 0;
   const int count= A.elcount();
@@ -90,123 +94,132 @@ int sum (const vararray&lt;int&gt;& A)</A>
   return total;
   }
   
-//... later
+<I>//&hellip; later</I>
 vararray_s&lt;int&gt; array1;
 vararray_g&lt;int&gt; array2;
-// ... populate the arrays ...
-int sum1= sum (array1);   //sum takes an _s
-int sum2= sum (array2);  // sum also takes a _g
+<I>// &hellip; populate the arrays &hellip;</I>
+int sum1= sum (array1);   <I>//sum takes an _s</I>
+int sum2= sum (array2);  <I>// sum also takes a _g</I>
 </PRE>
 
-<A NAME="2"><H2>Creation</H2></A>
-The <code>vararray_s</code> and <code>vararray_g</code> have several constructors.  Both flavors have the same interface, so I’ll 
+<H2 id="x2">Creation</H2>
+<P>The <code>vararray_s</code> and <code>vararray_g</code> have several constructors.  Both flavors have the same interface, so I’ll 
 demonstrate just once with <code>vararray_g</code>.  The same applies to <code>vararray_s</code>.  See also 
 <A HREF="vararray.html#constructor" TARGET="info">constructors</A> in the member reference.
 </P>
 
-With no arguments, an empty array is created.  You cannot subscript such an empty array, since any subscript value is 
+<P>With no arguments, an empty array is created.  You cannot subscript such an empty array, since any subscript value is 
 out of range.</P>
 
-<PRE>
-vararray_s&lt;C&gt; array1;
+<PRE class="code">
+vararray_s&lt;C&gt; array1;  <I>//empty</I>
 </PRE>
 
-If you give a single argument, the array is created with that many elements.
+<P>If you give a single argument, the array is created with that many elements.</P>
 
-<PRE>
-vararray_s&lt;C&gt; array2 (5);
+<PRE class="code">
+vararray_s&lt;C&gt; array2 (5);  <I>//5 elements constructed</I>
 </PRE>
 
-With two arguments, you specify an initial size and reserve room to grow without reallocating.  This “reserve area” 
-doesn’t always help, as explained under <A HREF="vararray.html#reserve" TARGET="info">reserve()</A>, but under the
-right conditions can cause a <code>vararray</code> to be changed in-place rather than copying all the elements to a new block of memory.
+<P>With two arguments, you specify an initial size and reserve room to grow without reallocating.
+As explained under the <A HREF="vararray.html#reserve" class="code">reserve</A> function, 
+a <code>vararray</code> with reserved space can be enlarged in-place rather than copying 
+all the elements to a new block of memory.</P>
 
-<P>To duplicate an existing array, use the copy constructor.  This shares data with the original, and doesn’t actually 
+<P>To duplicate an existing array, use the
+<A HREF="vararray.html#copy_constructor">copy constructor</A>.  This shares data with the original, and doesn’t actually 
 copy anything until you try to modify one of them.  It is semantically a distinct copy, but is lazy about actually duplicating
-the data.  This makes it efficient to pass and return <code>vararray</code>s by value.
+the data.  This makes it efficient to pass and return <code>vararray</code>s by value.</P>
 
-<PRE>
+<PRE class="code">
 vararray_s&lt;C&gt; array3 (array2);
+   <I>&hellip;or&hellip;</I>
+vararray&lt;C&gt; array3 (array2);  <I>// unnecessary to specify _s or _g.</I>
 </PRE>
 
-Alternativly, use the <code>alias</code> parameter to disable the copy-on-write behavior.  Now both arrays share data, 
+<P>Alternativly, use the <code><B>alias</B></code> parameter to disable the copy-on-write behavior.  Now both arrays share data, 
 and a change in one <I>will be</I> reflected in the other, and both arrays remain sharing data.  This is explained in more 
-detail under <A HREF="#5">Reference Counting — COW or alias</A>.
+detail under <A HREF="#x5">Reference Counting — COW or alias</A>.</P>
 
-<PRE>
-vararray_s&lt;C&gt; array3 (array2, alias);
+<PRE class="code">
+vararray&lt;C&gt; array3 (array2, alias);
 </PRE>
 
-Finally, you can create a vararray populated with elements from a regular C++ native array.
+<P>Finally, you can create a vararray populated with elements from a regular C++ native array.</P>
 
-<PRE>
+<PRE class="code">
 const int len= 6;
 int data[len] { 87, 98, 43 32, 0, 1 };
 vararray_s&lt;int&gt; array4 (data, len);
 </PRE>
 
-<A NAME="3"><H2>Access to Array Elements</H2></A>
-Once you have an array, you need to be able to use it for something.  You can access individual elements using
+<H2 id="x3">Access to Array Elements</H2>
+<P>Once you have an array, you need to be able to use it for something.  You can access individual elements using
 <A HREF="vararray.html#[]" TARGET="info">operator[]</A>,
 <A HREF="vararray.html#get_at" TARGET="info">get_at</A>, and
 <A HREF="vararray.html#put_at" TARGET="info">put_at</A>.</P>
 
-<P>The non-const version of the subscript operator returns a reference to the elemement within the array, and may be used as an
-lvalue.  However, always use the reference right away in a larger expression — don’t hang on to it.</P>
+<P>
+<IMG src="../images/caution.png" style="height:2em" ALIGN="right" ALT="caution" TITLE="This icon indicates special instructions or pitfalls.">
+The non-const version of the subscript operator returns a reference to the elemement within the array, and may be used as an
+lvalue. However, always use the reference right away in a larger expression — don’t hang on to it.  </P>
 
-<PRE>
-array4[2]= 99;
+<P class="PRElike">array4[2]= 99;
 int x= array4[2];
 
-// don't do this:
-int& r= array4[2];  //remember the reference
-array4.append (99);  //causes array to re-arrange its memory
-r= 88;  //ka-boom!
-</PRE>
+<IMG src="../images/caution.png" style="height:4em" ALIGN="right" ALT="caution" TITLE="This icon indicates special instructions or pitfalls."><I>// don't do this:</I>
+int& r= array4[2];  <I>//remember the reference</I>
+array4.append (99);  <I>//causes array to re-arrange its memory</I>
+r= 88;  <I>//ka-boom!</I>
+</P>
 
-The subscript operator is sensitive to the constness of the array.  Subscripting a const array will give a const 
+<P>The subscript operator is sensitive to the constness of the array.  Subscripting a const array will give a const 
 element, which you cannot assign to.  More importantly, the subscript operator doesn’t know if its being used on the 
 left side of an assignment or not, so it assumes the worst.  If the array is sharing data, subscripting a non-const 
 array will cause a lazy-copy to be triggered.</P>
 
-An alternative way to access elements is with <code>get_at</code>.  This function fetches a value, without leaving a potentially 
+<P>An alternative way to access elements is with <A HREF="vararray.html#get_at" class="code">get_at</A>.
+This function fetches a value, without leaving a potentially 
 dangerous reference hanging around.  It knows the operation is a read, and never triggers a lazy-copy.  Likewise, the 
-alternative to set a value is with <code>put_at</code>.
+alternative to set a value is with <A HREF="vararray.html#get_at" class="code">put_at</A>.</P>
 
-<PRE>
-array4.put_at (/*value*/99, /*index*/2);
+<PRE class="code">
+array4.put_at (<I>/*value*/</I>99, <I>/*index*/</I>2);
 int x= array4.get_at(2);
 </PRE>
 
-You can get/set more than one element at a time using
+<P>You can get/set more than one element at a time using
 <A HREF="vararray.html#get" TARGET="info">get</A>, and
 <A HREF="vararray.html#put" TARGET="info">put</A>.</P>
 
 
-<A NAME="4"><H2>Assignment and Copying</H2></A>
-The copy constructor and copy assignment operator work in the usual way, producing a unique
+<H2 id="x4">Assignment and Copying</H2>
+<P>The <A HREF="vararray.html#copy_constructor">copy constructor</A> and 
+<A HREF="vararray.html#copy_assignment">copy assignment operator</A> work in the usual way, producing a unique
 object which is a copy of the original.  Internally, the new object references the same implementation
 data as the original, and will copy the data when (and only if) it’s modified.  This is called <I>lazy copy</I>
 or more specifically <I>Copy On Write</I>.</P>
 
 <P>Alternativly, you can disable the copy-on-write feature when making a “copy”, so that the new
-object aliases the original.  This is explained in more detail in the next section.<?P>
+object aliases the original, by using a second argument in the copy constructor or using
+<A HREF="vararray.html#alias_with" class="code">alias_with</A> instead of assignment.
+This is explained in more detail in the next section.</P>
 
-<PRE>
+<PRE class="code">
 typedef vararray_s&lt;complex&gt; testarray;
 testarray A;
-testarray B (A);  //normal copy
-testarray C (A, classics::alias); //C is "same" array as A
+testarray B (A);  <I>//normal copy</I>
+testarray C (A, classics::alias); <I>//C is "same" array as A</I>
 
 testarray D, E;
-D= A;  //normal copy.
-E= A.make_alias();  //E is "same" array as A.
+D= A;  <I>//normal copy.</I>
+E= A.alias_with();  <I>//E is "same" array as A.</I>
 </PRE>
 
 
 
-<A NAME="5"><H2>Reference Counting — COW or alias</H2></A>
-A vararray supports the sharing of implementation data with underlying reference counting.
+<H2 id="x5">Reference Counting — COW or alias</H2>
+<P>A vararray supports the sharing of implementation data with underlying reference counting.
 The reference counting technique can have two different sets of semantics, called <I>alias</I>
 and <I>copy-on-write</I> or COW.</P>
 
@@ -223,7 +236,7 @@ place can refer to the “same” vararray, without having to worry about who owns i
 to stop using it automatically destroys it.</P>
 
 <P>The COW semantics are what you are used to in a string class.  You can pass and return strings
-efficiently by value, because it uses lazy copy on write under the hood.  With a <code>vararray</code>, you
+efficiently by value, because it uses lazy copy-on-write under the hood.  With a <code>vararray</code>, you
 get the same type of behavior.</P>
 
 <P>By default, copies of a vararray (produced using the copy constructor or assignment operator)
@@ -231,9 +244,9 @@ have COW semantics.  This is the normal meaning of a “copy” — copying an object 
 object having a distinct identity.</P>
 
 <P>To get an alias of a vararray, use a second parameter to the copy constructor or use
-the <code>alias_with</code> function instead of assignment.</P>
+the <A HREF="vararray.html#alias_with" class="code">alias_with</A> function instead of assignment.</P>
 
-<PRE>
+<PRE class="code">
 typedef vararray_s&lt;complex&gt; testarray;
 testarray A;
 testarray B (A);
@@ -247,10 +260,9 @@ If you change <CODE>A</CODE>, the change <I>is</I> seen by <CODE>C</CODE>.
 You will notice that COW and alias semantics can exists simultaniously between various
 objects.  If you change <CODE>A</CODE>, <CODE>C</CODE> sees the change and <CODE>B</CODE> doesn’t.</P>
 
-<A NAME="6"><H2>Splicing — insert, remove, append, etc.</H2></A>
-In addition to reading and writing <A HREF="#3">individual elements</A>, you can insert and remove elements from a vararray.</P>
-The workhorse function in this category is called <A HREF="vararray.html#replace" TARGET="info">
-<code>replace</code></A>.
+<H2 id="x6">Splicing — insert, remove, append, etc.</H2>
+<P>In addition to reading and writing <A HREF="#x3">individual elements</A>, you can insert and remove elements from a vararray.
+The workhorse function in this category is called <A HREF="vararray.html#replace" class="code">replace</A>.</P>
 
 <P>There is a single common implementation that handles the general case.  That is, it takes care of multi-threading issues,
 and deals with inserting part of one array into itself.  By building a testing a single function, quality and robustness can be
@@ -259,33 +271,31 @@ better guaranteed.</P>
 <P>The replace operation removes some elements and inserts other elements in their place.  So, this degenerates to
 a pure delete (replace with nothing), a pure insert (remove nothing), or an append (insert at the end).</P>
 
-<P>In addition, there are more specialized functions, but they are implemented to simply call the master replace function.
-Others may be added in the future.
+<P>In addition, there are more specialized functions, but they are implemented to simply call the master <code>replace</code> function.
+Others may be added in the future.</P>
 
 <UL>
-<A HREF="vararray.html#append" TARGET="info" class="code">
-append</A><BR>
+<LI><A HREF="vararray.html#append" class="code">append</A>
+<LI><A HREF="vararray.html#remove" class="code">remove</A>
+<LI><A HREF="vararray.html#remove_all" class="code">remove_all</A>
+</UL>
 
-<A HREF="vararray.html#remove" TARGET="info" class="code">
-remove</A><BR>
-
-<A HREF="vararray.html#remove_all" TARGET="info" class="code">
-remove_all</A><BR>
-
-<A HREF="vararray.html#sorted_insert" TARGET="info" class="code">
-sorted_insert</A><BR>
+<P>And there is a function which does more work in addition to calling replace:</P>
+<UL>
+<LI><A HREF="vararray.html#sorted_insert" class="code">sorted_insert</A>
 </UL>
 
 
-<A NAME="7"><H2>Iterators</H2></A>
-A common operation to perform on an array is to loop over all elements.  You can do this with a <code>for</code> loop
-(from <code>0</code> through <code>elcount()</code>as seen in the earlier <A href="#sum example 1">example</A>
+<H2 id="x7">Iterators</H2>
+<P>A common operation to perform on an array is to loop over all elements.  You can do this with a <code>for</code> loop
+from <code>0</code> through <A HREF="vararray.html#elcount" class="code">elcount</A> as seen in the 
+earlier <A href="#sum_example_1">example</A>
 on summing the elements of an array.  But, a special object called an <I>iterator</I> can handle the special case of looping
 over the entire array.  The iterator has two improvements to the simple loop:  It is more efficient, and it offers unique semantics,
 discussed below.</P>
 
 <P>Here is the sum function written using an iterator.</P>
-<PRE>
+<PRE class="code">
 int sum (const vararray&lt;int&gt;& A)
  {
   int total= 0;
@@ -296,7 +306,8 @@ int sum (const vararray&lt;int&gt;& A)
   }
 </PRE>
 
-The <code>const_iterator</code> gives read-only access to the elements.  Since the <code>vararray</code> itself was const, you 
+<P>The <code>const_iterator</code> <span class="prognote">(need XREF to iterator reference)</span>
+gives read-only access to the elements.  Since the <code>vararray</code> itself was const, you 
 must use a const iterator in this example.  Notice that the template argument to the iterator is the element type, same as was
 used in the <code>vararray</code>’s template argument.</P>
 
@@ -304,7 +315,8 @@ used in the <code>vararray</code>’s template argument.</P>
 <code>-&gt;</code> to access individual members.</P>
 
 <P>The iterators have a feature that distinguishes them from similar containers in other libraries:  they are <B>safe</B>.  As well
-as providing more efficient access than repeated use of a safe <code>operator[]</code>, the iterator is itself just as safe!  With STL, 
+as providing more efficient access than repeated use of a safe <A HREF="vararray.html#[]" class="code">operator[]</A>, 
+the iterator is itself just as safe!  With STL, 
 for example, changing the collection’s morphology (that is, adding or removing elements) will render all iterators invalid, and there is no
 error checking so you essentially have stray pointers if you use such an invalid iterator.</P>
 
@@ -316,7 +328,8 @@ iterators using the collection.  The iterators don’t see the change.</P>
 remove elements, the iterator doesn’t see the change, and keeps iterating over the original list.  In general, any change in
 morphology is not seen by the iterator.</P>
 
-<P>This property can be used to good advantage.  For example, in Tomahawk, the central dispatching mechanism uses
+<P>This property can be used to good advantage.  For example, in <A HREF="../Tomahawk/class_index.html" TARGET="index">
+Tomahawk</A>, the central dispatching mechanism uses
 an iterator to perform a series of callbacks.  Any callback may modify the callback list, by registring or revoking a handler.
 The change will not be seen on this callback pass, but takes effect next time the list is traversed.</P>
 
@@ -331,20 +344,24 @@ an element are seen by the iterator, and changes made to elements through the it
 morphology of the array, then its unspecified whether or not <code>alias</code> continues to work.  In the current implementation,
 it does not.  In a future implementation, it may continue to alias some of the elements but not others.</P>
 
-<A NAME="8"><H2>Capacity, Size, and Reserving Room</H2></A>
-There is a <A HREF="vararray.html#reserve" TARGET="info" class="code">reserve</A> function that enlarges the space for the array
+<H2 id="x8">Capacity, Size, and Reserving Room</H2>
+<P>There is a <A HREF="vararray.html#reserve" TARGET="info" class="code">reserve</A> function that enlarges the space for the array
 without increasing the size of the array itself.  That is, the actual size is smaller than the capacity, and potentially the array
 could grow in-place without having to recopy the entire array.  This affects subsequent calls to resize or any splicing function,
-if it does not need to trigger a copy-on-right and it doesn’t copy from stuff that is changed by the function.  See 
+if it does not need to trigger a copy-on-write and it doesn’t copy from stuff that is changed by the function.  See 
 <A HREF="vararray.html#reserve" TARGET="info" class="code">reserve</A> in the reference manual for more information.</P>
 
 <P>Besides changing the size of an array by adding or removing elements from the end using any of the splicing functions, 
-you can use the following specialized functions:
+you can use the following specialized functions:</P>
 
 <UL>
 <LI><A HREF="vararray.html#resize" TARGET="info" class="code">resize</A> — can make an array smaller or larger
 <LI><A HREF="vararray.html#truncate" TARGET="info" class="code">truncate</A> — can make an array smaller only
 </UL>
 
+<HR>
+<IFRAME id="page_footer" src="../page_footer.html"></IFRAME>
+</BODY>
+</HTML>
 
 

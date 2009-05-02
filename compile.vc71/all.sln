@@ -124,20 +124,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "virtual_key_UT", "Classics\
 		{711033DB-C296-44E6-AFFC-8AABB3454448} = {711033DB-C296-44E6-AFFC-8AABB3454448}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "trug_UT", "Classics\trug_UT.vcproj", "{1338E15C-BCE7-48BD-9E38-C583431AF765}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
 Global
-	GlobalSection(SourceCodeControl) = preSolution
-		SccNumberOfProjects = 2
-		SccProjectUniqueName0 = classics\\classics.vcproj
-		SccProjectName0 = \u0022$/repertoire/classics\u0022,\u0020DAAAAAAA
-		SccLocalPath0 = ..\\classics
-		SccProvider0 = MSSCCI:Microsoft\u0020Visual\u0020SourceSafe
-		SccProjectFilePathRelativizedFromConnection0 = ..\\compile.vc71\\classics\\
-		SccProjectUniqueName1 = ratwin\\ratwin.vcproj
-		SccProjectName1 = \u0022$/repertoire/ratwin\u0022,\u0020PAAAAAAA
-		SccLocalPath1 = ..\\ratwin
-		SccProvider1 = MSSCCI:Microsoft\u0020Visual\u0020SourceSafe
-		SccProjectFilePathRelativizedFromConnection1 = ..\\compile.vc71\\ratwin\\
-	EndGlobalSection
 	GlobalSection(SolutionConfiguration) = preSolution
 		CLR Release = CLR Release
 		Debug = Debug
@@ -175,7 +166,6 @@ Global
 		{711033DB-C296-44E6-AFFC-8AABB3454448}.Release.ActiveCfg = Release|Win32
 		{711033DB-C296-44E6-AFFC-8AABB3454448}.Release.Build.0 = Release|Win32
 		{AE36AB9B-5747-40D5-BA56-13947140B0B4}.CLR Release.ActiveCfg = CLR Release|Win32
-		{AE36AB9B-5747-40D5-BA56-13947140B0B4}.CLR Release.Build.0 = CLR Release|Win32
 		{AE36AB9B-5747-40D5-BA56-13947140B0B4}.Debug.ActiveCfg = Debug|Win32
 		{AE36AB9B-5747-40D5-BA56-13947140B0B4}.Debug.Build.0 = Debug|Win32
 		{AE36AB9B-5747-40D5-BA56-13947140B0B4}.Release.ActiveCfg = Release|Win32
@@ -229,7 +219,6 @@ Global
 		{993955C4-415B-4871-948A-0C0973675598}.Release.ActiveCfg = Release|Win32
 		{993955C4-415B-4871-948A-0C0973675598}.Release.Build.0 = Release|Win32
 		{7345B232-A986-4BBE-906A-096FBDA88900}.CLR Release.ActiveCfg = CLR Release|Win32
-		{7345B232-A986-4BBE-906A-096FBDA88900}.CLR Release.Build.0 = CLR Release|Win32
 		{7345B232-A986-4BBE-906A-096FBDA88900}.Debug.ActiveCfg = Debug|Win32
 		{7345B232-A986-4BBE-906A-096FBDA88900}.Debug.Build.0 = Debug|Win32
 		{7345B232-A986-4BBE-906A-096FBDA88900}.Release.ActiveCfg = Release|Win32
@@ -264,8 +253,7 @@ Global
 		{2F754517-61A3-4760-8966-E5D249E17685}.Debug.Build.0 = Debug|Win32
 		{2F754517-61A3-4760-8966-E5D249E17685}.Release.ActiveCfg = Release|Win32
 		{2F754517-61A3-4760-8966-E5D249E17685}.Release.Build.0 = Release|Win32
-		{286B441C-E2FB-4645-9AE6-DDC3E974E430}.CLR Release.ActiveCfg = CLR Release|Win32
-		{286B441C-E2FB-4645-9AE6-DDC3E974E430}.CLR Release.Build.0 = CLR Release|Win32
+		{286B441C-E2FB-4645-9AE6-DDC3E974E430}.CLR Release.ActiveCfg = Release|Win32
 		{286B441C-E2FB-4645-9AE6-DDC3E974E430}.Debug.ActiveCfg = Debug|Win32
 		{286B441C-E2FB-4645-9AE6-DDC3E974E430}.Debug.Build.0 = Debug|Win32
 		{286B441C-E2FB-4645-9AE6-DDC3E974E430}.Release.ActiveCfg = Release|Win32
@@ -294,6 +282,12 @@ Global
 		{264AF37C-3378-4B46-86D8-2323942D9B29}.Debug.Build.0 = Debug|Win32
 		{264AF37C-3378-4B46-86D8-2323942D9B29}.Release.ActiveCfg = Release|Win32
 		{264AF37C-3378-4B46-86D8-2323942D9B29}.Release.Build.0 = Release|Win32
+		{1338E15C-BCE7-48BD-9E38-C583431AF765}.CLR Release.ActiveCfg = CLR Release|Win32
+		{1338E15C-BCE7-48BD-9E38-C583431AF765}.CLR Release.Build.0 = CLR Release|Win32
+		{1338E15C-BCE7-48BD-9E38-C583431AF765}.Debug.ActiveCfg = Debug|Win32
+		{1338E15C-BCE7-48BD-9E38-C583431AF765}.Debug.Build.0 = Debug|Win32
+		{1338E15C-BCE7-48BD-9E38-C583431AF765}.Release.ActiveCfg = Release|Win32
+		{1338E15C-BCE7-48BD-9E38-C583431AF765}.Release.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 	EndGlobalSection

@@ -1,6 +1,6 @@
-// The Repertoire Project copyright 2003 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
+// The Repertoire Project copyright 2006 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: classics\atomic_counter.cpp
-// Revision: post-public build 6, modified 15-August-2003 or later
+// Revision: public build 8, shipped on 11-July-2006
 
 #define CLASSICS_EXPORT __declspec(dllexport)
 #include "classics\atomic_counter.h"

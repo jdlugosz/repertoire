@@ -1,19 +1,19 @@
-// The Repertoire Project copyright 2001 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
+// The Repertoire Project copyright 2006 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: ratwin\dialog.h
-// Revision: 
+// Revision: public build 8, shipped on 11-July-2006
 
 #pragma once
 #if defined RATWIN_NoGlobals
-   #error ratwin\dialog.h contains globals.
+   #error ratwin\dialog.h contains globals.  Use dialog=struct.h instead.
 #endif
-#include "ratwin\base.h"
+#include "ratwin\dialog=struct.h"
 
 // DLL imports "cloaked" for overloading
 extern "C" {
 __declspec(dllimport) int __stdcall EndDialog (Dlugosz::ratwin::arg::arg32 hDlg, int nResult);
 __declspec(dllimport) int __stdcall DialogBoxParamA (
     Dlugosz::ratwin::arg::arg32,
-    const char*,
+    Dlugosz::ratwin::arg::carg32,
     Dlugosz::ratwin::arg::arg32 hWndParent,
     Dlugosz::ratwin::arg::arg32 lpDialogFunc,
     Dlugosz::ratwin::arg::arg32 dwInitParam);
@@ -30,25 +30,6 @@ namespace ratwin {
 
 namespace dialog {
 
-enum command_id {
-   IDOK= 1, IDCANCEL, IDABORT, IDRETRY, IDIGNORE, IDYES, IDNO, IDCLOSE, IDHELP 
-   };
-
-enum user_button_notification_codes {
-   BN_CLICKED= 0,
-   BN_PAINT,
-   BN_PUSHED,
-   BN_HILITE= BN_PUSHED,
-   BN_UNPUSHED,
-   BN_UNHILITE= BN_UNPUSHED,
-   BN_DISABLE,
-   BN_DOUBLECLICKED,
-   BN_DBLCLK= BN_DOUBLECLICKED,
-   BN_SETFOCUS,
-   BN_KILLFOCUS
-   };
-
-typedef int (__stdcall* DLGPROC) (types::HWND, unsigned, unsigned, ulong);
 
 inline
 bool EndDialog (types::HWND hDlg, int nResult)
@@ -56,7 +37,7 @@ bool EndDialog (types::HWND hDlg, int nResult)
 
 inline int DialogBoxParam (
     types::HINSTANCE hInstance,
-    const char* lpTemplateName,
+    NumOrName<char>  lpTemplateName,
     types::HWND hWndParent,
     DLGPROC lpDialogFunc,
     void* dwInitParam)
@@ -69,7 +50,7 @@ inline int DialogBoxParam (
 
 inline int DialogBox (
     types::HINSTANCE hInstance,
-    const char* lpTemplateName,
+    NumOrName<char>  lpTemplateName,
     types::HWND hWndParent,
     DLGPROC lpDialogFunc)
  { return DialogBoxParam (hInstance, lpTemplateName, hWndParent, lpDialogFunc, 0); }    
@@ -88,13 +69,13 @@ types::HWND GetDlgItem (types::HWND wnd, int item)
 inline
 types::HWND CreateDialogParam (
     types::HINSTANCE hInstance,
-    const char* lpTemplateName,
+    NumOrName<char> lpTemplateName,
     types::HWND hWndParent,
     DLGPROC lpDialogFunc,
     void* dwInitParam)
  { return reinterpret_cast <types::HWND> (::CreateDialogParamA (
     reinterpret_cast<arg::arg32>(hInstance),
-    reinterpret_cast<arg::carg32>(lpTemplateName),
+    lpTemplateName,
     reinterpret_cast<arg::arg32>(hWndParent),
     reinterpret_cast<arg::arg32>(lpDialogFunc),
     reinterpret_cast<arg::arg32>(dwInitParam))); }

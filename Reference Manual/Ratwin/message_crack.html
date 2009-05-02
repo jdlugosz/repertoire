@@ -15,11 +15,17 @@
 <P>This describes the RatWin/Tomahawk system of extracting meaningful parameter information
 from the message information passed to a WinProc.</P>
 
+<H2>Related Documents</H2>
+<UL>
+	<LI><A HREF="../Tomahawk/message_tap_index.html" TARGET="index">Class <code>message_tap</code></A>
+	<LI><A HREF="../Tomahawk/WM_TOMAHAWK.html#toptop"><code>WM_TOMAHAWK</code> documentation</A>
+</UL>
+
 <H2>Contents</H2>
 <UL>
 	<LI><A HREF="#overview">Overview</A>
 	<LI><A HREF="#sMSG">sMSG</A>
-	<LI><A HREF="#WM_xxx">WM_ ...</A>
+	<LI><A HREF="#WM_xxx">WM_ ..._msg</A>
 	<LI><A HREF="#MSG_cast">MSG_cast</A>
 </UL>
 
@@ -68,7 +74,7 @@ over and over.  The code handling messages will often contain only a little code
 with the same message data, and call the base class version, and call the default, etc.  The message is
 <I>routed</I> to modular code, so it gets passed a lot and treated as a lump.</P>
 
-<P>Finally, putting the items together makes the idea of the MSG_cast very clean and elegant.</P>
+<P>Finally, putting the items together makes the idea of the <A HREF="#MSG_cast" class="code">MSG_cast</A> very clean and elegant.</P>
 
 <H3>Why is it so plain?</H3>
 
@@ -82,7 +88,7 @@ with no special way to &ldquo;crack&rdquo; them or refer to them with more meani
 Instead, each set of cracked arguments is described in a <I>different</I> class, with each class
 named after the message it services.</P>
 
-<H2 id="WM_xxx">WM_xxx structures</H2>
+<H2 id="WM_xxx">WM_..._msg structures</H2>
 
 <P>There are structures named after the messages they service, one per file, in the <code>Tomahawk\MSG</code>
 directory.  For example, <code>WM_command_msg</code> is a struct in <code>Tomahawk\MSG\WM_COMMAND.h</code>,

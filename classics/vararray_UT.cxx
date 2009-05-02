@@ -1,6 +1,6 @@
-// The Repertoire Project copyright 1999 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
+// The Repertoire Project copyright 2006 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: classics\vararray_UT.cxx
-// Revision: public build 6, shipped on 28-Nov-1999
+// Revision: public build 8, shipped on 11-July-2006
 
 #if _MSC_VER == 1310
    #pragma warning( disable : 4348 )  // Microsoft's std headers don't clean compile!
@@ -159,7 +159,7 @@ void tester<testarray_t>::t3()
     }
  cout << "note: aliasing not automatically validated." << endl;
  }
- 
+
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
 template <typename testarray_t>
@@ -324,7 +324,7 @@ int_object::operator int () const
  check();
  return value;
  }
- 
+
 int_object& int_object::operator= (const int_object& other)
  {
  check();
@@ -384,7 +384,7 @@ void replace_tester<Vector>::show (const Vector& v)
     cout << endl;
     }
  }
- 
+
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 //  simple sanity tests
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
@@ -482,7 +482,7 @@ inline int rand (int range)
  {
  return rand() % range;
  }
- 
+
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
 void get_range (int count, int& start, int& len)
@@ -497,7 +497,7 @@ void get_range (int count, int& start, int& len)
  len= end-start;
 // cout << "[" << count << ": " << start << ',' << len << "]\t";
  }
- 
+
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
 template <>
@@ -539,7 +539,7 @@ bool replace_tester<Vector>::check_memory()
     }
  return true;  // no discrepencies
  }
- 
+
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
 template <typename Vector>
@@ -560,7 +560,7 @@ void replace_tester<Vector>::setup_population()
     memorize (loop);
     }
  }
- 
+
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 //  Crunching super tests -- test cases
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
@@ -573,7 +573,7 @@ void showarray (const char* name, T array, int len)
     cout << array[loop] << " ";
  cout << "]" << endl;
  }
- 
+
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
 template <typename Vector>
@@ -614,7 +614,7 @@ void replace_tester<Vector>::validate_replace (int target, int delpos, int delle
  // OK! passed all tests.
  memorize (target);
  }
- 
+
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
 template<>
@@ -640,7 +640,7 @@ void replace_tester<Vector>::crunching_replace (int iterations)
  int loop= 0;
  int total_population= get_total_population();
  const int population_point= 10*total_population;
- try { 
+ try {
     for (;  loop < iterations;  loop++) {
     const int target= rand (array_size);
     int delpos, dellen;
@@ -682,8 +682,8 @@ void replace_tester<Vector>::crunching_replace (int iterations)
           else if (new_elcount > old_elcount)  ++ same_alloc_larger;
           else ++ same_alloc_same_size;
           }
-       
-       // get more shared copies   
+
+       // get more shared copies
        test_array[doner]= test_array[5];
        memorize (doner);
        }
@@ -699,7 +699,7 @@ void replace_tester<Vector>::crunching_replace (int iterations)
     ++errorcount;
     }
  }
- 
+
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
 template <typename Vector>
@@ -718,7 +718,20 @@ void replace_tester<Vector>::test_replace()
     cout << "replace() testing aborted.  Error is: " << s << endl;
     }
  }
- 
+
+/* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
+
+void base_template_ctor()
+ {
+ using classics::specify_data_t;
+ using classics::s_data_t;
+ // sanity: does the compiler even swollow this usage?
+ //  no?
+ //      auto classics::vararray<int> A1 (specify_data_t< s_data_t<int> > ());
+ specify_data_t< s_data_t<int> > ss;
+ classics::vararray<int> A1 (ss);  // so far, so good.
+ }
+
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
 int main (int argc, char* argv[])
@@ -741,6 +754,7 @@ int main (int argc, char* argv[])
        cout << errorcount << " errors detected." << endl;
        return 10;
        }
+    base_template_ctor();
     }
  catch (classics::exception& X) {
     cout << "unexpected exception caught:" << endl;
@@ -754,5 +768,5 @@ int main (int argc, char* argv[])
  cout << "All tests passed." << endl;
  return 0;
  }
- 
+
 

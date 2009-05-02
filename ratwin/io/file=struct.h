@@ -1,6 +1,6 @@
-// The Repertoire Project copyright 2000 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
+// The Repertoire Project copyright 2006 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: ratwin\io\file=struct.h
-// Revision: post - public build 5
+// Revision: public build 8, shipped on 11-July-2006
 
 
 #pragma once

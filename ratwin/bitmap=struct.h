@@ -1,6 +1,6 @@
-// The Repertoire Project copyright 2001 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
-// File: ratwin\bitmap.h
-// Revision: updated
+// The Repertoire Project copyright 2006 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
+// File: ratwin\bitmap=struct.h
+// Revision: public build 8, shipped on 11-July-2006
 
 #pragma once
 #include "ratwin\base.h"

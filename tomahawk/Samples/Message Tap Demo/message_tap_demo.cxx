@@ -1,3 +1,6 @@
+// The Repertoire Project copyright 2006 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
+// File: tomahawk\Samples\Message Tap Demo\message_tap_demo.cxx
+// Revision: public build 8, shipped on 11-July-2006
 
 #include "tomahawk\message_tap.h"
 #include "tomahawk\Dialog_message_tap.h"
@@ -282,7 +285,7 @@ int __stdcall WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance, char* lpCmd
  if (!InitInstance(hInstance, ratwin::window::SW_window(nCmdShow))) return (2);
  tomahawk::simple_message_pump pump;
  int exitcode= pump.pumpit();
- if (tomahawk::message_tap::get_object_count())  OutputDebugString ("*** Not all objects were destroyed!\n");
+// if (tomahawk::message_tap::get_object_count())  OutputDebugString ("*** Not all objects were destroyed!\n");
  return exitcode;
  }
 

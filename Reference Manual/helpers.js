@@ -1,6 +1,9 @@
+/* javascript used by www.dlugosz.com/Repertoire/refman/
+   Copyright 2004 by John M. Dlugosz
+*/
 
 function get_params (w, result)
- {   
+ {
  var url= w.document.URL;
  var qpos= url.indexOf ('?');
  if (qpos < 0)  return false;
@@ -27,7 +30,7 @@ function checkframe (indexurl)
     if (params.param1 == "NOFRAMES") return;  //don't change anything.
     else alert ("invalid parameter " + params.param1 + " ignored.");
     }
- if (name != "info") {
+ if (name != "info" && name != "footer") {
     var infoURL= location.href;
     // make the URL relative to this location.
     var pos= infoURL.indexOf ('/Tomahawk/');
@@ -40,4 +43,4 @@ function checkframe (indexurl)
     location.href= newURL;
     }
  }
- 
+

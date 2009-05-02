@@ -1,6 +1,6 @@
-// The Repertoire Project copyright 2002 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
-// File: classics\COM\IOleItemContainer_impl.h
-// Revision: fresh
+// The Repertoire Project copyright 2006 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
+// File: classics\COM\OleItemContainer_impl.h
+// Revision: public build 8, shipped on 11-July-2006
 
 #pragma once
 #if !defined CLASSICS_EXPORT

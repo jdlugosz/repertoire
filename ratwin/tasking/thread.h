@@ -1,6 +1,6 @@
-// The Repertoire Project copyright 1999 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
+// The Repertoire Project copyright 2006 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: ratwin\tasking\thread.h
-// Revision: updated
+// Revision: public build 8, shipped on 11-July-2006
 
 #pragma once
 #if defined RATWIN_NoGlobals

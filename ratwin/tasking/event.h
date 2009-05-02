@@ -1,6 +1,6 @@
-// The Repertoire Project copyright 2002 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
+// The Repertoire Project copyright 2006 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: ratwin\tasking\event.h
-// Revision: updated
+// Revision: public build 8, shipped on 11-July-2006
 
 // SEE ALSO classics\event_flag.h for easy-to-use class wrapper.
 

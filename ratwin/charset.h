@@ -1,6 +1,6 @@
-// The Repertoire Project copyright 2001 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
+// The Repertoire Project copyright 2006 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: ratwin\charset.h
-// Revision: 
+// Revision: public build 8, shipped on 11-July-2006
 
 #pragma once
 #if defined RATWIN_NoGlobals
@@ -15,6 +15,7 @@ __declspec(dllimport) int __stdcall CharToOemBuffW (Dlugosz::ratwin::arg::carg32
 __declspec(dllimport) int __stdcall MultiByteToWideChar (unsigned, unsigned long, Dlugosz::ratwin::arg::carg32, int, Dlugosz::ratwin::arg::arg32, int);
 __declspec(dllimport) int __stdcall GetStringTypeW (unsigned long, Dlugosz::ratwin::arg::carg32, int, unsigned short*);
 __declspec(dllimport) int __stdcall WideCharToMultiByte (unsigned, unsigned long, Dlugosz::ratwin::arg::carg32, int, char*, int, const char*, int*);
+__declspec(dllimport) int __stdcall FoldStringW (unsigned long, Dlugosz::ratwin::arg::carg32, int, Dlugosz::ratwin::arg::arg32, int);
 __declspec(dllimport) unsigned long __stdcall LCMapStringW (unsigned long, unsigned long, Dlugosz::ratwin::arg::carg32, int, Dlugosz::ratwin::arg::arg32, int);
 __declspec(dllimport) unsigned long __stdcall LCMapStringA (unsigned long, unsigned long, Dlugosz::ratwin::arg::carg32, int, Dlugosz::ratwin::arg::arg32, int);
 __declspec(dllimport) unsigned long __stdcall GetThreadLocale();
@@ -80,6 +81,29 @@ inline
 int WideCharToMultiByte (CodePage_t cp, unsigned flags, const wchar_t* src, int srclen, char* dest, int destlen)
  {
  return ::WideCharToMultiByte (cp, flags, reinterpret_cast<arg::carg32>(src), srclen, dest, destlen, 0,0);
+ }
+ 
+enum MapFlag_t {
+   MAP_FOLDCZONE= 0x0010,  // fold compatibility zone chars
+   MAP_PRECOMPOSED= 0x0020,  // convert to precomposed chars
+   MAP_COMPOSITE= 0x0040,  // convert to composite chars
+   MAP_FOLDDIGITS= 0x0080,  // all digits to ASCII 0-9
+
+#if(WINVER >= 0x0500)
+   MAP_EXPAND_LIGATURES= 0x2000  // expand all ligatures
+#endif /* WINVER >= 0x0500 */
+   };
+
+inline
+int FoldString (classics::flagword<MapFlag_t> flags, const wchar_t* src, int srclen, wchar_t* dest, int destlen)
+ {
+ return ::FoldStringW (flags.validdata(), reinterpret_cast<arg::carg32>(src), srclen, reinterpret_cast<arg::arg32>(dest), destlen);
+ }
+ 
+inline
+int FoldString (MapFlag_t flag, const wchar_t* src, int srclen, wchar_t* dest, int destlen)
+ {
+ return ::FoldStringW (flag, reinterpret_cast<arg::carg32>(src), srclen, reinterpret_cast<arg::arg32>(dest), destlen);
  }
  
 enum string_info_t {

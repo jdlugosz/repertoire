@@ -40,6 +40,10 @@ when &ldquo;freed&rdquo;.</P>
 	<LI><A HREF="#housekeeping">Threading and Housekeeping Issues</A>
 	<LI><A HREF="#purpose">Purpose and Concept</A>
 	<LI><A HREF="#what">What Do I Do With It?</A>
+	<UL>
+		<LI><A HREF="#what-pointers">Using Pointers</A>
+		<LI><A HREF="#what-HANDLEs">Using HANDLEs</A>
+	</UL>
 	
 	<LI><A HREF="#hypothetical">the <code>hypothetical_trug</code> class</A>
 	<LI><A HREF="#trug_for_pointers">specialized <code>trug</code> for pointers</A>
@@ -84,6 +88,8 @@ handy often-used container lives up to its namesake.</P>
 	<LI>Generalize a container for use in writing templates, so template code can use indirect or proxy references.
 </UL>
 
+<H3 id="what-pointers">Using Pointers</H3>
+
 <P>Consider the following examples.  The trug is being used to hold a primitive pointer, and you can see
 it gives the same benifits as the <code>std::auto_ptr</code>.</P>
 
@@ -124,7 +130,7 @@ ought to work in C++.</P>
 takes responsibility for the pointer returned.  Such responsibilities are often under-documented,
 while here the compiler enforces it.  This is explored further in the next example.</P>
 
-<PRE class="code" style="clear:both; float:right; margin-left:2em">
+<PRE class="code" style="clear:both; float:right; margin-left:1.5em">
 typedef array_trug&lt;int*> atp;
 
 void f1 (atp param1);  // wrong!
@@ -138,12 +144,85 @@ f1 (p1);  <I>// compile-time error!</I>
 f2 (p1);
 f3 (p1);  <I>// compile-time error!</I>
 f3 (p1.eject());
+f3 (p1.get_r());
 f3 (p1.duplicate());
-f3 (p1.get_r());  // not a good idea
 </PRE>
 
-<P>fffffff fffffff fffffffff ffffffffff
-</P>
+<P>Calling <code>f1(p1)</code> it is a compile-time error.  By design, trugs cannot be
+passed by value.  The problem with &ldquo;shallow value&rdquo; objects is that copying them
+causes ownership problems, so you cannot (simply) copy it.</P>
+
+<P>Calling <code>f2(p1)</code> shows a clearer, and correct, case.  Passing <code>p1</code> by
+reference makes it clear that the function is not going to take ownership of the pointer.</P>
+
+<P>Calling <code>f3(p1)</code> is a compile-time error.  You cannot (simply) pass a
+trug to a function taking a raw pointer.  Having the trug indicates that the lifetime and ownership
+of the pointer is under its control, and it will not implicitly give up that control.  Is <code>f3</code>
+going to take ownership of the pointer or not?  You’ll have to check the documentation of the
+function to know; it is certainly not known to the compiler.</P>
+
+<P>On the other hand, calling <code>f3 (p1.eject())</code> is legal, because you are
+being explicit about what the ownership semantics are.  You are saying that <code>p1</code> is to
+give up ownership (which also sets <code>p1</code> to null) when it passes the raw pointer to <code>f3</code>.
+
+<P>Alternativly, calling <code>f3 (p1.get_r())</code> indicates that p1 will <I>not</I> give up
+ownership.  So, you can’t simply use a trug where a raw pointer is expected, but you can use
+the members <A HREF="trug.html#eject" class="code">eject</A> or <A HREF="trug.html#get_r" class="code">get_r</A>
+to explicitly indicate how it should work.</P>
+
+<P>Another option is to call <code>f3 (p1.duplicate())</code>.  This will cause a deep-copy, and pass the
+copy (a different pointer value) to the function.</P>
+
+<PRE class="code" style="float:left; clear:both; margin-right:2em">
+typedef array_trug&lt;int*> atp;
+
+<B>atp::trule</B> foo ()
+ {
+ atp p1 (new int [42]);
+ return p1;
+ }
+
+int* bar()
+ {
+ int* p2= new int [42];
+ return p2;
+ }
+
+<I>// later&hellip;</I>
+atp p3= foo ();
+p3= bar();
+</PRE>
+
+<P>
+Using trugs for returning things is a little more difficult.  Not difficult to do the calling and
+returning, but only in how to declare the return type of the function.  Unlike the <code>std::auto_ptr</code>
+class which mixes up the meaning of &ldquo;copy&rdquo;, the ability to <I>transfer</I> (not &ldquo;copy&rdquo;) the
+value out of the function is done using a helper class, <B>trule</B>.</P>
+
+<P>All you have to do is declare the return type, not of the trug (in this case <code>atp</code>), but of
+the nested type <code>trule</code>.  Whatever the trug type is, just append <code>::trule</code> to it
+when declaring the return type of a function that you want to return the trug.</P>
+
+<P>By doing so, the trule prevents the copy constructor of the trug from being triggered, which
+would be a problem because copying trugs is disallowed.  In the call <code>atp p3= foo()</code>,
+the constructor of <code>p3</code> is getting the returning <code>p1</code> value wrapped
+in a trule, rather than the value <code>p1</code> itself.  The trule mediates the transfer of the
+value from one trug to the other, so that <code>p1</code>’s destructor will not free the pointer
+and <code>p3</code> takes ownership.</P>
+
+<P>It’s also no problem for a trug to be assigned the result of <code>bar</code>, which is a
+raw pointer.  In this case, <code>p3</code> takes ownership, and frees the previous
+pointer it was holding.  Note that when initializing, you must use the initialization syntax rather than
+the = syntax because the constructor is <code>explicit</code>.</P>
+
+<PRE class="code" style="float:right; margin-left:1.5em">
+
+<P>The reason the constructor is declared <code>explicit</code> is to prevent the mistake
+illustrated in the listing to the right.
+
+<H3 id="what-HANDLEs">Using HANDLEs</H3>
+
+<P>The trug isn’t only for pointers.  
 
 <H2 id="hypothetical" style="clear:left">the <code>hypothetical_trug</code> class</H2>
 

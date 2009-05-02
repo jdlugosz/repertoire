@@ -1,6 +1,6 @@
-// The Repertoire Project copyright 2001 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
-// File: 
-// Revision: fresh
+// The Repertoire Project copyright 2006 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
+// File: tomahawk\message_tap.h
+// Revision: public build 8, shipped on 11-July-2006
 
 #pragma once
 #if !defined TOMAHAWK_EXPORT
@@ -15,26 +15,14 @@
 STARTWRAP
 namespace tomahawk {
 
-namespace internal {
-
-class message_tap_count {
-public:
-   TOMAHAWK_EXPORT static classics::atomic_counter<int> ObjectCount;
-   message_tap_count() { ++ObjectCount; }
-   message_tap_count (const message_tap_count&) { ++ObjectCount; }
-   ~message_tap_count() { --ObjectCount; }
-   };
-
-   }  // end internal
    
-class __single_inheritance message_tap : public classics::can_handle {
+class message_tap : virtual public classics::can_handle {
    ratwin::types::HWND WindowHandle;
    classics::handle <message_tap> WindowOwnsMe;  // on behalf of the (valid) WindowHandle
    long (__stdcall* OldWndProc)(ratwin::message::sMSG);
    const classics::member_callback_thunk<message_tap, long, ratwin::message::sMSG> EntryPoint;
    bool UnhookASAP;
    long SaneCheck;
-   internal::message_tap_count ObjectCount;  // this triggers counting on all my own constructors and destructors.
    // disable copying
    message_tap (const message_tap&);  // never defined
    void operator= (const message_tap&); // never defined
@@ -44,7 +32,7 @@ protected:
    unsigned short LastMessage;  // unhook when I see this.
 public:
    void sane_check() const;
-   static int get_object_count() { return internal::message_tap_count::ObjectCount; }
+//   static int get_object_count() { return internal::message_tap_count::ObjectCount; }
    typedef long (__stdcall* Proc)(ratwin::message::sMSG);
    TOMAHAWK_EXPORT Proc get_WndProc();
    TOMAHAWK_EXPORT message_tap();

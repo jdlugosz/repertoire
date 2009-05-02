@@ -22,10 +22,14 @@
 	<LI><A HREF="#member_callback_thunk">Using the <code>member_callback_thunk</code> Template</A>
 	<UL>
 		<LI><A HREF="#limitations">Limitations</A>
+		<LI><A HREF="#argcount">How Many Arguments?</A>
+		<LI><A HREF="#constvolatile">Const and Volatile Members</A>
 	</UL>
 	<LI><A HREF="#others">Other Kinds Of Thunks</A>
 	<LI><A HREF="#internals">Internals: How It Works</A>
-	<LI><A HREF="how_fast">How Fast Is It?</A>
+	<LI><A HREF="#how_fast">How Fast Is It?</A>
+	<LI><A HREF="#caveats">Caveats</A>
+	<LI><A HREF="#porting">Porting</A>
 </UL>
 
 <H2 id="overview">What Is A Closure?</H1>
@@ -116,18 +120,6 @@ the function you got from <code>callptr</code> isn’t any good anymore.</P>
 
 <H3 id="limitations">Limitations</H3>
 
-<H4>The function takes exactly one argument.</H4>
-
-<P>To make it handle various numbers of arguments would
-greatly increase the complexity, and compilers available at the time I
-originally developed this were rather flakey on template
-support in the first place so I didn’t want to press my luck.</P>
-
-<P>This is not too much of a restriction, it turns out.  If you have more than one argument, you can
-declare the function to take a single <code>struct</code> instead.  Make the memory layout of the
-structure on the stack the same as what passing multiple arguments would be.  For the WinProc, I
-ended up liking it better this way!</P>
-
 <H4>The member must be <code>__thiscall</code></H4>
 
 <P>Member functions, in Microsoft’s compiler, other than those with ellipses, are normally
@@ -162,6 +154,68 @@ non-standard and therefore compiler-specific.  If you want to supply code for ot
 be happy to merge it in.  Note that the <code>closure.h</code> file just includes the proper
 implementation, and each implementation goes in its own file.  That is, each file is written
 for the platform rather than having a nest of conditional compilation.</P>
+
+<H3 id="argcount">How Many Arguments?</H3>
+
+<P>You need to use a different class name for each count of arguments to the function.
+For example,</P>
+
+<PRE class="code">
+ int out1= object.call3(12,3.14,'a'); <I>// member takes three arguments.</I>
+ member_callback_thunk_<B>3</B>&lt;C,int, int,double,char> thunk (&object, &C::call3);
+ int (__stdcall *callback3)(int, double, char)= thunk.callptr();
+ int output= callback3 (12, 3.14, 'a'); <I>// thunk takes three arguments also.</I>
+</PRE>
+
+<P>The template class <code>member_callback_thunk_3</code> is for functions that
+take three arguments, The template class <code>member_callback_thunk_12</code> is for functions that
+take 12 arguments, etc.</P>
+
+<P>You need to specify the types of all the arguments to the template.  Since template classes
+can’t be overloaded based on different number of arguments, the simplest thing is to give them
+different names.</P>
+
+<H4>Where are they declared?</H4>
+
+<P>The template class <code>member_callback_thunk_3</code> is in the header file
+<code>"classics\closure-3.h"</code>, the template class <code>member_callback_thunk_99</code> is in the header file
+<code>"classics\closure-99.h"</code>, etc.  Each count is in a header by itself, named with the count also.</P>
+
+<P>But where is the file <code>"classics\closure-867.h"</code>?  They are not to be seen in the directory when Classics
+is installed.  Instead, they are generated using the program <code>ThunkN.perl</code>.  Each variation is a simple
+mechanical change from the basic class, amounting to how many <code>ParamType<I>n</I></code>’s are listed in each
+place that lists them.  Since C++ doesn’t have meta-templates that let you change the number of parameters, and
+preprocessor macros have neither iteration nor recursion, while Perl is born to do text manipulations, I used Perl.  The program
+copies the basic definition from the header and adds more parameters.  So, any change to the basic definition is
+automatically reflected in the copies.</P>
+
+<P>If you desire to include <code>"closure-867.h"</code>, go to the Classics source directory and run
+<PRE class="screencaption">Command</PRE>
+<PRE class="screenshot">
+<span class="prompt">[blah\blah\blah\classics]</span> ThunkN 867
+        <I>or perhaps</I>
+<span class="prompt">[blah\blah\blah\classics]</span> perl.exe ThunkN.perl 867
+</PRE>
+
+<P>If you don’t have <A HREF="http://www.activestate.com/Products/ActivePerl/" TARGET="extern">Perl</A>, it’s probably 
+easier to just replace all occurances of <code>ParamType</code> using your text editor, since that’s all there 
+is to it.  Look at the existing <code>classics\closure-3.h"</code> for an example.</P>
+
+<H4>But you only need one</H4>
+
+<P>If you have more than one argument, you can
+declare the function to take a single <code>struct</code> instead.  Make the memory layout of the
+structure on the stack the same as what passing multiple arguments would be.  For the WinProc, I
+ended up liking it better this way!</P>
+
+<H4>Zero arguments</H4>
+
+<P>If you have no arguments, use <code>member_callback_thunk_0</code> declared in
+<code>"classics\closure-0.h"</code>.</P>
+
+
+<H3 id="constvolatile">Const and Volatile Members</H3>
+
 
 <H2 id="others">Other kinds of thunks</H2>
 
@@ -296,6 +350,10 @@ when the CPU is doing other things, not just millions of concecutive calls.  If 
 called function is realistic in its complexity, the overhead of the thunk is not even
 measurable with a simple timing program.</P>
 
+<H2 id="caveats">Caveats</H2>
+<H3>Microsoft VC++</H3>
+
+<H2 id="porting">Porting</H2>
 
 <HR>
 <IFRAME id="page_footer" src="../page_footer.html"></IFRAME>

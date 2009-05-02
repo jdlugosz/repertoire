@@ -1,6 +1,6 @@
-// The Repertoire Project copyright 2001 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
-// File: ratwin\controls\ReBar.h
-// Revision: new
+// The Repertoire Project copyright 2006 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
+// File: ratwin\controls\Rebar.h
+// Revision: public build 8, shipped on 11-July-2006
 
 #pragma once
 #if defined RATWIN_NoGlobals

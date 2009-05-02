@@ -1,5 +1,6 @@
-// The Repertoire Project copyright 2001 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
+// The Repertoire Project copyright 2006 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: ratwin\COM\IEnumSTATSTG.h
+// Revision: public build 8, shipped on 11-July-2006
 
 #pragma once
 

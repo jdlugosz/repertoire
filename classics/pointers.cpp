@@ -1,10 +1,11 @@
-// The Repertoire Project copyright 2001 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
+// The Repertoire Project copyright 2006 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: classics\pointers.cpp
-// Revision: updated
+// Revision: public build 8, shipped on 11-July-2006
 
 #define CLASSICS_EXPORT __declspec(dllexport)
 #include "classics\pointers.h"
 #include "classics\exception.h"
+#include "ratwin\utilities.h"
 
 STARTWRAP
 namespace classics {
@@ -24,19 +25,19 @@ lifetime* can_handle::get_lifetime_object() const
     }
  if (Lifetime->deleted)  {
     // stray pointer bug discovered!
-    __asm int 3;
+    *(reinterpret_cast<int*>(0));
     // serious problem:  memory may have already been corrupted.
     }
  return Lifetime;
  }
- 
+
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
-int can_handle::get_reference_count() const 
+int can_handle::get_reference_count() const
  {
  lifetime* Lifetime= reinterpret_cast<lifetime*>(~cloaked_Lifetime);
  if (!Lifetime)  return 0;
- return Lifetime->owned_count; 
+ return Lifetime->owned_count;
  }
 
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
@@ -87,6 +88,31 @@ void handle_structure_nt::zap_unowned() const
 
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
+inline lifetime* handle_structure_nt::atomic_swap (lifetime* B) const
+ {
+ address_t b= reinterpret_cast<address_t>(B);
+ address_t a= internal::Xexchange (reinterpret_cast<address_t*>(&Lifetime), b);
+ return reinterpret_cast<lifetime*>(a);
+ }
+
+/* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
+
+lifetime* handle_structure_nt::check_out_Lifetime() const
+ {
+ #ifdef CLOAK_LIFETIME
+   #error Not yet supported
+ #endif
+ retry:
+ lifetime* L= atomic_swap (0);
+ if (!L) {
+    ratwin::util::Sleep (1);
+    goto retry;
+    }
+ return L;
+ }
+
+/* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
+
 void lifetime::claim_owned_reference()
 // Get an owner from a borrower.  If there are no existing owners,
 // the object does not exist so I can't get another owner.
@@ -105,7 +131,7 @@ void lifetime::claim_owned_reference()
     // So, only release if this is not the first owner.
     dec_hold();
  }
- 
+
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
 int debug_can_handle::object_count;

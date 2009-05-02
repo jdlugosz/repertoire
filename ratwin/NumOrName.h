@@ -1,6 +1,6 @@
-// The Repertoire Project copyright 2000 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
+// The Repertoire Project copyright 2006 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: ratwin\NumOrName.h
-// Revision: post - public build 6
+// Revision: public build 8, shipped on 11-July-2006
 
 #pragma once
 #if !defined I646693f0_f9dc_11d3_8ded_0006296222ef

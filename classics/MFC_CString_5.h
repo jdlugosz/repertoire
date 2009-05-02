@@ -1,6 +1,6 @@
-// The Repertoire Project copyright 1999 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
-// File: classics\MFC_CString.h
-// Revision: public build 6, shipped on 28-Nov-1999
+// The Repertoire Project copyright 2006 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
+// File: classics\MFC_CString_5.h
+// Revision: public build 8, shipped on 11-July-2006
 
 /*  This is included by the ustring code in order to manipulate MFC's CString's without
     having to include AFX.h.  Generally, you should not need to include this

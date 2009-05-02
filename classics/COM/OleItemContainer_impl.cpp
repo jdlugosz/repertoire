@@ -1,6 +1,6 @@
-// The Repertoire Project copyright 2002 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
-// File: classics\COM\OleItemContainer_impl
-// Revision: 
+// The Repertoire Project copyright 2006 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
+// File: classics\COM\OleItemContainer_impl.cpp
+// Revision: public build 8, shipped on 11-July-2006
 
 #define CLASSICS_EXPORT __declspec(dllexport)
 #include "classics\COM\OleItemContainer_impl.h"

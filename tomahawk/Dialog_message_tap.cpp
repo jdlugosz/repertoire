@@ -1,6 +1,6 @@
-// The Repertoire Project copyright 2001 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
-// File: 
-// Revision: fresh
+// The Repertoire Project copyright 2006 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
+// File: tomahawk\Dialog_message_tap.cpp
+// Revision: public build 8, shipped on 11-July-2006
 
 #define TOMAHAWK_EXPORT __declspec(dllexport)
 #include "tomahawk\Dialog_message_tap.h"

@@ -1,6 +1,6 @@
-// The Repertoire Project copyright 2002 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
+// The Repertoire Project copyright 2006 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: classics\exception.h
-// Revision: post-public build 6 (25-June-2002 or later)
+// Revision: public build 8, shipped on 11-July-2006
 
 #pragma once
 #if !defined DLUGOSZ_CLASSICS_ERROR_DEFINED

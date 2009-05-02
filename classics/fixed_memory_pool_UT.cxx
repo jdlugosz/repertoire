@@ -1,15 +1,21 @@
-// The Repertoire Project copyright 2001 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
+// The Repertoire Project copyright 2006 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: classics\fixed_memory_pool_UT.cxx
-// Revision: post-public build 6
+// Revision: public build 8, shipped on 11-July-2006
 
 // test of the fixed_memory_pool
 
 #include "classics\new.h"
 #include "classics\fixed_memory_pool.h"
+#include "classics\thread.h"
+#include "classics\critical_section.h"
+#include "classics\atomic_counter.h"
 #include <iostream>
 using std::cout;
 using std::endl;
 int errorcount= 0;
+
+using classics::critical_section;
+critical_section cs;
 
 class C : public classics::pool_mixin<C> {
    const void* addr;
@@ -17,13 +23,26 @@ class C : public classics::pool_mixin<C> {
 public:
    C (int x) : addr(this), value(x) {}
    void check (int val) const;
+   static bool check_heap() { return pool.check_heap(); }
+   static void validate_heap();
+   static void thread_safe (bool b) { pool.single_thread_only= !b; }
+   static int wait_count() { return pool.wait_count; }
    };
 
 
 void C::check (int val) const
  {
  if (addr != this || value != val) {
-    cout << "failed check." << endl;
+    critical_section::locker k (cs);
+    cout << "failed check: " << addr << "==" << this << " && " << value << "==" << val << endl;
+    ++errorcount;
+    }
+ }
+
+void C::validate_heap()
+ {
+ if (!check_heap()) {
+    cout << "Unexpected heap corruption." << endl;
     ++errorcount;
     }
  }
@@ -58,29 +77,65 @@ void test1()
 
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
-void test2()
+class sweeper {
+public:
+   void sweep();
+   void start() { sweep(); }
+   };
+
+void sweeper::sweep()
  {
- cout << "Test 2 -- ...";
  const int MAX= 1000;
  const int sweep= 10;
+ static classics::atomic_counter<int> xx= 0;
  int count= 0;
  C* array[MAX];
  int loop= 0;
+ int indicator= (xx += 1000000);
  while (loop < MAX-sweep) {
     for (int x= 0;  x < sweep;  x++) {
-       array[loop+x]= new C(loop+x);
+       array[loop+x]= new C(indicator+loop+x);
        ++count;
        }
     for (int y= 1;  y < sweep;  y++) {
-       array[loop+y]->check (loop+y);
+       array[loop+y]->check (indicator+loop+y);
        delete array[loop+y];
        count++;
        }
     loop++;
     }
+ critical_section::locker k (cs);
  cout << ' ' << count << " operations performed" << endl;
  }
- 
+
+/* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
+
+void test2()
+ {
+ cout << "Test 2 -- ...";
+ C::validate_heap();
+ sweeper s;
+ s.sweep();
+ C::validate_heap();
+ }
+
+/* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
+
+void test7()
+ {
+ cout << "Test 7 -- multi-thread use" << endl;
+ const int thread_count= 10;
+ ratwin::types::Kernel_HANDLE handles[thread_count];
+ sweeper s;
+ C::thread_safe(true);
+ cout << "wait_count was originally " << C::wait_count() << endl;
+ for (int loop= 0;  loop < thread_count;  loop++) {
+    handles[loop]= classics::launch_thread (s);
+    }
+ ratwin::tasking::WaitForMultipleObjects (thread_count, handles, true);
+ cout << "wait_count now " << C::wait_count() << endl;
+ }
+
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
 void test3()
@@ -89,7 +144,7 @@ void test3()
  cout << "Test 3 -- works before main is called" << endl;
  premain->check (99);
  }
- 
+
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
 void test4()
@@ -103,7 +158,7 @@ void test4()
  char* p= reinterpret_cast<char*>(premain);
  if (C::check_address (1+p))  {++errorcount; cout << "Failed 4.4 (didn't catch misaligned)\n"; }
  }
- 
+
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
 struct staticbase
@@ -121,7 +176,7 @@ public:
    member (int x) : val (x) {}
    void operator= (const member& other) { /* does not change value */ }
    };
-   
+
 template <typename T>
 class testclass : public T {
    member s1;
@@ -142,7 +197,7 @@ bool testclass<T>::check()
  {
  return (s1.val != s2.val);
  }
- 
+
 void test5()
 // test for mixin assignment bug
  {
@@ -175,7 +230,30 @@ void test5()
     cout << "Did not detect compiler bug (great!)\n";
     }
  }
- 
+
+/* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
+
+void test6()
+ {
+ cout << "Test 6 -- check_heap function" << endl;
+ C* boo= new C (1);
+ const int MAX= 10;
+ C* a[MAX];
+ for (int loop= 0;  loop < MAX;  ++loop)
+    a[loop]= new C(loop+100);
+ delete boo;
+ delete a[0];
+ C::validate_heap();
+ int* p= reinterpret_cast<int*>(boo);
+ int save= *p;
+ ++*p;  // boom!!
+ if (C::check_heap()) {
+    cout << "failed to detect corrupted free list." << endl;
+    ++errorcount;
+    }
+ *p= save;  // put it back before continuing!
+ }
+
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
 int main()
@@ -185,8 +263,10 @@ int main()
  test3();
  test4();
  test5();
+ test6();
+ test7();
  if (errorcount)  cout << "** There were " << errorcount << " errors detected." << endl;
  else cout << "All tests passed." << endl;
  return 0;
  }
- 
+

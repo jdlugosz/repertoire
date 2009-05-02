@@ -1,6 +1,6 @@
-// The Repertoire Project copyright 2003 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
+// The Repertoire Project copyright 2006 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: ratwin\hid=struct.h
-// Revision: fresh
+// Revision: public build 8, shipped on 11-July-2006
 
 #pragma once
 #include "ratwin\COM\GUID.h"

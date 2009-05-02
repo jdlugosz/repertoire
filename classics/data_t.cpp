@@ -1,6 +1,6 @@
-// The Repertoire Project copyright 2004 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
+// The Repertoire Project copyright 2006 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: classics\data_t.cpp
-// Revision: 
+// Revision: public build 8, shipped on 11-July-2006
 
 #define CLASSICS_EXPORT __declspec(dllexport)
 #include "classics\data_t.h"

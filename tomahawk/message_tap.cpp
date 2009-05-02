@@ -1,6 +1,6 @@
-// The Repertoire Project copyright 2001 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
-// File: 
-// Revision: fresh
+// The Repertoire Project copyright 2006 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
+// File: tomahawk\message_tap.cpp
+// Revision: public build 8, shipped on 11-July-2006
 
 #define TOMAHAWK_EXPORT __declspec(dllexport)
 #include "tomahawk\message_tap.h"
@@ -16,8 +16,6 @@ const char FNAME[]= __FILE__;
 using classics::exception;
 using classics::wFmt;
 const long SaneMask= 0x19F52204;  // a random number.
-
-classics::atomic_counter<int> internal::message_tap_count::ObjectCount= 0;
 
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 

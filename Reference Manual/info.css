@@ -1,12 +1,29 @@
 H1 {
    font-family: Verdana, Tahoma, sans-serif;
    text-align:center; text-decoration: underline;
+   clear: both;
    }
-H2 { font-family: "Lucida Sans", "Lucida Sans Unicode", sans-serif; text-indent:-1in; margin-left:1in }
+H2 {
+   font-family: "Lucida Sans", "Lucida Sans Unicode", sans-serif;
+   text-indent:-1in;
+   margin-left:1in;
+   clear: both;
+   }
 
-H2 B { background-color:#FFEBCD /*blanchedalmond*/ }
+H2 B { background-color:#FFEBCD; /*blanchedalmond*/
+   color: black;
+   }
+
+H3 {
+   clear: both;
+   }
 
 PRE { font-family: "Lucida Sans Typewriter", monospace }
+
+P EM {
+	background-color: #fffff0;
+	font-style: normal;
+	}
 
 .code,CODE {
 	font-family: "Lucida Sans", "Lucida Sans Unicode", sans-serif;
@@ -15,29 +32,100 @@ PRE { font-family: "Lucida Sans Typewriter", monospace }
 
 PRE.code {
 	background-color: #EEE;
-	foreground-color: #000;
+	color: #000;
 	border-style: solid;
 	padding: 0.5em;
 	}
 
-PRE I {
+.filename {
+	font-family: "Arial Narrow",sans-serif;
+	font-stretch: condensed;
+	}
+
+PRE I , .PRElike I{
 	color: #006;
+	background-color: #EEE
+	}
+
+.PRElike { /* if I want to do something not allowed in a PRE */
+	/* make it the same as P */
+	display: block;
+	font-family: "Lucida Sans Typewriter", monospace;
+	white-space: pre;
+	/* matches my P.code" style */
+	font-size: 0.9em;
+	background-color: #EEE;
+	color: #000;
+	border-style: solid;
+	padding: 0.5em;
+	}
+
+PRE.screenshot {
+	background-color: black;
+	color: white;
+	font-family: "Lucida Sans Typewriter", monospace;
+/*	font-weight: bold; */
+	font-size: 0.9em;
+	padding: 1em 0.5em 1em;
+	margin-top: 0;
+	border-color: ActiveBorder;
+	border-style: solid ridge ridge;
+	border-width: thin thick thick;
+	}
+
+
+PRE.screenshot I {
+	color: #ff0;
+	background-color: inherit;
+	}
+
+.screenshot .prompt {
+	color: #aaa;
+	background-color: inherit;
+	}
+
+.screencaption {
+	font-family: sans-serif;
+	font-weight: bold;
+	background-color: ActiveCaption;
+	color: CaptionText;
+	margin: 0;
+	padding: 0.2em;
+	padding-left: 1em;
+	border-color: ActiveBorder;
+	border-style: ridge ridge none;
+	border-width: thick;
 	}
 
 /* BODY { font-family: "GeoSlab703 Lt BT" } */
-BODY { font-family: "Georgia", serif }
+BODY {
+	font-family: "Georgia", serif;
+	background-color: white;
+	color: black;
+	}
 
 .mematt {  /* MEMber ATTributes */
    font-size: smaller;
-   text-align:right
+   text-align:right;
+   color: green;
+   background-color: inherit;
    }
+
+.memof {  /* MEMber OF */
+	float:left;
+	font-size: smaller;
+	padding:0; margin:0;
+	font-family: "Lucida Sans", "Lucida Sans Unicode", sans-serif;
+	color: green;
+   background-color: inherit;
+	}
 
 A:link, A:visited { text-decoration: none }
 A:hover[TARGET=index]{
 	background-color: green;
 	color: #fff;
 	}
-A:hover { text-decoration: underline }
+A:hover[HREF] { text-decoration: underline }
 
 H2:hover A { color: blue }
 
@@ -51,9 +139,30 @@ H2 A { color: black }
    margin: 0;
    }
 
+.banner2 {
+	margin-left: 20%;
+	font-family: sans-serif;
+	}
+
+.sidebar {
+	font-family: "Verdana", sans-serif;
+	background-color: #fffff8;
+	font-size: smaller;
+	border-style: solid;
+	border-color: #888888;
+	margin: 0;
+	padding:1em;
+	}
+
 .footnoter {
 	vertical-align: super;
 	font-size: smaller
+	}
+
+P.footnote {
+	font-weight:bold;
+	color: green;
+	background-color: white;
 	}
 
 HR.sep1 {
@@ -80,4 +189,30 @@ IFRAME#page_banner {
 	margin: 0;
 	padding: 0;
 	}
-	
+
+#toppane {
+	position: fixed;
+	top: 0;  left: 0;
+	background-color: #66cc66; /* dull light green */
+	margin-top: 0;
+	padding-bottom: 3pt;
+	width: 100%;
+	}
+
+#toppane .button {
+	background-color:#33ff33;
+	border-style:outset;
+	padding-left: 0.2em;
+	padding-right: 0.5em;
+	}
+
+.button B {
+	font-size: 150%;
+	}
+
+.prognote {
+	background-color: #ffffdd;
+	color: #808000;
+	font-style: italic;
+	}
+

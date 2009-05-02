@@ -1,6 +1,6 @@
-// The Repertoire Project copyright 2001 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
-// File: 
-// Revision: fresh
+// The Repertoire Project copyright 2006 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
+// File: classics\closure-=-MSonPC.h
+// Revision: public build 8, shipped on 11-July-2006
 
 /*
    This is included by closure.h if the platform is Microsoft compiler on a PC

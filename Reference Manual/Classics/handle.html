@@ -1,124 +1,430 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"  "http://www.w3.org/TR/html4/loose.dtd">
 <HTML>
 <HEAD>
 <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=windows-1252">
 <TITLE>handle class reference</TITLE>
+<META http-equiv="Content-Script-Type" content="text/javascript">
+<SCRIPT type= "text/javascript" src="../helpers.js"></SCRIPT>
 <LINK REL=STYLESHEET HREF="../info.css" TYPE="text/css">
+<SCRIPT type="text/javascript">
+   checkframe ("Classics/handle_index.html");
+</SCRIPT>
+<META name="date" content="2006-06-28">
 </HEAD>
 
 <BODY>
-<H1>handle, const_handle, cow class reference</H1>
-The templates <code>handle</code>, <code>const_handle</code>, and <code>cow</code> are general purpose
+<IFRAME id="page_banner" src="../page_banner.html" scrolling="no"></IFRAME>
+
+<H1 id="toptop">handle, const_handle, cow class reference</H1>
+<P>The templates <code>handle</code>, <code>const_handle</code>, and <code>cow</code> are general purpose
 smart pointers.  They provide reference-counted shared ownership of the referenced object, so the object
 is destroyed automatically when the last reference to it is dropped.</P>
 <P>A <code>const_handle</code> provides read-only access to the referenced object.  A regular <code>handle</code>
 provides read/write access.  And a <code>cow</code> provides copy-on-write semantics.  See the
-<A HREF="handle_guide.html">User's Guide</A> for more explaination.</P>
-<HR SIZE=10 COLOR=black>
+<A HREF="handle_guide.html#flavors">User’s Guide</A> for more explaination.</P>
+<HR SIZE=3 class="sep1">
 <!-- WWWW		wwww		wwww		wwww		wwww		wwww -->
 
 
 
-<A NAME="constructor"><H2>explicit const_handle (const T* p=0)</H2></A><BR>
-<H2>explicit const_handle (T* p)</H2><BR>
-<H2>explicit handle (T* p=0)</H2><BR>
-<H2>explicit cow (T* p=0)</H2><BR>
-<P ALIGN="right"><FONT SIZE="-1">constructor, public</FONT></P>
-The primary constructors take a regular pointer as an argument, and produce a smart
+<H2 id="constructor">explicit <B>const_handle</B> (const T* p=0)</H2>
+<H2>explicit <B>const_handle</B> (T* p)</H2>
+<H2>explicit <B>handle</B> (T* p=0)</H2>
+<H2>explicit <B>cow</B> (T* p=0)</H2>
+<A HREF="handle_index.html" TARGET="index" class="memof"><I>any handle</I></A>
+<P class="mematt">constructor, public</P>
+<P>The primary constructors take a regular pointer as an argument, and produce a smart
 pointer.  This constructor does increment the reference count, so the plain object
 should be constructed initially with a reference count of zero.</P>
-Note that the null pointer is supported, and a default constructor will create a null smart pointer.</P>
-<HR SIZE=3 COLOR=black>
+<P>Note that the null pointer is supported, and a default constructor will create a null smart pointer.</P>
 
-<H2>const_handle (const const_handle& other)</H2><BR>
-<H2>handle (const handle& other)</H2><BR>
-<H2>cow (const cow& other)</H2><BR>
-<P ALIGN="right"><FONT SIZE="-1">constructor, public</FONT></P>
-The copy constructors create a new counted reference to an existing object.  Note that since
-handle and cow are both derived from const_handle, the "isa" relationship applies.  So, you
-can use a cow or a handle anywhere that a const_handle is declared.  This means that
-the const_handle copy constructor can copy cows and handles as well.</P>
-<HR SIZE=3 COLOR=black>
+<H3>Type Argument Constraints</H3>
+<P>The type <code>T</code>, the object being pointed to, must satisfy the template.  Specifically,
+the expression <code>Get_lifetime_object(p)</code> must be supported.  The easiest way to do
+this for your own types is to inherit from <A HREF="../class_summary.html#can_handle" class="code">can_handle</A>.</P>
+<P>To use a <code>cow</code>, the type <code>T</code> must either have a <code>clone</code> member,
+or <code>cow&lt;T>::clone</code> can be explicitly specialized.</P>
+<P>See the <A HREF="handle_guide.html#constraints">User’s Guide</A> for a more detailed discussion.</P>
 
-<H2>explicit handle (const baro<T>& other)</H2>
-<H2>explicit const_handle (const const_baro<T>& other)</H2>
-<P ALIGN="right"><FONT SIZE="-1">constructor, public</FONT></P>
-This form allows you to create a usable handle from a baro.  See the Baro User's Guide
+<H3>No Implicit Conversion</H3>
+<P>These constructors are <code>explicit</code> because implicit conversion of a raw pointer to a handle
+will delete it!</P>
+<PRE class="code">
+void foo (handle&lt;C>);
+
+C* p= new C;
+foo (p);  <I>if allowed, would surprise you</I>
+p->bar();  <I>BOOM!  p has already been deleted</I>
+</PRE>
+<P>This is easily understood by expanding the function in-line:  The parameter is a handle that is initialized with the
+raw pointer, setting the reference count to 1.  When that parameter goes out of scope, the reference count drops
+to 0 and that triggers deletion.  Basically, this clashes with the normal use of constructing a handle from a raw
+pointer and then using the handle and forgetting all about the raw pointer directly.</P>
+<P>If you really want to construct a handle around a pointer, you have to do so explicitly, not implicitly.</P>
+
+<HR SIZE=3 class="sep1">
+
+<H2><B>const_handle</B> (const const_handle&amp; other)</H2>
+<H2><B>handle</B> (const handle&amp; other)</H2>
+<H2><B>cow</B> (const cow&amp; other)</H2>
+<A HREF="handle_index.html" TARGET="index" class="memof"><I>any handle</I></A>
+<P class="mematt">constructor, public</P>
+<P>The copy constructors create a new counted reference to an existing object.  Note that since
+<code>handle</code> and <code>cow</code> are both derived from <code>const_handle</code>, the &ldquo;isa&rdquo; relationship applies.
+So, you can use a <code>cow</code> or a <code>handle</code> anywhere that a const_handle is declared.  This means that
+the <code>const_handle</code> copy constructor can copy (regular) <code>handle</code>s as well.  However, initializing a <code>const_handle</code>
+from a <code>cow</code> finds an exact match below so doesn’t call this form.</P>
+<H3>Threading Issues</H3>
+<P>When initializing any kind of a handle <I>from</I> a <code>cow</code>, it has to interoperate with the locking mechanism used
+by <A HREF="#operator_arrow" class="code">operator-></A>.  The copy constructor for <code>cow</code> does this, so may need to
+wait on the other thread.  The other forms in this section know this is not the case so never block.</P>
+
+<HR SIZE=3 class="sep1">
+<H2><B>const_handle</B> (const const_handle&lt;U>&amp; other)</H2>
+<H2><B>handle</B> (const handle&lt;U>&amp; other)</H2>
+<H2><B>handle</B> (const cow&lt;U>&amp; other)</H2>
+<H2><B>cow</B> (const cow&lt;U>&amp; other)</H2>
+<P class="mematt">constructor, public, template</P>
+<P>These are generalized forms of the copy constructors.  If there is a conversion from U* to T*, this provides a conversion from
+<code>handle&lt;U></code> to <code>handle&lt;T></code>, <code>const_handle&lt;U></code> to <code>const_handle&lt;T></code>,
+<code>cow&lt;U></code> to <code>cow&lt;T></code>, and furthermore from <code>cow&lt;U></code> to <code>const_handle&lt;T></code>
+and <code>handle&lt;U></code> to <code>const_handle&lt;T></code>.</P>
+<P>The presence of these members don’t prevent the ordinary copy constructor from being auto-generated, so the normal copy constructors
+are also defined (above) even though these are supersets of them.</P>
+<H3>Threading Issues</H3>
+<P>When initializing any kind of a handle <I>from</I> a <code>cow</code>, it has to interoperate with the locking mechanism used
+by <A HREF="#operator_arrow" class="code">operator-></A>.  The generalized copy constructor for <code>cow</code> does this.
+The form that constructs a <code>const_handle</code> from a <code>cow</code> is provided separately (rather than allowing
+the normal copy constructor to handle it through inheritance) because it needs this extra overhead, while initializing a <code>const_handle</code>
+from any other kind of handle does not.</P>
+
+<HR SIZE=3 class="sep1">
+
+<H2>explicit <B>handle</B> (const baro&lt;T>&amp; other)</H2>
+<H2>explicit <B>const_handle</B> (const const_baro&lt;T>&amp; other)</H2>
+<P class="mematt">constructor, public</P>
+<P>This form allows you to create a usable <code>handle</code> from a <code>baro</code>.  See <A HREF="Smart%20Pointers%20Overview.html#baro">the section in the overview</A>
 for more information.</P>
-<HR SIZE=10 COLOR=black>
+<HR SIZE=10 class="sep1">
 <!-- WWWW		wwww		wwww		wwww		wwww		wwww -->
 
 
-<A NAME="destructor"><H2>~const_handle()</H2></A>
-<P ALIGN="right"><FONT SIZE="-1">destructor, public</FONT></P>
-
-<HR SIZE=10 COLOR=black>
+<H2 id="destructor"><B>~const_handle</B>()</H2>
+<H2><B>~handle</B>()</H2>
+<H2><B>~cow</B>()</H2>
+<P class="mematt">destructor, public</P>
+<P>The destructor for a handle decrements the ownership count, and frees the handled object if
+this was the <I>last</I> handle referring to it.</P>
+<HR SIZE=10 class="sep1">
 <!-- WWWW		wwww		wwww		wwww		wwww		wwww -->
 
-<A NAME=
-"assignment"><H2>const_handle& const_handle::operator= (const const_handle& other)</H2></A><BR>
-// no non-const form?  Hiding problem?<BR>
-<H2>handle& handle::operator= (T* other)</H2><BR>
-<H2>const_handle& const_handle::operator= (T* other)</H2>
-<P ALIGN="right"><FONT SIZE="-1">assignment, public</FONT></P>
+<H2 id="assignment">handle&amp; handle::<B>operator=</B> (T* other)</H2>
+<H2>const_handle&amp; const_handle::<B>operator=</B> (T* other)</H2>
+<H2>cow&amp; cow::<B>operator=</B> (T* other)</H2>
+<A HREF="handle_index.html" TARGET="index" class="memof"><I>any handle</I></A>
+<P class="mematt">assignment, public</P>
+<P>Assigning a raw pointer to a handle increments the reference count of the object being handled, just like the constructor does.
+However, being assignment it decrements the ownership count of the existing contents of the handle first.</P>
 
-<HR SIZE=10 COLOR=black>
+<H2>const_handle&amp; const_handle::<B>operator=</B> (const&nbsp;const_handle&amp; other)</H2>
+<P class="mematt">assignment, public</P>
+<H2>handle&amp; handle::<B>operator=</B> (const handle&amp; other)</H2>
+<H2>cow&amp; cow::<B>operator=</B> (const cow&amp; other)</H2>
+<P class="mematt">assignment, public, supplied by compiler</P>
+<P>Because <code>cow</code> and <code>handle</code> have an &ldquo;isa&rdquo;relationship with <code>const_handle</code>, either
+type of non-const handle can be assigned to a <code>const_handle</code>; but assignment of a <code>cow</code> to a <code>const_handle</code> finds an
+exact match below so does not call this form.  And of course one <code>const_handle</code> can be assigned to
+another.  Assignment will decrement the reference count of the object being forgotten and increment it for the one being
+referenced.</P>
+<H2>const_handle&lt;T>&amp; <B>operator=</B> (const cow&lt;U>&amp; other)</H2>
+<P>Assigning any kind of <code>cow</code> to a <code>const_handle</code> needs the extra overhead of a <code>cow</code> on
+the right-hand-side, so this overloaded form is provided.  That way the general form (which is a superset of this) can avoid the overhead since
+it knows the right side will not be a <code>cow</code>.</P>
+<H2>const_handle&lt;T>&amp; <B>operator=</B> (const&nbsp;const_handle&lt;U>&amp;&nbsp;other)</H2>
+<P>This provides assignment from any kind of <code>const_handle</code> (if the object types <code>T</code> and <code>U</code> are
+compatible) and through inheritance also provides assignment from any kind of (regular) <code>handle</code>.</P>
+<H2>handle&lt;T>&amp; <B>operator=</B> (const&nbsp;handle&lt;U>&amp;&nbsp;other)</H2>
+<P>This provides assignment from any kind of <code>handle</code> to another <code>handle</code>.</P>
+
+<H3>Threading Issues</H3>
+<P>Note that assigning to a handle (any flavor) is not thread-safe.  That is, if one thread does <code>h1=h2;</code>
+and another thread does <code>h1=h3;</code> at the same time, bad things will happen.  However, if you have
+two handles pointing to the same underlying object initially, <code>h1a=h1b;</code>, then one thread may
+perform <code>h1a=h2;</code> and another thread <I>may</I> perform <code>h1b=h3;</code> at the same
+time.</P>
+<P>When assigning to kind of a handle <I>from</I> a <code>cow</code>, it has to interoperate with the locking mechanism used
+by <A HREF="#operator_arrow" class="code">operator-></A>.  The forms that take a <code>cow</code> as the right-hand-side
+do this.  The others know they don’t have to.</P>
+
+
+<HR SIZE=10 class="sep1">
 <!-- WWWW		wwww		wwww		wwww		wwww		wwww -->
 
-<A NAME="operator arrow"><H2>const T* const_handle::operator->() const</H2></A></BR>
-<H2>T* handle::operator->() const</H2><BR>
-<H2>T* cow::operator->() const</H2>
-<P ALIGN="right"><FONT SIZE="-1">public</FONT></P>
-Dereferencing a handle of any flavor provides access to the referenced object.  For a plain
-handle, read/write access is provided.  For a const_handle, read-only access is provided
-because the return value is a const T*.  For a cow, the referenced object is cloned first
+<H2 id="operator_arrow">const T* const_handle::<B>operator-></B>() const</H2>
+<H2>T* handle::<B>operator-></B>() const</H2>
+<H2>T* cow::<B>operator-></B>() const</H2>
+<A HREF="handle_index.html" TARGET="index" class="memof"><I>any handle</I></A>
+<P class="mematt">public</P>
+<P>Dereferencing a handle of any flavor provides access to the referenced object.  For a plain
+<code>handle</code>, read/write access is provided.  For a <code>const_handle</code>, read-only access is provided
+because the return value is a <code>const T*</code>.  </P>
+<P>For a <code>cow</code>, the referenced object is cloned first
 if it is being shared, so the returned object is always unique.</P>
+<P>This cannot distinguish between subsequent calling of a const or non-const member on the
+returned pointer, so <EM>dereferencing a <code>cow</code> will always ensure a unique object.</EM>  If you will be
+only reading and don’t wish to clone, call <A HREF="#const_object" class="code">const_object</A> instead, or assign to a temporary
+<code>const_handle</code> first.</P>
 
-<HR SIZE=10 COLOR=black>
+<H3>Threading Issues</H3>
+<P>For a <code>cow</code>, this operator calls <A HREF="#make_unique" class="code">make_unique</A>, so see notes
+there on threading issues.</P>
+<P>For all handle flavors, the handle library itself will properly provide access to the same underlying object from
+multiple threads dereferencing handles at the same time.  However, it does not add anything to that class’s own
+thread safety!  For example, if you have <code>h1->foo()</code> the use of handles doesn’t change what <code>foo</code>
+does (including whether <code>foo</code> is thread safe) once this <code>operator-></code> resolves the underlying object.</P>
+
+<HR SIZE=10 class="sep1"><!-- WWWW		wwww		wwww		wwww		wwww		wwww -->
+
+<H2 id="operator_bool"><B>operator bool</B>() const</H2>
+<A HREF="handle_index.html" TARGET="index" class="memof"><I>any handle</I></A>
+<P class="mematt">public</P>
+<P>Returns <code>true</code> if the pointer is not null.</P>
+
+<HR SIZE=10 class="sep1"><!-- WWWW		wwww		wwww		wwww		wwww		wwww -->
+
+<H2 id="operator_not">bool <B>operator!</B>() const</H2>
+<A HREF="handle_index.html" TARGET="index" class="memof"><I>any handle</I></A>
+<P class="mematt">public</P>
+<P>Returns <code>true</code> if the pointer is null.</P>
+
+<HR SIZE=10 class="sep1"><!-- WWWW		wwww		wwww		wwww		wwww		wwww -->
+
+<H2 id="operator_EQ">bool <B>operator==</B>(const handle_structure&lt;T>&amp;&nbsp;a, const&nbsp;handle_structure&lt;T>&amp; b)</H2>
+<H2>bool <B>operator!=</B>(const handle_structure&lt;T>&amp;&nbsp;a, const&nbsp;handle_structure&lt;T>&amp; b)</H2>
+<A HREF="handle_index.html" TARGET="index" class="memof"><I>any handle</I></A>
+<P class="mematt">non-member, template</P>
+<PRE class="code" style="float:right; margin-left:2em">
+const_handle&lt;C> h1;
+cow&lt;C> h2;
+<I>// &hellip;</I>
+if (<B>h1 == h2</B>) {
+   <I>// &hellip;</I>
+</PRE>
+<P>This tests for equality of the underlying object.  The <code>==</code> operator returns <code>true</code> if both handles point to the same object.
+The <code>!=</code> operator is precicely the opposite of <code>==</code>.</P>
+<P>These will compare different flavors of handle (<code>handle_structure</code> is a base class of all the handle types), as seen
+to the right.</P>
+<PRE class="code" style="float:left; margin-right:2em">
+const_handle&lt;C> h1;
+const_handle&lt;D> h2;
+<I>// &hellip;</I>
+if (<B>h1 == h2</B>) {
+   <I>// &hellip;</I>
+</PRE>
+<P>You can also have different types of underlying pointer type.  As seen in the listing to the left, handles to different types
+can be compared.  It makes exactly as much sence as comparing raw pointers to different types: there has to be a common
+base class or conversion operator involved.</P>
+<P>The two kinds of flexibility can be used at the same time.  You can compare different kinds of handles to different
+declared types.  This feature is not immediatly apparent from the signature, which shows both parameters having
+an underlying object of the same type T.  Since there is a conversion chain from any kind of handle to <code>U</code>
+to a <code>const handle_structure&lt;T></code> (navigate up the hierarchy from whatever concrete handle class to
+<code>const handle_structure&lt;U></code>, then use the generalized copy constructor convert a <code>const handle_structure&lt;U></code>
+to a temporary <code>handle_structure&lt;T></code>, which can be bound to the parameter), and the comparison only
+makes sence if one of the types is derived from the other (so there is an implicit conversion from <I>either</I> <code>D*</code>
+to <code>C*</code> <I>or</I> vice-versa <I>but not both</I>), the compiler figures out the unique way to make it fit
+the template.</P>
+<P>There are some comparisons that are meaningful in context that the compiler won’t accept, but that is the same as with
+comparisons between raw pointers of different types.  If the corresponding pointer comparison needed help by using
+explicit casts, the handle comparison will need the same help.  See <A HREF="handle_guide.html#handle_cast">the User’s Guide</A>
+for more details.</P>
+<P>See also <A HREF="#points_to">points_to</A>.
+<BR clear="all">
+
+<HR SIZE=10 class="sep1"><!-- WWWW		wwww		wwww		wwww		wwww		wwww -->
+
+<H2 id="clone">T* cow::<B>clone</B> (T*)</H2>
+<A HREF="handle_index.html" TARGET="index" class="memof">cow</A>
+<P class="mematt">public, static</P>
+<P>If you need to supply a <code>clone</code> member to type <code>T</code>, but cannot, an alternative is to
+explicitly specialize this member.</P>
+<PRE class="code">
+struct S;  <I>// defined in someone else's header; not mine to alter</I>
+
+cow&lt;S> h1;
+cow&lt;S> h2 (h1);
+h1->foo();  <I>// no such member S::clone.</I>
+</PRE>
+
+<P>The example above shows a situation that will not compile, giving an error while attempting to
+instantiate the template.  Adding the <code>clone</code> member specialization to the <code>cow</code>
+will take care of it:</P>
+<PRE class="code">
+namespace classics {
+template&lt;> S* cow&lt;S>::clone (S* original)
+ {
+ return new S (original);
+ }
+}
+</PRE>
+<P>Note that implementing the code here, instead of in a virtual clone member of the underlying object,
+will not behave polymorphically.  See <A HREF="handle_guide.html#clone">the User’s Guide</A> for more on cloning issues.
+If using &ldquo;somebody else’s&rdquo; class hierarchy with the <code>cow</code> template, this
+specialization will be written to call the supplied cloning mechanism that exists as part of that class.</P>
+
+<HR SIZE=10 class="sep1"><!-- WWWW		wwww		wwww		wwww		wwww		wwww -->
+
+<H2 id="const_object">const T* <B>const_object</B>() const</H2>
+<A HREF="handle_index.html" TARGET="index" class="memof"><I>any handle</I></A>
+<P class="mematt">public</P>
+<P>When you have a <code>cow</code>, as opposed to a plain <code>handle</code> or <code>const_handle</code>,
+dereferencing it with <A HREF="#operator_arrow" class="code">-></A> will cause the object to be cloned if it is being
+shared.  If you want read-only access, to call <code>const</code> members, then it is unnecessary to copy since the idea
+is to copy-on-<I>write</I>.</P>
+<P>For consistancy, <code>const_object</code> is available on any of the handle flavors.  In addition to being
+particularly useful with <code>cow</code>s, it could be used when writing templates that work on any flavor of
+handle (though you might still consider defining a local <code>const_handle</code>).
+
+<HR SIZE=10 class="sep1"><!-- WWWW		wwww		wwww		wwww		wwww		wwww -->
+
+<H2 id="data">T* <B>data</B>() const</H2>
+<A HREF="handle_index.html" TARGET="index" class="memof"><I>any handle</I></A>
+<P class="mematt">public</P>
+<P>This returns the underlying object, without modifying the reference count.  If you’re doing something a little
+funny so using <A HREF="#operator_arrow" class="code">operator-></A> is awkward, then use <code>data</code>
+instead.</P>
+<P>Note that in a <code>const_handle</code>, the return value is a const pointer, in keeping with the meaning of
+a <code>const_handle</code>.  For a <code>cow</code>, calling <code>data</code> causes a copy to be made if
+the data was being shared, again exactly like <A HREF="#operator_arrow" class="code">operator-></A>
+(see also <A HREF="#const_object" class="code">const_object</A>).<P>
+
+<HR SIZE=10 class="sep1"><!-- WWWW		wwww		wwww		wwww		wwww		wwww -->
+
+<H2 id="get_lifetime_object">const lifetime* <B>get_lifetime_object</B>() const</H2>
+<A HREF="handle_index.html" TARGET="index" class="memof"><I>any handle</I></A>
+<P class="mematt">public, advanced</P>
+<P>This returns the <A HREF="../class_summary.html#lifetime">lifetime</A> object associated with
+the underlying object, for read-only access.  Note that if the underlying pointer is null, the returned <code>lifetime</code> object is
+<I>not</I> null also, but a real <code>lifetime</code> object that counts references like any other.  Whether or not all
+null handles use the same <code>lifetime</code> object is unspecified (it depends on the implementation of
+the global <code>Get_lifetime_object</code> overload for <code>T</code>.)</P>
+<P>The implementation does some error checks to possibly catch usage errors.</P>
+<P>This function is provided to allow unit testing, so reference counts can be examined after doing sample
+manipulations.  It might also be used if you wanted to detect a heavily-referenced object as opposed to
+a lightly used one.  Use <A HREF="#is_unique" class="code">is_unique</A> if you just want to know if the
+handle is sharing data or not.</P>
+<P>This function is not to be confused with the private <code>get_Lifetime</code> that provides read/write access, and
+is used within the implementation.</P>
+
+<HR SIZE=10 class="sep1"><!-- WWWW		wwww		wwww		wwww		wwww		wwww -->
+
+<H2 id="is_unique">bool <B>is_unique</B>() const</H2>
+<A HREF="handle_index.html" TARGET="index" class="memof"><I>any handle</I></A>
+<P class="mematt">public</P>
+<P>This allows code to detect whether the handle is the only handle pointing to the underlying object, or whether
+additional handles are sharing the same object.</P>
+<P>This could be used by code that can optimize for the situation.  For example, when inserting into the middle of
+a string it is more efficient to copy the parts to the final positions of the larger destination rather than duplicating
+it first and then inserting; if the copy is already unique, though, it may be able to change it in-place without making
+another copy.  In general, this allows &ldquo;lazy copy&rdquo; to become an optimized copy based on later context.</P>
+
+<HR SIZE=10 class="sep1"><!-- WWWW		wwww		wwww		wwww		wwww		wwww -->
+
+<H2 id="make_unique">bool cow::<B>make_unique</B>() const</H2>
+<A HREF="handle_index.html" TARGET="index" class="memof">cow</A>
+<P class="mematt">public, advanced</P>
+<P>This forces any pending copy to be completed, and is what is called by <A HREF="#operator_arrow" class="code">operator-></A> and
+<A HREF="#data" class="code">data</A>.  If code desides that
+it needs to dis-entangle from any other shared users, without calling some member yet, it is clearer to call <code>make_unique</code>
+then to make a dummy call to <code>data</code> and ignore the result.</P>
+<P>The return value is <code>true</code> if it did actually make a copy, and <code>false</code> if it didn’t do anything
+because the data was not shared to begin with.</P>
+<H3>Threading Issues</H3>
+<P>The central point of the <code>cow</code> flavor of handle is that a copy of the handled object will be created only if
+needed, and delayed until (if ever) it is needed.  The pending delayed copy makes dereferencing essentially like an
+assignment&mdash;it replaces the content with a pointer to a newly-created object.</P>
+<P style="float:left; margin-right:1.5em; width:40%" class="sidebar">To clarify, two handles (e.g. <code>cow1</code> and <code>cow2</code>)
+pointing to the same shared underlying object (<code>cow1=cow2</code>) are fully thread-independant and non-blocking.  One
+thread can use <code>cow1</code> and another thread can use <code>cow2</code>, either or both might need to clone the object,
+but <code>make_unique</code> never blocks.  It is only when two threads use the <I>same</I> object, such as two threads using the same
+global <code>cow1</code>, that concern us here.<P>
+<P>If left alone, this makes multiple threads using the <I>same</I> handle variable run into the same thread-safety issue
+as assignment.  It is doing the assignment, delayed from when it was actually specified.  However, making <A HREF="#operator_arrow" class="code">operator-></A>
+subject to the same threading restrictions as assignment is unintuative and error-prone.  So, as of PB8, <code>make_unique</code>
+is implemented to be thread-safe if called on multiple threads at the same time for the same object.  The case illustrated here is handled
+transparantly, but unlike other handle operarations one thread may have to wait for the other to complete the cloning.</P>
+<TABLE style="clear:both; border-collapse:collapse;">
+<TR><TH>prior to starting threads
+<TR><TD style="border-style:solid;background-color: #EEE;">
+<PRE class="code" style="display:table-cell;border-style: none;">
+cow&lt;C> cow1 (new C);
+cow&lt;C> cow3 (cow1);
+const_handle&lt;C> ch4 (cow1);
+</PRE>
+<TR><TH>Thread 1<TH>Thread 2<TH>Thread 3
+<TR><TD style="border-style:solid">
+<PRE class="code" style="display:table-cell;border-style: none;">
+cow1->foo();
+   <I>// operator-> calls make_unique</I>
+</PRE>
+<TD style="border-style:solid"><PRE class="code" style="display:table-cell;border-style: none;">
+cow1->bar();
+   <I>// operator-> calls make_unique</I>
+</PRE>
+<TD style="border-style:solid"><PRE class="code" style="display:table-cell;border-style: none;">
+cow2= cow1;
+   <I>// use on right-hand-side</I>
+</PRE>
+</TABLE>
+
+<P>An underlying object is pointed to by three handles, including <code>cow1</code>.  Two threads each trigger copy-on-write at the
+same time (ignore Thread 3 for now), so each thread wants to make <code>cow1</code> point to a unique copy of the original shared object.  When the execution of
+the two calls to <code>cow1.make_unique()</code> overlap, one thread will do the cloning and the other will wait for it to finish.  The waiting is done by
+simply calling the Win32 <code>Sleep</code> function with a minimal time.</P>
+<P>Now look at Thread 3, an assignment <I>from</I> <code>cow1</code>.  Again, using an object on the right-hand-side of an assignment is
+not normally something that either modifies the object or causes threading issues.  But, it affects the reference count, and needs to interoperate
+with the locking done by <code>make_unique</code>.  So, this assignment-from (or initialization-from) may also need to wait.</P>
+<P>If all threads do their things at the same time, it’s possible that Thread 1 will proceed first, making <code>cow1</code> distinct from <code>cow3</code>
+or <code>ch4</code>; then Thread 3 proceeds and makes <code>cow1</code> non-unique again; then Thread 2 proceeds.  Thread 2 makes <code>cow1</code>
+unique again, and <code>bar</code> is called on a different object from <code>foo</code>.  If the execution of the threads don’t overlap their
+locked regions of code, this could indeed happen, just like writing sequential code to do things in that order:</P>
+<PRE class="code">
+C* temp1= cow1.operator->();
+cow2= cow1;
+C* temp2= cow1.operator->();
+temp1->foo();
+temp2->bar();
+</PRE>
+<P>The value in <code>temp1</code> is still valid because <code>cow2</code> is holding a reference to the same object
+that <code>cow1</code> used to be.  But, what if Thread 3 runs for a while longer before we get back to Thread 1, and <code>cow2</code>
+goes out of scope?  Nothing good.</P>
+<P>This is a compelling reason to guarantee the following implementation detail:  <EM>If two calls to <code>make_unique</code> are performed on
+the same object with overlapping execution, both will return the same object</EM> even if it is no longer unique by the time the second call returns.  That is,
+the above scenareo will always behave as if Thread 3 went last.</P>
+<P>Of course, trying to execute <code>cow1=whatever;</code> at the same time as anything else on <code>cow1</code> is ill-formed, and the
+implementation makes no attempt to deal with that possibility.</P>
+
+<HR SIZE=10 class="sep1"><!-- WWWW		wwww		wwww		wwww		wwww		wwww -->
+
+<H2 id="points_to">bool <B>points_to</B> (const T* p) const</H2>
+<A HREF="handle_index.html" TARGET="index" class="memof"><I>any handle</I></A>
+<P class="mematt">public</P>
+<P>This returns <code>true</code> if the handle is currently pointing to the same object as <code>p</code>.</P>
+
+<HR SIZE=10 class="sep1"><!-- WWWW		wwww		wwww		wwww		wwww		wwww -->
+
+<H2 id="Type">typedef T <B>Type</B></H2>
+<A HREF="handle_index.html" TARGET="index" class="memof"><I>any handle</I></A>
+<P class="mematt">public</P>
+<P>This provides a declaration for the type used to instantiate the template.  You’ll need this if you use
+a handle in another template, and need to know what <code>T</code> was.</P>
+
+<HR SIZE=10 class="sep1">
 <!-- WWWW		wwww		wwww		wwww		wwww		wwww -->
 
 
-<A NAME="operator bool"><H2>operator bool() const</H2></A>
-<P ALIGN="right"><FONT SIZE="-1">public</FONT></P>
-Returns <code>true</code> if the pointer is not null.
-<HR SIZE=10 COLOR=black>
-<!-- WWWW		wwww		wwww		wwww		wwww		wwww -->
-
-<A NAME="operator!"><H2>bool operator!() const</H2>
-<P ALIGN="right"><FONT SIZE="-1">public</FONT></P>
-Returns <code>true</code> if the pointer is null.
-<HR SIZE=10 COLOR=black>
-<!-- WWWW		wwww		wwww		wwww		wwww		wwww -->
 
 
-<A NAME="get_lifetime_object"><H2>const lifetime* get_lifetime_object() const</H2>
-<P ALIGN="right"><FONT SIZE="-1">public</FONT></P>
-<HR SIZE=10 COLOR=black>
-<!-- WWWW		wwww		wwww		wwww		wwww		wwww -->
-
-<A NAME="is_unique"><H2>bool is_unique() const</H2>
-<P ALIGN="right"><FONT SIZE="-1">public</FONT></P>
-<HR SIZE=10 COLOR=black>
-<!-- WWWW		wwww		wwww		wwww		wwww		wwww -->
-
-<A NAME="points_to"><H2>bool points_to (const T* p) const</H2>
-<P ALIGN="right"><FONT SIZE="-1">public</FONT></P>
-<HR SIZE=10 COLOR=black>
-<!-- WWWW		wwww		wwww		wwww		wwww		wwww -->
-
-<A NAME="Type"><H2>typedef T Type</H2>
-<P ALIGN="right"><FONT SIZE="-1">public</FONT></P>
-<HR SIZE=10 COLOR=black>
-<!-- WWWW		wwww		wwww		wwww		wwww		wwww -->
-
-
-
-
-<!-- Stock footer-->
-<FONT size="-2">Page content copyright 1998 by John M. Dlugosz.
-Home:<A HREF="http://www.dlugosz.com">http://www.dlugosz.com</A>,
-email:<A HREF="mailto:john@dlugosz.com">mailto:john@dlugosz.com</A>
-</FONT>
-<!-- End footer-->
+<IFRAME id="page_footer" src="../page_footer.html"></IFRAME>
 
 </BODY>
 

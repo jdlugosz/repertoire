@@ -3,26 +3,22 @@
 <HEAD>
 <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=windows-1252">
 <TITLE>message_tap member reference</TITLE>
+<META http-equiv="Content-Script-Type" content="text/javascript">
+<SCRIPT type= "text/javascript" src="../helpers.js"></SCRIPT>
 <LINK REL=STYLESHEET HREF="../info.css" TYPE="text/css">
+<SCRIPT type="text/javascript">
+   checkframe ("Tomahawk/message_tap_index.html");
+</SCRIPT>
 </HEAD>
 
 <BODY>
-
-<DIV id="toppane">
-<P style="margin:0">
-<A HREF="message_tap_index.html" TARGET="index" class="button" ><B>&#x261A;</B>index</A>
-<code style="font-size:150%">message_tap</code> Member Reference</P>
-</DIV>
-
-<DIV style="position:fixed; top:3em; left:0; width: 100%; height:100%; overflow:auto">
-<DIV style="margin-left: 0.3em; margin-right:0.3em; padding:0">
 
 <IFRAME id="page_banner" src="../page_banner.html" scrolling="no"></IFRAME>
 <A NAME="toptop"></A>
 
 
 <H1 id="overview" >message_tap</H1>
-<P>Base class: can_handle</P>
+<P>Base class: <A HREF="../class_summary.html#can_handle" style="code">can_handle</A></P>
 <P>This class provides a WinProc that adds a <I>this</I> pointer and calls a virtual function on
 an object.  It provides the mechanisms for subclassing an <code>HWND</code>.</P>  
 
@@ -35,13 +31,15 @@ for more discussion.</P>
 <HR SIZE=10 class="sep1">
 
 <H2 id="constructor"><SPAN class="signame">message_tap</span>()</H2>
+<A HREF="message_tap_index.html" TARGET="index" class="memof">message_tap</A>
 <P class="mematt">constructor, public</P>
 <P>The constructor is unsurprising.</P>
 
 
 <HR SIZE=10 class="sep1">
 
-<H2 id="destructor"><SPAN class="signame">~<SPAN class="signame">message_tap</span></span>()</H2>
+<H2 id="destructor"><SPAN class="signame">~message_tap</span>()</H2>
+<A HREF="message_tap_index.html" TARGET="index" class="memof">message_tap</A>
 <P class="mematt">destructor, public</P>
 <P>The destructor will <A HREF="#unhook" class="code">unhook</A> the class, to ensure that subsequent 
 messages don’t get sent to a nonexistant object.  The WinProc itself is a thunk that’s a member of this class, 
@@ -54,6 +52,7 @@ so this is there just to be safe.</P>
 
 <H2 id="call_old_wndproc">long <SPAN class="signame">call_old_wndproc</span> 
 	(<A HREF="../class_summary.html#sMSG">sMSG</A>&amp; msg)</H2>
+<A HREF="message_tap_index.html" TARGET="index" class="memof">message_tap</A>
 <P class="mematt">public</P>
 <P>This calls the WndProc that the window had before it was subclassed by 
 a call to <A HREF="#hook" class="code">hook</A>, or calls <code>DefWndProc</code> if there wasn’t
@@ -67,6 +66,7 @@ one.</P>
 <HR SIZE=10 class="sep1">
 
 <H2 id="get_object_count">int <SPAN class="signame">get_object_count</span>()</H2>
+<A HREF="message_tap_index.html" TARGET="index" class="memof">message_tap</A>
 <P class="mematt">public, static</P>
 <P>This returns a count of how many objects exist.  A thread-safe counter is incremented in the constructor and
 decremented in the destructor.</P>
@@ -76,6 +76,7 @@ It might also be used to exit the program when the last window is closed.</P>
 <HR SIZE=10 class="sep1">
 
 <H2 id="get_WndProc">Proc <SPAN class="signame">get_WndProc</span>()</H2>
+<A HREF="message_tap_index.html" TARGET="index" class="memof">message_tap</A>
 <P class="mematt">public</P>
 <P>This returns the generated callback function that is a thunk to turn a <code>WNDPROC</code> or 
 <code>WNDPROC_2</code> signature into a call to 
@@ -104,6 +105,7 @@ use of the same instance.</P>
 <HR SIZE=10 class="sep1">
 
 <H2 id="handle_message">long <SPAN class="signame">handle_message</span> (<A HREF="../class_summary.html#sMSG">sMSG</A>&amp; msg)</H2>
+<A HREF="message_tap_index.html" TARGET="index" class="memof">message_tap</A>
 <P class="mematt">public, virtual</P>
 <P>This function is called by the WinProc of the window to which it is attached.  
 The <A HREF="../class_summary.html#sMSG" class="code">sMSG</A> structure (short MSG, since it is a subset (base class) of the 
@@ -124,6 +126,7 @@ class.</P>
 <HR SIZE=10 class="sep1">
 
 <H2 id="hook">void <SPAN class="signame">hook</span> (HWND)</H2>
+<A HREF="message_tap_index.html" TARGET="index" class="memof">message_tap</A>
 <P class="mematt">public</P>
 <P>This function associates this object with the specified Window.  Call this after calling Win32 
 <code>CreateWindow</code> or otherwise obtaining an <code>HWND</code> to a valid Window.</P>
@@ -136,6 +139,7 @@ old WinProc.</P>
 <HR SIZE=10 class="sep1">
 
 <H2 id="on_attach">void <SPAN class="signame">on_attach</span>()</H2>
+<A HREF="message_tap_index.html" TARGET="index" class="memof">message_tap</A>
 <P class="mematt">public, virtual</P>
 <P>This virtual function is called after the window and object are put 
 together.  It fills the role of <code>WM_CREATE</code> or <code>WM_INITDIALOG</code>, which can’t 
@@ -153,7 +157,8 @@ at first oppertunity once the window handle and object are put together.</P>
 
 <HR SIZE=10 class="sep1">
 
-<H2 id="pre_translate_message">int <SPAN class="signame">pre_translate_message</span> (const MSG&amp; msg)</H2>
+<H2 id="pre_translate_message">int <SPAN class="signame">pre_translate_message</span> (const <A HREF="../class_summary.html#MSG">MSG</A>&amp; msg)</H2>
+<A HREF="message_tap_index.html" TARGET="index" class="memof">message_tap</A>
 <P class="mematt">public, virtual</P>
 <P>This is called when the Tomahawk <code>pre_translate_message</code>
 message is processed.  It basically does the same thing that you could do yourself by handling a 
@@ -187,6 +192,7 @@ For either, return 1 if the translate call returned <code>true</code>, or return
 <HR SIZE=10 class="sep1">
 
 <H2 id="Proc">typedef long (__stdcall* <SPAN class="signame">Proc</span>)(<A HREF="../class_summary.html#sMSG">sMSG</A>)</H2>
+<A HREF="message_tap_index.html" TARGET="index" class="memof">message_tap</A>
 <P class="mematt">public, typename</P>
 <P>This is typedef'ed here because the compiler could not handle the written-out form as a return
 value for a function.  I don’t want to reference the <code>ratwin::window::WNDPROC_2</code> type because
@@ -195,7 +201,8 @@ they can be used interchangably.</P>
 
 <HR SIZE=10 class="sep1">
 
-<H2 id="report_error">void <SPAN class="signame">report_error</span> (const classics::exception& X)</H2>
+<H2 id="report_error">void <SPAN class="signame">report_error</span> (const <A HREF="../class_summary.html#exception">classics::exception</A>&amp; X)</H2>
+<A HREF="message_tap_index.html" TARGET="index" class="memof">message_tap</A>
 <P class="mematt">public, virtual</P>
 <P>This function is called to log non-fatal errors generated within the class, and any exceptions caught by the 
 internal hook handler.</P>
@@ -206,6 +213,7 @@ on an application-wide basis.</P>
 <HR SIZE=10 class="sep1">
 
 <H2 id="sane_check">void <SPAN class="signame">sane_check</span>() const</H2>
+<A HREF="message_tap_index.html" TARGET="index" class="memof">message_tap</A>
 <P class="mematt">public</P>
 <P>This uses a simple and cheap test to verify that the <code>this</code> pointer is indeed pointing to a 
 non-destructed object of (or derived from) class <code>message_tap</code>.</P>
@@ -219,6 +227,7 @@ handy for spotting bugs and usage errors during development.</P>
 <HR SIZE=10 class="sep1">
 
 <H2 id="set_window_handle">void <SPAN class="signame">set_window_handle</span> (HWND)</H2>
+<A HREF="message_tap_index.html" TARGET="index" class="memof">message_tap</A>
 <P class="mematt">public</P>
 <P>This function performs half the work needed to associate this object with the 
 specified Win32 Window handle. It sets the data member so that subsequent calls to 
@@ -233,6 +242,7 @@ redundant&mdash;the parameter is the same).  This catches errors from duplicate 
 <HR SIZE=10 class="sep1">
 
 <H2 id="unhook">bool <SPAN class="signame">unhook</span> (bool force=false)</H2>
+<A HREF="message_tap_index.html" TARGET="index" class="memof">message_tap</A>
 <P class="mematt">public</P>
 <P>You are not expected to unhook a window explicitly, but to leave it hooked until the window is destroyed.  
 You may call this function to unhook the window, but it will be called automatically in the destructor or when
@@ -256,6 +266,7 @@ classes can change this behavior.</P>
 <HR SIZE=10 class="sep1">
 
 <H2 id="unhook_when_possible">bool <SPAN class="signame">unhook_when_possible</span>()</H2>
+<A HREF="message_tap_index.html" TARGET="index" class="memof">message_tap</A>
 <P class="mematt">public</P>
 <P>Calling this function sets a flag, which instructs the class to unhook itself  as soon as it is able, after all 
 objects that subclassed the window <I>after</I> this object have restored their WndProc pointers.</P>
@@ -268,6 +279,7 @@ objects that subclassed the window <I>after</I> this object have restored their 
 <HR SIZE=10 class="sep1">
 
 <H2 id="window_handle">HWND <SPAN class="signame">window_handle</span>() const</H2>
+<A HREF="message_tap_index.html" TARGET="index" class="memof">message_tap</A>
 <P class="mematt">public</P>
 <P>This returns the Win32 window handle of the window to which this class is paired with.</P>
 <P>Note that this is a <code>const</code> member, as the state of this object is not 
@@ -279,7 +291,6 @@ through this <code>HWND</code>, since there is no const-ness concept on <code>HA
 <HR SIZE=10 class="sep1">
 
 <IFRAME id="page_footer" src="../page_footer.html"></IFRAME>
-</DIV></DIV>
 </BODY>
 </HTML>
 

@@ -1,6 +1,6 @@
-// The Repertoire Project copyright 1999 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
+// The Repertoire Project copyright 2006 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: classics\pointers=const_handle.h
-// Revision: public build 6, shipped on 28-Nov-1999
+// Revision: public build 8, shipped on 11-July-2006
 
 STARTWRAP
 namespace classics {
@@ -12,6 +12,7 @@ template <typename T> class const_baro;
 template <typename T>
 class const_handle : public handle_structure<T> {
    typedef handle_structure<T> Base;
+   void assign_from_cow (const cow<T>& other);  // implementation is in "pointers=cow.h" file
 public:
    explicit const_handle (const const_baro<T>& other)
       : Base(other) { claim_owned_reference(); }
@@ -21,13 +22,24 @@ public:
       : Base(p) { claim_owned_reference(); }
    const_handle (const const_handle& other)
       : Base(other) { inc_owned_reference(); }
+   template <typename U>
+   const_handle (const const_handle<U>& other)
+      : Base(other) { inc_owned_reference(); }
+   template <typename U>
+   const_handle (const cow<U>& other) : Base ((const cow<T>&)other) {}
    ~const_handle()
       { dec_owned_reference(); }
+   template <typename U>
+   const_handle<T>& operator= (const const_handle<U>& other)
+      { assign_owned (other);  return *this; }
    const_handle& operator= (const const_handle& other)
-      { other.inc_owned_reference(); dec_owned_reference(); Base::operator=(other); return *this; }
+      { assign_owned (other);  return *this; }
    const_handle& operator= (T* other);
+   template <typename U>
+   const_handle<T>& operator= (const cow<U>& other)
+      { assign_from_cow (other);  return *this; }
+   const T* data() const { return Base::data(); }
    const T* operator->() const  { return data(); }
-   bool is_unique() const  { return Base::is_unique(); }
    };
 
 /* ======================================================== */
@@ -43,7 +55,7 @@ const_handle<T>& const_handle<T>::operator= (T* other)
  // now get rid of the old.  I have to grab first then delete the old, in
  // case both old and other refer to the same complete object and
  // the reference count was 1.
- old.dec_owned_reference();
+ dec_owned_reference(old);
  return *this;
  }
 

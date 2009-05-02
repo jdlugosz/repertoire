@@ -1,6 +1,6 @@
-// The Repertoire Project copyright 2001 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
-// File: 
-// Revision: fresh
+// The Repertoire Project copyright 2006 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
+// File: classics\closure-=-old.h
+// Revision: public build 8, shipped on 11-July-2006
 
 /*
   This is the contents of an older version of closure.h.
@@ -42,7 +42,7 @@ class closure_stdcall_to_thiscall {
    __int32 displacement;  // target= next instruction + displacement
 public:
    CLASSICS_EXPORT closure_stdcall_to_thiscall (void* object, void* function);
-   closure_stdcall_to_thiscall (const closure_stdcall_to_thiscall&);
+   CLASSICS_EXPORT closure_stdcall_to_thiscall (const closure_stdcall_to_thiscall&);
    closure_stdcall_to_thiscall& operator= (const closure_stdcall_to_thiscall&);
    void* callptr() const  { (void*)this; }
    };
@@ -89,7 +89,7 @@ void* member_callback_thunk<Class,RetType,ParamType>::helper2 (method member, ch
  {
  // When the method pointer is 4 bytes, it is simply a function pointer to either the
  // actual member function entry point, or a VCALL thunk that looks up the vtable.
- // Either way, that is simply the address I need.  This is the __single_inheritance 
+ // Either way, that is simply the address I need.  This is the __single_inheritance
  // case of VC++ member pointer representation.
  union {
     method p;
@@ -110,8 +110,8 @@ void* member_callback_thunk<Class,RetType,ParamType>::helper (method member)
 
 
 /////////////////////
-// Add a parameter to a __stdcall function 
-/* 
+// Add a parameter to a __stdcall function
+/*
 Does the same thing as writing the following glue function:
 
    Class* p;

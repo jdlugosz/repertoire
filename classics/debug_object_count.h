@@ -1,3 +1,6 @@
+// The Repertoire Project copyright 2006 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
+// File: classics\debug_object_count.h
+// Revision: public build 8, shipped on 11-July-2006
 
 class debug_object_count_t {
 public:

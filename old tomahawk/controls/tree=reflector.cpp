@@ -1,6 +1,6 @@
-// The Repertoire Project copyright 1999 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
-// File: tomahawk\controls\tree=reflector.cpp
-// Revision: public build 6, shipped on 28-Nov-1999
+// The Repertoire Project copyright 2006 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
+// File: old tomahawk\controls\tree=reflector.cpp
+// Revision: public build 8, shipped on 11-July-2006
 
 #define TOMAHAWK_EXPORT __declspec(dllexport)
 #include "tomahawk\controls\tree.h"

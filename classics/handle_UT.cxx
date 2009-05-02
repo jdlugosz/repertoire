@@ -1,6 +1,6 @@
-// The Repertoire Project copyright 2001 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
+// The Repertoire Project copyright 2006 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: classics\handle_UT.cxx
-// Revision: post-public build 6
+// Revision: public build 8, shipped on 11-July-2006
 
 #include "classics\new.h"
 #include "classics\pointers.h"
@@ -41,7 +41,7 @@ void report_life_count()
 void test1()
  {
  typedef classics::const_handle<testclass> ht;
- cout << "test 1 -- basic sanity check\n";
+ cout << "test 1 -- basic sanity check.\n";
  try {
     ht p1;
     ht p2 (new testclass);
@@ -49,6 +49,20 @@ void test1()
     p1= p2;
     p2= 0;
     report_life_count();
+    if (!p1) {  // call operator!
+       cout << "failed number 1.2" << endl;
+       ++errorcount;
+       }
+    if (p2) { // call operator bool
+       cout << "failed number 1.3" << endl;
+       ++errorcount;
+       }
+    const ht cp2= p2;
+    bool b= cp2;
+    if (b) { // call operator bool on const object
+       cout << "failed number 1.3" << endl;
+       ++errorcount;
+       }
     }
  catch (...) {
     cout << "* failed: exception thrown during test 1" << endl;
@@ -56,7 +70,7 @@ void test1()
     }
  cout << "note: ctor/dtor calling not automatically verified." << endl;
  }
- 
+
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 // stuff used for tests 2 through 6 (real crunching)
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
@@ -111,7 +125,7 @@ void verify (int number, int index, ulong changes)
 // if (oldflags[index] | changes != flags[index])
  if ((oldflags[index] | changes) != flags[index])
     cout << "failed number " << number << endl;
- oldflags[index]= flags[index];   
+ oldflags[index]= flags[index];
  }
 
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
@@ -216,6 +230,20 @@ void test4()
     cout << "failed 4.3" << endl;
     ++errorcount;
     }
+ // assignment operator different for cow's, so test that separately.
+ h1= h2;
+ if (!h1.points_to (h2)) {
+    cout << "failed 4.4" << endl;
+    ++errorcount;
+    }
+ test_object* p1= new test_object;
+ h1= p1;
+ if (!h1.points_to(p1)) {
+    cout << "failed 4.5" << endl;
+    ++errorcount;
+    }
+ const_handle h5 (h1);  // construct const_handle from cow
+ h5= h2;  // assignment operator
  }
 
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
@@ -248,7 +276,7 @@ void test5()
     cout << "failed 5.4" << endl;
     ++errorcount;
     }
- 
+
  h1= 0;
  try {
     const_handle temp (b1);  //claim the borrower for use
@@ -258,10 +286,10 @@ void test5()
  catch (classics::exception& X) {
     cout << "exception caught (as expected):\n";
     X.show();
-    }  
+    }
  // compiler should reject this:
  //-- handle h2 (b1);  //can't get a non-const handle from a const baro
- 
+
  }
 
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
@@ -307,7 +335,7 @@ void test6()
     ++errorcount;
     }
  }
- 
+
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
 int usecount;
@@ -323,7 +351,7 @@ void check_leaks()
     usecount= newcount;
     }
  }
- 
+
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
 void callback (int mode, void* p)
@@ -346,7 +374,7 @@ void callback (int mode, void* p)
        break;
     }
  }
- 
+
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
 struct node {
@@ -362,7 +390,7 @@ unsigned find_checksum (node* p)
     }
  return sum;
  }
- 
+
 // ==========================================
 
 void validate (unsigned checksum, node* top, int LINE)
@@ -371,12 +399,12 @@ void validate (unsigned checksum, node* top, int LINE)
     throw "OOps!";  //keep it simple, to avoid recursive failures!
     }
  }
- 
+
 // ==========================================
 
 void fmp_friendly_callback (int mode, void* p)
  {
- static classics::static_fixed_memory_pool& Pool= classics::lifetime::pool;
+ static classics::general_static_fixed_memory_pool<>& Pool= classics::lifetime::pool;
  static unsigned checksum= 0;
  if (!checksum) {
     checksum= find_checksum (reinterpret_cast<node*>(Pool.get_nodelist()));  // rebuild.
@@ -394,15 +422,15 @@ void fmp_friendly_callback (int mode, void* p)
        break;
     }
  }
- 
+
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 //  test 7 (thread safety) infrastructure
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 #if !defined NOTHREAD
 
 using namespace ratwin::tasking;
-const int iteration_count= 1000;
-const int thread_count= 4; // how many threads
+const int iteration_count= 1000000;
+const int thread_count= 6; // how many threads
 
 int fromlog[iteration_count*thread_count];
 int tolog[iteration_count*thread_count];
@@ -447,8 +475,8 @@ noisy1::~noisy1()
  ratwin::util::Sleep(1);
  }
 
- 
-noisy1::noisy1 (const noisy1& other) 
+
+noisy1::noisy1 (const noisy1& other)
  {
  if (verbose) {
     critical_section::locker k (cs);
@@ -482,7 +510,7 @@ void thread_test_object::report() const
  cout << "\thold= " << L->hold << endl;
  cout << "\tdeleted= " << L->deleted << endl;
  }
- 
+
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
 inline int random (int range)
@@ -511,7 +539,7 @@ cruncher1::~cruncher1()
  for (int loop= 0;  loop < asize;  loop++)  array[loop]= 0;
  delete[] array;
  }
- 
+
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
 void cruncher1::start()
@@ -525,7 +553,7 @@ void cruncher1::start()
     tolog[pos]= dest;
     }
  }
- 
+
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
 cruncher1::cruncher1 (int size)
@@ -536,7 +564,7 @@ cruncher1::cruncher1 (int size)
     array[loop]= new thread_test_object;
     }
  }
- 
+
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
 cruncher1::cruncher1 (const cruncher1& other)
@@ -547,7 +575,7 @@ cruncher1::cruncher1 (const cruncher1& other)
     array[loop]= other.array[loop];
     }
  }
- 
+
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
 bool surviving (const noisy1* p)
@@ -556,7 +584,7 @@ bool surviving (const noisy1* p)
     if (p == destructed[loop])  return false;
  return true;
  }
- 
+
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
 void post_mortem()
@@ -570,7 +598,7 @@ void post_mortem()
        }
     }
  }
- 
+
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
 void show_log()
@@ -579,7 +607,7 @@ void show_log()
     cout << "  assigned to #" << tolog[loop] << " from #" << fromlog[loop] << endl;
     }
  }
- 
+
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
 void test7()
@@ -658,7 +686,7 @@ void test8_callback (int mode, void* p)
        enabled= true;
     }
  }
- 
+
 void test8()
  {
  cout << "test 8 -- recursive freeing" << endl;
@@ -671,6 +699,73 @@ void test8()
     cout << "** FAILED **"<< endl;
     }
  classics::lifetime::pool.callback= 0;  // revoke test8_callback
+ }
+
+void test9()
+ {
+ cout << "test 9 -- test for bad lifetime" << endl;
+ try {
+    handle xx;
+    { // extra scope
+       handle h1 (new test_object);
+       memcpy (&xx, &h1, sizeof xx);  // !!!!
+       }  // h1 is destroyed
+//    try {
+//       xx->foo();  // problem, as it's already destroyed.  But, never inspects the lifetime object.
+//       }
+//    catch (...) { cout << "noted foo on bad pointer.\n"; }  // it may or may not; not an issue.
+    // now handle xx goes out of scope, causing a problem.
+    }
+ catch (...) {
+    // does assert throw an exception or just terminate?
+    cout << "exception caught (as expected)\n";
+    return;
+    }
+ ++errorcount;  // should have caught a problem.
+ }
+
+/* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
+
+void test10()
+ {
+ cout << "test 10 -- operator==" << endl;
+ const int original_errorcount= errorcount;
+ classics::handle<recursive_test_object> h1 (new recursive_test_object);
+ classics::handle<recursive_test_object> h2 (new recursive_test_object);
+ if (h1==h2)  ++errorcount;
+ handle h3 (h1);  // uses generalized copy constructor
+ if (h1==h3) {
+    // tested different declared types pointing to the same complete object
+    }
+ else ++errorcount;
+ const_handle h4 (h1);
+ if (h1!=h4)  ++errorcount;
+    // tested different declared types pointing to the same complete object
+ if (errorcount != original_errorcount)
+    cout << "Test 10 failed. " << endl;
+ }
+
+/* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
+
+template <typename T>
+void access_check (T& h)
+ {
+ // don't have to call this; just make sure the compiler allows visibility to them.
+ h.data();
+ h.get_lifetime_object();
+ h.is_unique();
+ typename T::Type* p= 0;
+ h.points_to (p);
+ }
+
+void access_check()
+ {
+ handle xx;
+ access_check (xx);
+ const_handle yy;
+ access_check (yy);
+ cow zz;
+ access_check (zz);
  }
 
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
@@ -702,9 +797,13 @@ int main (int argc, char* argv[])
        test7();
     #else
      cout << "test 7 -- theading test disabled." << endl;
-       #endif
+    #endif
     test8();
     check_leaks();
+    #ifdef _DEBUG
+//    test9();
+    #endif
+    test10();
     if (errorcount != 0) {
        cout << errorcount << " errors detected." << endl;
        return 10;
@@ -720,7 +819,7 @@ int main (int argc, char* argv[])
     return 10;
     }
  cout << "All tests passed." << endl;
- return 0; 
+ return 0;
  }
- 
+
 

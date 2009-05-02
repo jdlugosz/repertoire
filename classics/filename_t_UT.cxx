@@ -1,6 +1,6 @@
-// The Repertoire Project copyright 1999 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
+// The Repertoire Project copyright 2006 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: classics\filename_t_UT.cxx
-// Revision: post-public build 6
+// Revision: public build 8, shipped on 11-July-2006
 
 #include <iostream>
 #include "classics\filename_t.h"

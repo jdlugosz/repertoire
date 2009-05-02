@@ -1,6 +1,6 @@
-// The Repertoire Project copyright 2004 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
+// The Repertoire Project copyright 2006 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: classics\string.hpp
-// Revision: post-public build 6
+// Revision: public build 8, shipped on 11-July-2006
 
 /* These are the template bodies for the string class.  Since the instansiations of
    the normal cases are already in the DLL, you don't need to include this.  This

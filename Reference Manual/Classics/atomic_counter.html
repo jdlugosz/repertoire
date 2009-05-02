@@ -7,23 +7,88 @@
  CONTENT="Repertoire documentation user's guide atomic_counter Classics">
 <TITLE>atomic_counter Reference</TITLE>
 <LINK REL=STYLESHEET HREF="../info.css" TYPE="text/css">
+<LINK REL="STYLESHEET" HREF="../info.css" TYPE="text/css">
+<SCRIPT type="text/javascript">
+   checkframe ("Classics/atomic_counter_index.html");
+</SCRIPT>
+<META name="date" content="2006-06-13">
 </HEAD>
 
 <BODY>
-<!-- Standard banner at top of Reper file -->
-<P CLASS="banner">
-This document is one section of The Repertoire Reference, found at
-<A HREF="http://www.dlugosz.com/Repertoire/refman/mainframe.html" TARGET="_top">
-http://www.dlugosz.com/Repertoire/refman/mainframe.html</A>.<BR>
-Copyright 2001 by <A HREF="mailto:john@dlugosz.com">John M. Dlugosz</A>.
+<IFRAME id="page_banner" src="../page_banner.html" scrolling="no"></IFRAME>
+
+<H1 id="toptop">atomic_counter reference</H1>
+
+
+<H2>Related Documents</H2>
+<UL>
+	<LI><A HREF="atomic_counter_whitepaper.html#toptop">Whitepaper</A>
+	<LI><A HREF="atomic_counter_overview.html#toptop">Overview</A>
+</UL>
+
+<H2>Contents</H2>
+<UL>
+	<LI><A HREF="#category">Members by Category</A>
+	<LI><A HREF="#direct">Direct Use of Primitives</A>
+	<LI><A HREF="#template">Template Information</A>
+</UL>
+
+<H1 id="category">Members by Category</H1>
+<UL>
+	<LI>Housekeeping: constructor, assignment, conversion
+	<LI>prefix and postfix <code>++</code> and <code>--</code>
+	<LI>in-place arithmetic <code>+=</code> and <code>-=</code>
+	<LI>functions <code>inc</code> and <code>dec</code>
+	<LI><code>exchange</code> and <code>compare_and_swap</code>
+</UL>
+
+<H2>Housekeeping</H2>
+
+<P>The <code>atomic_counter&lt;T></code> where <code>T</code> is a primitive integer type with 8, 16, or 32 bits is implemented
+using genuine atomic arithmetic primitives.  So, it is non-blocking, and it is the same size as
+the underlying <code>T</code>.  That is, <code>sizeof(atomic_counter&lt;T>)==sizeof(T)</code>.  Furthermore, there is
+no special constructor, destructor, or copy semantics.
 </P>
-<A NAME="toptop">
-<!-- end of standard banner -->
-<H1>atomic_counter reference</H1>
 
-<P>The members are obvious, so this page has a very low priority.  See the <A 
-HREF="atomic_counter_whitepaper.html#toptop"> for a detailed description.<P>
+<P>This means that you can declare a structure containing atomic_counters and the struct will be binary compatible
+with the plain structure using ordinary integers.
+</P>
 
+<P>The <code>atomic_counter&lt;T></code> where <code>T</code> is <I>not</I> a primitive integer type, but
+the size is 8, 16, 32 or 64 bits, is implemented using a software transaction.  It will sleep if it has to retry.  It still has
+the property of not needing any extra baggage, so <code>sizeof(atomic_counter&lt;T>)==sizeof(T)</code> and there is
+no special constructor, destructor, or copy semantics.</P>
+
+<P>The general case where T is not 1, 2, 4, or 8 bytes is implemented using a critical_section.  It has the usual implications
+of a class with interesting stuff inside it:  you must construct, destruct, and copy it properly.</P>
+
+<H3>Constructors</H3>
+<P>With no parameters, <code>atomic_counter()</code>, nothing special is done and the underlying initialization for the
+T type is performed.  For primitive integers, that means doing nothing.</P>
+
+<P>The copy constructor is not surprising.</P>
+
+<P>You can also construct given an underlying primitive value: <code>atomic_counter (T)</code>.  This allows reasonably
+transparent use of an ordinary <code>T</code> when an <code>atomic_counter</code> is needed.</P>
+
+
+</P>
+
+
+<H2>prefix and postfix <code>++</code> and <code>--</code></H2>
+
+<H2>in-place arithmetic <code>+=</code> and <code>-=</code></H2>
+
+<H2>functions <code>inc</code> and <code>dec</code></H2>
+
+<H2><code>exchange</code> and <code>compare_and_swap</code></H2>
+
+<H1 id="direct">Direct Use of Primitives</H1>
+
+<H1 id="template">Template Information</H1>
+
+<HR>
+<IFRAME id="page_footer" src="../page_footer.html"></IFRAME>
 </BODY>
 </HTML>
 

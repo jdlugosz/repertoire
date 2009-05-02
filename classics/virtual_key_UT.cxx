@@ -1,6 +1,6 @@
-// The Repertoire Project copyright 1999 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
+// The Repertoire Project copyright 2006 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: classics\virtual_key_UT.cxx
-// Revision: public build 5, shipped on 8-April-1999
+// Revision: public build 8, shipped on 11-July-2006
 
 #include "classics\virtual_key.h"
 #if _MSC_VER == 1310

@@ -3,7 +3,12 @@
 <HEAD>
 <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=windows-1252">
 <TITLE>message_tap User’s Guide</TITLE>
+<META http-equiv="Content-Script-Type" content="text/javascript">
+<SCRIPT type= "text/javascript" src="../helpers.js"></SCRIPT>
 <LINK REL=STYLESHEET HREF="../info.css" TYPE="text/css">
+<SCRIPT type="text/javascript">
+   checkframe ("Tomahawk/message_tap_index.html");
+</SCRIPT>
 </HEAD>
 
 <BODY>
@@ -73,7 +78,7 @@ a WndProc that looks up the object (by whatever means) and calls a function on t
 that is hard-coded with the address of the object and calls it directly without having to find anything.</P>
 
 <P>This is possible by using dynamically-generated WndProcs, one per instance.  That is the responsibility of
-the <code>member_callback_thunk</code> class.  This <code>message_tap</code> class uses a
+the <A HREF="../class_summary.html#member_callback_thunk" class="code">member_callback_thunk</A> class.  This <code>message_tap</code> class uses a
 <code>member_callback_thunk</code>, and encapsulates the mechanism for subclassing an <code>HWND</code>
 and all the related housekeeping issues.</P>
 
@@ -148,7 +153,9 @@ testhook_1* <B>p</B>= new testhook_1;
 
 <P>The <code>new testhook_1</code> is assigned to a simple pointer, not a smart pointer.  That is fine since this code
 is not going to remember the value after InitInstance returns.  The window itself keeps a reference to this object, and
-the object will be destructed when the window is closed.  If I had <I>kept</I> a pointer (that is, not a smart pointer), it would point
+the object will be destructed when the window is closed.  
+<IMG src="../images/caution.png" style="height:2em" ALIGN="right" ALT="caution" TITLE="This icon indicates special instructions or pitfalls.">
+If I had <I>kept</I> a pointer (that is, not a smart pointer), it would point
 to an object that the smart pointer system might free, without itself participating in the lifetime control.  In general, don’t
 do that.  But construction is a special case.  Here, <code>p</code> is used only before the object is
 introduced to the smart pointer system, never used after the call that creates the first smart pointer to the object, and

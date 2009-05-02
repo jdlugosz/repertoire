@@ -1,9 +1,10 @@
-// The Repertoire Project copyright 2001 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
-// File: 
-// Revision: fresh
+// The Repertoire Project copyright 2006 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
+// File: tomahawk\MSG\WM_TOMAHAWK.h
+// Revision: public build 8, shipped on 11-July-2006
 
 #pragma once
 #include "ratwin\message=struct.h"
+#include "ratwin\WM_constants.h"
 
 namespace tomahawk {
 namespace MSG {
@@ -17,6 +18,7 @@ struct WM_TOMAHAWK_msg : public ratwin::message::MSG_base {
       };
    codes notification_code() const { return static_cast<codes>(SubCode); }
    TOMAHAWK_EXPORT static unsigned get_TOMAHAWK_id();
+   static const ratwin::WM_constants::messages message_constant;
    };
 
 }}

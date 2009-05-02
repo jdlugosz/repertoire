@@ -1,6 +1,6 @@
-// The Repertoire Project copyright 2001 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
+// The Repertoire Project copyright 2006 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: ratwin\socket2.h
-// Revision:  updated 3-August-2003 or later
+// Revision: public build 8, shipped on 11-July-2006
 
 #pragma once
 #if defined RATWIN_NoGlobals
@@ -91,7 +91,7 @@ inline char * inet_ntoa (const sockaddr* address)
 This code assumes an IP4 address without checking the family.
 */
    {
-   const sockaddr_in* A= reinterpret_cast<const sockaddr_in*>(address):
+   const sockaddr_in* A= reinterpret_cast<const sockaddr_in*>(address);
    const unsigned __int32* addr32= reinterpret_cast<const unsigned __int32*>(A->ipaddr);
    return ::inet_ntoa (reinterpret_cast<arg::arg32>( *addr32 ));
    }

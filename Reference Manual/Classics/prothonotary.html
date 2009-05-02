@@ -1,0 +1,99 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"  "http://www.w3.org/TR/html4/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=windows-1252">
+<TITLE>Prothonotary complete documentation</TITLE>
+<META http-equiv="Content-Script-Type" content="text/javascript">
+<SCRIPT type= "text/javascript" src="../helpers.js"></SCRIPT>
+<LINK REL="STYLESHEET" HREF="../info.css" TYPE="text/css">
+<SCRIPT type="text/javascript">
+   checkframe ("Classics/class_index.html");
+</SCRIPT>
+<META name="date" content="2006-06-16">
+</HEAD>
+
+<BODY>
+<IFRAME id="page_banner" src="../page_banner.html" scrolling="no"></IFRAME>
+
+
+<H1 id="toptop">Prothonotary</H1>
+<P><I>prothonotary: A cheif notary or clerk</I></P>
+
+<H2 id="overview">Overview</H2>
+
+<P>This is used to register or unregister COM servers.  Use this to implement the /RegServer feature.</P>
+
+<H2>Contents</H2>
+<UL>
+	<LI><A HREF="#housekeeping">Threading and Housekeeping Issues</A>
+	<LI><A HREF="#usage">Usage</A>
+</UL>
+
+<H2 id="housekeeping">Threading and Housekeeping Issues</H2>
+
+<P>This class is not designed with multi-threading access in mind.  It is intended to be used in
+one place in the program, and do so when nothing else is going on.</P>
+
+<H2 id="usage">Usage</H2>
+
+<H3>Synopsis</H3>
+<P>Define an instance of type <code>prothonotary</code>, and use members to set information
+about the component object class (coclass).  Then call <code>register</code> or <code>unregister</code>.</P>
+
+<PRE class="code">
+void setup_clerk (classics::COM::prothonotary&amp; clerk)
+ {
+ <I>// identical code for register and unregister</I>
+ clerk.set_clsID (__uuidof (my_implementation_class), "My CoClass's Human Name");
+ clerk.set_progID (g_szProgID, g_szVerIndProgID);
+ clerk.set_threading_model (clerk.Both_thread);
+ }
+
+
+int main (int argc, char* argv[])
+ {
+ <I>// &hellip; blah blah blah</I>
+       case UnregServer: {
+          classics::COM::prothonotary clerk;
+          setup_clerk (clerk);
+          return clerk.unregister_server()->as_number();
+          }
+       case RegServer: {
+          classics::COM::prothonotary clerk;
+          setup_clerk (clerk);
+          int retval= clerk.register_server()->as_number();
+          return retval;
+          }
+ <I>// &hellip; blah blah blah</I>
+ }
+</PRE>
+
+<P>There are other things that have meaningful defaults or automatically figure out the proper values.  At
+minimum, you need to set the clsID.</P>
+
+<H3>Details</H3>
+<P>The COM registration is described in <I>Inside COM</I> by Dale Rogerson, specifically figures 10-6 and 6-4
+and the text following the figure.</P>
+
+<P>You can call <code><B>set_hModule</B></code> to specify which DLL is the actual COM server.  The default is
+the main EXE, which is correct if you are registering an out-of-process server.  This will make it look up the
+full path and file name of the loaded module.  Alternativly, you can call <code><B>set_server_name</B></code>
+directly.  For an EXE server, you don’t need to do anything.</P>
+
+<P>You can call <code><B>set_server_type</B></code>, but if you don&rsquo;t it will assume you want <code>LocalServer</code>
+if the server names ends in &ldquo;.exe&rdquo; or <code>InprocServer</code> otherwise.</P>
+
+<P>You need to call <code><B>set_clsID</B></code> with the GUID and friendly name of the coclass to register.
+You can also call <code><B>set_progID</B></code>.</P>
+
+<P>You can call <code><B>set_appID</B></code> too.  If you don’t, it will set an AppID anyway using the same values as for CLSID.
+You only need to set the appID once if registering multiple coclasses in one app.</P>
+
+<P>Finally, call <code><B>register_server</B></code> or <code><B>unregister_server</B></code>.  If you have
+multiple coclasses, set the next CLSID and progID (leave everything else the same) and call it again.</P>
+
+<HR>
+<IFRAME id="page_footer" src="../page_footer.html"></IFRAME>
+</BODY>
+</HTML>
+

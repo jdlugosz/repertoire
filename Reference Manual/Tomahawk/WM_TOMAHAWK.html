@@ -1,0 +1,84 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"  "http://www.w3.org/TR/html4/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=windows-1252">
+<TITLE>WM_TOMAHAWK Documentation</TITLE>
+<LINK REL=STYLESHEET HREF="../info.css" TYPE="text/css">
+</HEAD>
+
+<BODY>
+<IFRAME id="page_banner" src="../page_banner.html" scrolling="no"></IFRAME>
+<A NAME="toptop"></A>
+
+<H1><code>WM_TOMAHAWK</code> Documentation</H1>
+
+
+<H2>Contents</H2>
+<UL>
+	<LI><A HREF="#message">The <code>WM_TOMAHAWK</code> Message</A>
+	<LI><A HREF="#msg-struct">The <code>WM_TOMAHAWK_msg</code> Structure</A> 
+	<LI><A HREF="#subcodes">Subcodes</A>
+		<UL>
+			<LI><A HREF="#pre_translate_message">The <code>pre_translate_message</code> subcode</A>
+		</UL>
+</UL>
+
+<H2 id="message">The <code>WM_TOMAHAWK</code> Message</H2>
+
+<P>Tomahawk defines a Windows message called <code>WM_TOMAHAWK</code>, in keeping with the naming
+conventions of such things.  It is general purpose, using a subcode for different meanings.  Anything the library
+needs to do that requires a special message can use this one.</P>
+
+<P>The message identifier is dynamically allocated from Windows, using <code>RegisterWindowMessage ("WM_TOMAHAWK")</code>.
+You don’t know what the number is, and it may vary from run to run.  But, it will be the same for the life of the
+program, and the same across all programs in the same Window Session.</P>
+
+<P>To obtain the message identifier, use the static memer <code>get_TOMAHAWK_id</code> in
+the file <code>Tomahawk\MSG\WM_TOMAHAWK.h</code>.  The full name is seen in the example:</P>
+
+<PRE class="code">
+const unsigned <B>WM_TOMAHAWK</B>= ::tomahawk::MSG::WM_TOMAHAWK_msg::<B>get_TOMAHAWK_id</B>();
+</PRE>
+
+
+
+<H2 id="msg-struct">The <code>WM_TOMAHAWK_msg</code> Structure</H2> 
+
+<P>The <code>WM_TOMAHAWK_msg</code> structure is similar to the <A HREF="message_crack.html#WM_xxx">WM_ ..._msg</A>
+structures defined for the normal Windows messages.  However, because the message’s id code is not known
+at compile time, there are a couple differences:</P>
+
+<P>The constant member <code>message_constant</code> is defined for consistancy with the other message structures.
+However, it is not known at compile time, and is computed at static construction time when the program is loaded.
+Because the order of initialization of the DLLs making up a program is undefined, you should not count on Tomahawk’s
+static constructors to be called already when executing the code belonging to a static constructor in a DLL.  (In the
+main EXE code, you know all DLLs have been initialized first.)</P>
+
+<P>The function <code>get_TOMAHAWK_id</code> will always work, though.</P>
+
+<P>The other difference you may notice is that using the <code>WM_TOMAHAWK</code> struct will incur a dependancy on
+the Tomahawk DLL, while none of the other <code>WM_..._msg</code> structs do since they are entirely inline.  However,
+if you are using the <code>WM_TOMAHAWK</code> message you are probably using other features of the library anyway.</P>
+
+
+<H2 id="subcodes">Subcodes</H2>
+
+<P>Only one subcode is defined so far.</P>
+
+<H3 id="pre_translate_message">The <code>pre_translate_message</code> subcode</H3>
+
+<P>The pre-translate message is part of a convention that allows windows to define their own
+pre-translation step.  Instead of a message pump needing to know about the windows
+it is servicing and call <code>IsDialog</code> for every dialog box and <code>TranslateAccelerator</code> for top-level windows
+that use accelerator tables, this message is used so that the message routing system can let the
+window define its own work, in the same way as any other message is handled by windows.</P>
+
+<P>The proper use can be seen in the <A HREF="simple_message_pump.html#pre_translate_message" class="code">simple_message_pump::pre_translate</A> function.
+The other end&mdash;code that receives the message and does any pre-translation&mdash;can be
+seen in the <A HREF="message_tap.html#pre_translate_message" class="code">message_tap::pre_translate_message</A>
+function.</P>
+
+<HR>
+<IFRAME id="page_footer" src="../page_footer.html"></IFRAME>
+</BODY>
+</HTML>

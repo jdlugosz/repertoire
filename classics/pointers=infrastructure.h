@@ -1,12 +1,19 @@
-// The Repertoire Project copyright 2001 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
+// The Repertoire Project copyright 2006 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: classics\pointers=infrastructure.h
-// Revision: post-public build 6
+// Revision: public build 8, shipped on 11-July-2006
+
+// #define CLOAK_LIFETIME
 
 #include "classics\atomic_counter.h"
 #include "classics\fixed_memory_pool.h"
+#ifdef CLOAK_LIFETIME
+#include "cloaked_pointer.h"
+#endif
 
 STARTWRAP
 namespace classics {
+
+template <typename T> class cow;
 
 // note:  handle_structure and lifetime *should* be in an internal namespace,
 // but VC++5 tends to crash with this.  I'll wrap them after the compiler is
@@ -18,7 +25,7 @@ struct lifetime {
    CLASSICS_EXPORT static ts_static_fixed_memory_pool pool;
    static void* operator new (size_t size) { return pool.alloc (size); }
    static void operator delete (void* p)  { pool.free(p); }
-   static int get_pool_use_count()  { return pool.get_use_count(); }
+   static int get_pool_use_count()  { return pool.use_count; }
    atomic_counter<int> owned_count;
    atomic_counter<int> unowned_count;
    atomic_counter<short> hold;
@@ -34,9 +41,17 @@ struct lifetime {
    inline bool dec_hold_and_delete();
    void inc_hold()  { hold.inc(); }
    bool is_unique() const  // !!  need to analyse threading issues
-      { return owned_count == 1 && unowned_count == 0; }
+      { return this != 0 && owned_count == 1 && unowned_count == 0; }
    CLASSICS_EXPORT void check_no_baro();
    CLASSICS_EXPORT void claim_owned_reference();
+#if defined _DEBUG
+   ~lifetime() {
+      if ( 2 == internal::Xexchange (&deleted, 2)) {
+         // duplicate free, will be on the freelist twice!
+         ++*(reinterpret_cast<int*>(0));  // force pointer deref error.
+         }
+      }  // works with Lifetime test
+#endif
    };
 
 // -----------------------------------------
@@ -51,42 +66,90 @@ inline bool lifetime::dec_hold_and_delete()
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
 struct handle_structure_nt {  //non-template base
-   lifetime* Lifetime;
+#ifdef CLOAK_LIFETIME
+   cloaked_pointer<lifetime, 0xFF123456> Lifetime;
+#else
+   mutable lifetime* Lifetime;
+#endif
    void* Data;
+   handle_structure_nt () { /* nothing */ }
    handle_structure_nt (lifetime* Lifetime, void* p) : Lifetime(Lifetime), Data(p) { Lifetime->deleted= false; }
    ~handle_structure_nt() { Lifetime=0; Data=0; }  // for debugging.
    void assign (lifetime* L, void* p)  { Lifetime=L;  Data=p;  }
    CLASSICS_EXPORT void zap_unowned() const;  //called when baro count hits zero
-   void inc_unowned_reference() const { Lifetime->inc_unowned_count(); }
-   void dec_unowned_reference() const { if (Lifetime->dec_unowned_count()) zap_unowned(); }   
+   void inc_unowned_reference() const { get_Lifetime()->inc_unowned_count(); }
+   void dec_unowned_reference() const { if (get_Lifetime()->dec_unowned_count()) zap_unowned(); }
+   lifetime* get_Lifetime() const
+    {
+    lifetime* retval= Lifetime;
+    if (retval->deleted == 2) {
+       // trying to activly use a deleted lifetime object!
+       ++*(reinterpret_cast<int*>(0));  // force pointer error
+       }
+    return retval;
+    }
+   void inc_owned_reference() const { get_Lifetime()->inc_owned_count(); }
+   void claim_owned_reference() const { Lifetime->claim_owned_reference(); }
+   bool is_unique() const  { return get_Lifetime()->is_unique(); }
+   operator bool() const  { return Data; }
+   bool operator!() const  { return !Data; }
+   const lifetime* get_lifetime_object() const
+    {
+    const lifetime* retval= Lifetime;
+    if (retval->deleted == 2) {
+       // trying to activly use a deleted lifetime object!
+       ++*(reinterpret_cast<int*>(0));  // force pointer error
+       }
+    return retval;
+    }
+   lifetime* atomic_swap (lifetime* B) const;
+   CLASSICS_EXPORT lifetime* check_out_Lifetime() const;
+   void set_lifetime_object (lifetime* L) const { Lifetime=L; }
    };
 
 
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
 template <typename T>
-struct handle_structure : private handle_structure_nt {
-   typedef T Type;
-   T* data() const { return static_cast<T*> (Data); }
-   handle_structure (T* p) : handle_structure_nt (Get_lifetime_object(p), p) {}
-   void operator= (T* p)  { handle_structure_nt::assign (Get_lifetime_object(p), p); }
-   void inc_owned_reference() const { Lifetime->inc_owned_count(); }
-   void dec_owned_reference() const { if (Lifetime->dec_owned_count()) zap_owned(); }
+class handle_structure : protected handle_structure_nt {
+protected:
+   void dec_owned_reference() const { if (get_Lifetime()->dec_owned_count()) zap_owned(); }
+   static void dec_owned_reference (const handle_structure<T>& self) { self.dec_owned_reference(); }
    void zap_owned() const;  //called when owned count hits zero
-   void claim_owned_reference() const { Lifetime->claim_owned_reference(); }
-   bool is_unique() const  { return Lifetime->is_unique(); }
+   T* data() const { return static_cast<T*> (Data); }
+   static T* data (const handle_structure<T>& x)  { return x.data(); }
+   void set_data (T* p) { Data= p; }
+   void assign_owned (const handle_structure_nt& other)
+         { other.inc_owned_reference(); dec_owned_reference(); handle_structure_nt::operator=(other); }
+public:
+   typedef T Type;
+   template <typename U> friend class handle_structure;
+   handle_structure (T* p) : handle_structure_nt (Get_lifetime_object(p), p) {}
+   handle_structure (lifetime* L, T* p) : handle_structure_nt (L, p) {}
+   template <typename U>
+   handle_structure (const handle_structure<U>& other) : handle_structure_nt (other) {}
+   handle_structure (const cow<T>& other);  // implementation is in "pointers=cow.h" file
+   void operator= (T* p)  { handle_structure_nt::assign (Get_lifetime_object(p), p); }
    bool points_to (const T* p) const  { return data() == p; }
-   operator bool() const  { return data(); }
-   bool operator!() const  { return !data(); }
-   using handle_structure_nt::inc_unowned_reference;
-   using handle_structure_nt::dec_unowned_reference;
-   const lifetime* get_lifetime_object() const  { return Lifetime; }
+   bool points_to (const handle_structure& h) const  { return data() == h.data(); }
+   const T* const_object() const { return data(); }
+   using handle_structure_nt::get_lifetime_object;
+   using handle_structure_nt::is_unique;
+//   using handle_structure_nt::operator bool;
+   operator bool() const  { return handle_structure_nt::operator bool(); }
+   using handle_structure_nt::operator!;
    };
 
 template <typename T>
 bool operator== (const handle_structure<T>& a, const handle_structure<T>& b)
  {
- return a.data() == b.data();
+ return a.points_to (b);
+ }
+
+template <typename T>
+bool operator!= (const handle_structure<T>& a, const handle_structure<T>& b)
+ {
+ return ! a.points_to (b);
  }
 
 /* ======================================================== */
@@ -94,21 +157,20 @@ bool operator== (const handle_structure<T>& a, const handle_structure<T>& b)
 template <typename T>
 void handle_structure<T>::zap_owned() const
  {
+ lifetime* L= get_Lifetime();
+ L->inc_unowned_count();
  // first, remove the object itself.
- if (Lifetime->dec_hold_and_delete()) {
+ if (L->dec_hold_and_delete()) {
     // no more owners, and no more prospective owners either
     //    Lifetime->deleted= true;
     //    done as a side effect of the "...and_delete()".
     // The dec, test, and deleted=false needs to be atomic.
-    Lifetime->inc_hold();
-      // must prevent the destructor from deleting Lifetime, if it happens to
-      // remove the last unowned count.
     delete data();
-    Lifetime->dec_hold();
-    Lifetime->check_no_baro();
+    if (L->unowned_count.dec()) delete L;
     }
+ else L->dec_unowned_count();
  }
- 
+
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
 } // end of classics

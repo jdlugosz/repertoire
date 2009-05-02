@@ -1,6 +1,6 @@
-// The Repertoire Project copyright 2001 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
+// The Repertoire Project copyright 2006 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: ratwin\r-types.h
-// Revision: post-public build 6
+// Revision: public build 8, shipped on 11-July-2006
 
 /* Usage:
   This will define typedefs for common RatWin types at the point of

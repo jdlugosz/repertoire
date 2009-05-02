@@ -1,6 +1,6 @@
-// The Repertoire Project copyright 2001 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
+// The Repertoire Project copyright 2006 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: classics\atomic_counter_benchmark.cxx
-// Revision: updated
+// Revision: public build 8, shipped on 11-July-2006
 
 #include "classics\atomic_counter.h"
 #include "classics\profile_timer.h"

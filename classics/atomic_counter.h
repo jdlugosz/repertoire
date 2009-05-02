@@ -1,8 +1,9 @@
-// The Repertoire Project copyright 2003 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
+// The Repertoire Project copyright 2006 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: classics\atomic_counter.h
-// Revision: post-public build 6, modified 16-September-2003 or later
+// Revision: public build 8, shipped on 11-July-2006
 
 #pragma once
+#pragma warning (disable: 4146)
 
 #if !defined CLASSICS_EXPORT
 #define CLASSICS_EXPORT __declspec(dllimport)
@@ -153,15 +154,15 @@ namespace internal {
       { return nf_CompareAndSwap (dest, source, comparend); }
 #endif
    inline long CompareAndSwap (volatile long* dest, int source, int comparend)
-   	{ return CompareAndSwap ((volatile int*)dest, source, comparend); }
+      { return CompareAndSwap ((volatile int*)dest, source, comparend); }
    inline long CompareAndSwap (volatile unsigned* dest, int source, int comparend)
-   	{ return CompareAndSwap ((volatile int*)dest, source, comparend); }
+      { return CompareAndSwap ((volatile int*)dest, source, comparend); }
    inline long CompareAndSwap (volatile ushort* dest, int source, int comparend)
-   	{ return CompareAndSwap ((volatile short*)dest, source, comparend); }
+      { return CompareAndSwap ((volatile short*)dest, source, comparend); }
    inline long CompareAndSwap (volatile ulong* dest, int source, int comparend)
-   	{ return CompareAndSwap ((volatile long*)dest, source, comparend); }
+      { return CompareAndSwap ((volatile long*)dest, source, comparend); }
    inline long CompareAndSwap (volatile byte* dest, int source, int comparend)
-   	{ return CompareAndSwap ((volatile char*)dest, source, comparend); }
+      { return CompareAndSwap ((volatile char*)dest, source, comparend); }
 } // end of internal
 
 
@@ -226,7 +227,6 @@ public:
 
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
-#pragma warning (disable:4146)
 template<>
 class atomic_counter<int> : public atomic_integer_xx<int> {
 public:
@@ -234,7 +234,7 @@ public:
    atomic_counter (int x) : atomic_integer_xx<int>(x) {}
    int operator= (atomic_counter x) volatile { return value = x.value; }
    };
- 
+
 template<>
 class atomic_counter<unsigned> : public atomic_integer_xx<unsigned> {
 public:
@@ -242,7 +242,7 @@ public:
    atomic_counter (unsigned x) : atomic_integer_xx<unsigned>(x) {}
    unsigned operator= (atomic_counter x) volatile { return value = x.value; }
    };
-   
+
 template<>
 class atomic_counter<short> : public atomic_integer_xx<short> {
 public:
@@ -258,7 +258,7 @@ public:
    atomic_counter (long x) : atomic_integer_xx<long>(x) {}
    long operator= (atomic_counter x) volatile { return value = x.value; }
    };
-   
+
 template<>
 class atomic_counter<ulong> : public atomic_integer_xx<ulong> {
 public:
@@ -266,7 +266,7 @@ public:
    atomic_counter (ulong x) : atomic_integer_xx<ulong>(x) {}
    ulong operator= (atomic_counter x) volatile { return value = x.value; }
    };
-   
+
 template<>
 class atomic_counter<ushort> : public atomic_integer_xx<ushort> {
 public:
@@ -274,7 +274,7 @@ public:
    atomic_counter (ushort x) : atomic_integer_xx<ushort>(x) {}
    ushort operator= (atomic_counter x) volatile { return value = x.value; }
    };
-   
+
 template<>
 class atomic_counter<char> : public atomic_integer_xx<char> {
 public:

@@ -7,6 +7,28 @@
 </HEAD>
 <BODY>
 <A NAME="changes"><H1>Changes</H1></A>
+<H2>Changes since release PB7</H2>
+<UL>
+	<LI><code>prothonotary</code> includes AppID.
+	<LI>June 2006.
+    Bug found in smart pointers!  A race condition when the last <code>handle</code> and the last <code>baro</code>
+    were destructed at the same time on different threads, never showed up before.
+	<LI><code>fixed_memory_pool</code> speeded up again.
+	<LI>Vararray improvements.
+	<LI>Thunks (closures, <code>member_callback_thunk</code> fully generalized to work with
+	multiple and virtual inheritence.
+	<LI>October 2004.
+    Although it has never caused an actual problem, I detected an issue with freeing the <code>~static_fixed_memory_pool</code>.
+    Items from the pool will still be in use, since the shutdown order is not known!  Specifically, the pool for the lifetime object
+    is destroyed during DLL shutdown before the static empty string object which uses a lifetime object from the pool.
+    Changed to free pool itself after all nodes are returned (so it still stays clear of memory leak reporting tools), and also
+    reset the members to zeros so it will spring back to life again if an <code>alloc</code> is made later.
+
+	<LI>Support /CLR option for linking with "Managed" code.
+
+    <LI>Loads of stuff to be cataloged...
+</UL>
+
 <H2>Changes since release PB6</H2>
 <UL>
 	<LI>added <code>directory_list</code> class.
@@ -81,7 +103,7 @@
 	<LI>filename_t wrappers around filesystem_t features use const_object on the smart pointer
 	rather than the normal defreference, to prevent unneeded copy-on-write.
 	<LI>introduced classics::mutex.
-	<LI>add members to classics::registry_key : zero-argument constructor, assignment operator, 
+	<LI>add members to classics::registry_key : zero-argument constructor, assignment operator,
 	value_exists, set_value taking an int, get_value, get_value_string, get_value_int.
 	<LI>improve error text for registry_key::create.
 	<LI>Fix: bug in classics::UCS2_to_UTF8, bad return code could corrupt the stack.
@@ -101,7 +123,7 @@
 	<LI>Update <code>filename_t</code> class to automatically handle ANSI or Unicode
 	<LI>Introduce "classics\new.h" feature.
 	<LI>Introduce <code>PC_filesystem_t::move_file</code> function.
-	<LI>COM-related classes introduced: <code>factory</code>, <code>prothonotary</code>, and <code>server_lifetime_manager</code>.	
+	<LI>COM-related classes introduced: <code>factory</code>, <code>prothonotary</code>, and <code>server_lifetime_manager</code>.
 	<LI>Introduce <code>registry_key</code> class.
 	<LI>Introduce 32-bit CRC functions.
 	<LI>Simple <code>file_factory</code> class taken from Tomahawk.

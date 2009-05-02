@@ -1,6 +1,6 @@
-// The Repertoire Project copyright 1999 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
+// The Repertoire Project copyright 2006 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: classics\COM\prothonotary.cpp
-// Revision: post-public build 5, shipped on 8-April-1999
+// Revision: public build 8, shipped on 11-July-2006
 
 #define CLASSICS_EXPORT __declspec(dllexport)
 #include "classics\COM\prothonotary.h"
@@ -37,7 +37,7 @@ static const wchar_t* server_type_key (COM::prothonotary::server_type_t type)
        return L"InprocServer32";
     }
  }
- 
+
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
 static const wchar_t* threading_model_value (COM::prothonotary::threading_model_t type)
@@ -62,12 +62,22 @@ namespace COM {
 
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
-HRESULT prothonotary::register_server (const ustring& friendly_name)
+HRESULT prothonotary::register_server()
  {
  try {
     wstring CLSID_string= as_string(clsid);
     // + HKCR\CLSID\<clsid> [default] = friendly name
-    registry_key CLSID= HKEY_CLASSES_ROOT.set_subkey_and_value (wstring(L"CLSID\\") + CLSID_string, friendly_name);
+    registry_key CLSID= HKEY_CLASSES_ROOT.set_subkey_and_value (wstring(L"CLSID\\") + CLSID_string, friendly_class_name);
+    if (server_type() == LocalServer) {
+       wstring APPID_string= as_string (get_appID());
+       // + HKCR\AppID\<appid> [default] = friendly name
+       // other values (RemoteServerName and RunAs) are set by DCOMCNFG.
+       HKEY_CLASSES_ROOT.set_subkey_and_value (wstring(L"AppID\\") + APPID_string, app_name());
+       // + HKCR\CLSID\<clsid> [AppID] = appid
+       CLSID.set_value (L"AppID", APPID_string);
+       // + HKCR\AppID\<exename> [default] = appid
+       HKEY_CLASSES_ROOT.set_subkey_and_value (wstring(L"AppID\\") + server_name(), APPID_string);
+       }
     // + HKCR\CLSID\<clsid>\<servertag> [default] = server file name
     CLSID.set_subkey_and_value (server_type_key(server_type()), server_name());
     if (server_type() == InprocServer) {
@@ -75,18 +85,18 @@ HRESULT prothonotary::register_server (const ustring& friendly_name)
        if (ThreadingModel == Legacy_thread)  ServKey.remove_value ("ThreadingModel");
        else ServKey.set_value ("ThreadingModel", threading_model_value(ThreadingModel));
        }
-    if (progid.elcount() != 0) {
+    if (!progid.is_empty()) {
        // + HKCR\CLSID\<clsid>\ProgID [default] = progID
        CLSID.set_subkey_and_value ("ProgID", progid);
        // + HKCR\<progid> [default] = friendly name
-       registry_key ProgID= HKEY_CLASSES_ROOT.set_subkey_and_value (progid, friendly_name);
+       registry_key ProgID= HKEY_CLASSES_ROOT.set_subkey_and_value (progid, friendly_class_name);
        // + HKCR\<progid>\CLSID [default] = clsid
        ProgID.set_subkey_and_value ("CLSID", CLSID_string);
-       if (version_independant_progid.elcount() != 0) {
+       if (!version_independant_progid.is_empty()) {
           // + HKCR\CLSID\VersionIndependantProgID [default] = vi_progID
           CLSID.set_subkey_and_value ("VersionIndependentProgID", version_independant_progid);
           // + HKCR\<vi_progID> = friendly name
-          registry_key viProgID= HKEY_CLASSES_ROOT.set_subkey_and_value (version_independant_progid, friendly_name);
+          registry_key viProgID= HKEY_CLASSES_ROOT.set_subkey_and_value (version_independant_progid, friendly_class_name);
           // + HKCR\<vi_progid>\CLSID [default] = clsid
           viProgID.set_subkey_and_value ("CLSID", CLSID_string);
           // + HKCR\<vi_progid>\CurVer [default] = clsid
@@ -109,6 +119,32 @@ wstring prothonotary::server_name()
     ServerName= GetModuleFileName (hModule);
     }
  return ServerName;
+ }
+
+/* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
+
+void prothonotary::check_appID()
+ {
+ if (friendly_app_name.is_empty()) {
+    friendly_app_name= friendly_class_name;
+    appid= clsid;
+    }
+ }
+
+/* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
+
+ratwin::GUID prothonotary::get_appID()
+ {
+ check_appID();
+ return appid;
+ }
+
+/* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
+
+wstring prothonotary::app_name()
+ {
+ check_appID();
+ return friendly_app_name;
  }
 
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
@@ -158,7 +194,7 @@ HRESULT prothonotary::unregister_server ()
  {
  // if HKCR\CLSID\<clsid>\<other-servertag> exists, then =only= remove my <servertag> subkey.
  // otherwise, remove everything from HKCR\CLSID\<clsid>\* except for TreatAs.
- // if empty, remove HKCR\CLSID\<clsid> itself, and remove ProgID things too.
+ // if empty, remove HKCR\CLSID\<clsid> itself, and remove ProgID and AppID things too.
  try {
     wstring CLSID_string= as_string(clsid);
     registry_key CLSID= HKEY_CLASSES_ROOT.open (wstring(L"CLSID\\") + CLSID_string);
@@ -184,6 +220,11 @@ HRESULT prothonotary::unregister_server ()
           HKEY_CLASSES_ROOT.remove (version_independant_progid);
        if (progid.elcount() != 0)
           HKEY_CLASSES_ROOT.remove (progid);
+       if (server_type() == LocalServer) {
+          wstring APPID_string= as_string (get_appID());
+          HKEY_CLASSES_ROOT.remove (wstring(L"AppID\\") + APPID_string);
+          HKEY_CLASSES_ROOT.remove (wstring(L"AppID\\") + server_name());
+          }
        }
     return ratwin::S_OK;
     }
@@ -193,7 +234,7 @@ HRESULT prothonotary::unregister_server ()
     }
  }
 
- 
+
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
 }} // end namespace

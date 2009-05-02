@@ -1,28 +1,167 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"  "http://www.w3.org/TR/html4/loose.dtd">
 <HTML>
 <HEAD>
 <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=windows-1252">
-<TITLE>handle User's Guide</TITLE>
+<TITLE>handle User’s Guide</TITLE>
+<SCRIPT type= "text/javascript" src="../helpers.js"></SCRIPT>
 <LINK REL=STYLESHEET HREF="../info.css" TYPE="text/css">
+<SCRIPT type="text/javascript">
+   checkframe ("Classics/handle_index.html");
+</SCRIPT>
+<META name="date" content="2006-06-29">
 </HEAD>
 
 <BODY>
 <H1>handle Users Guide</H1>
-<P>The handle is ...</P>
+
+<P>The handle is the pre-eminent &ldquo;smart pointer&rdquo; for reference counting in C++.</P>
+<UL>
+	<LI><A HREF="#threads">Multi-Threaded Usage</A>
+	<LI>Multiple Inheritance
+	<LI><code>const</code> Correctness
+	<LI>Non-Owning References
+	<LI>Copy-on-Write or Aliasing Semantics
+	<LI>Non-Blocking and Efficient
+	<LI>&ldquo;Lost &amp; Found&rdquo;
+	<LI>Still Free, since 1997
+</UL>
+
+<H2>Related Documents</H2>
+<UL>
+	<LI><A HREF="Smart%20Pointers%20Overview.html#toptop">Original Whitepaper</A>
+	<LI><A HREF="handle.html#toptop"><code>handle</code> Member Reference</A>
+	<LI><A HREF="baro.html#toptop"><code>baro</code> Member Reference</A>
+</UL>
 
 <H2>Overview</H2>
 See <A HREF="Smart Pointers Overview.html">intro</A>
 
+<H2>Contents</H2>
 <UL>
-Read about:</P>
-<LI><A HREF="#1">section 1</A>
-<LI><A HREF="#2">section 2</A>
-<LI><A HREF="#3">section 3</A>
+	<LI><A HREF="#flavors">Five Flavors of Smart Pointer</A>
+	<LI><A HREF="#constraints">Requirements for <code>T</code></A>
+	<UL>
+		<LI><A HREF="#can_handle">The <code>can_handle</code> class</A>
+		<LI><A HREF="#Get_lifetime_object"><code>Get_lifetime_object</code></A>
+		<LI><A HREF="#clone">Cloning <code>cow</code>s</A>
+	</UL>
+	<LI><A HREF="#housekeeping">Threading and Housekeeping Issues</A>
+	<LI><A HREF="#handle_cast">Casting &mdash; <code>handle_cast</code></A>
+	<LI><A HREF="#baro"><code>baro</code> &mdash Non-Owning References</A>
 </UL>
 
-<A NAME="1"><H2>section 1</H2></A>
-<A NAME="2"><H2>section 2</H2></A>
-<A NAME="3"><H2>section 3</H2></A>
+<H2 id="flavors">Five Flavors of Smart Pointer</H2>
+<H2 id="constraints">Requirements for <code>T</code></H2>
+<H3 id="can_handle">The <code>can_handle</code> class</H3>
+<H3 id="Get_lifetime_object"><code>Get_lifetime_object</code></H3>
+<H3 id="clone">Cloning <code>cow</code>s</H3>
 
+<H2 id="housekeeping">Threading and Housekeeping Issues</H2>
+
+<H3>Handling</H3>
+
+<P>A handle (of any flavor) must<A HREF="#footnote_must" class="footnoter" target="footer">1</A> only point to a dynamically-allocated object, since the handle
+will call <code>delete</code> on it when the reference count hits zero.  Obviously, using the address of a stack-based
+or global variable is a bad idea.</P>
+
+<P>A freshly-constructed object, upon returning from <code>new</code>, should have an original reference count
+of zero.  Ideally, the first and only thing you do with that pointer is to give it to a handle.  That increments the reference count,
+and now the object is part of the system and should not be freed directly.</P>
+<PRE class="code">
+handle&lt;C> h (new C);  <I>// normal way to create a handled object</I>
+</PRE>
+
+<PRE class="code" style="float:left; margin-right:2em">
+class D : public B, public C { <I>// &hellip;</I>
+
+void foo (handle&lt;D>&amp;);
+
+/*virtual*/ void D::bar()
+ {
+ handle&lt;D> self (this);
+ foo (self);
+ <I>// &hellip;</I>
+ }
+
+void baz (handle&lt;C>&amp; h)
+ {
+ h->bar();
+ }
+</PRE>
+
+<P>Ideally, you would use handles only and not complicate things by using raw pointers to the same object as well.
+But there is one case where you can’t get away from it:  The <code>this</code> pointer!  It may be necessary for
+a member function to recover the handle when it only has the raw pointer.  This feature is called &ldquo;Lost &amp; Found&rdquo;.</P>
+
+<P>The listing on the left shows why you can’t avoid the problem.  Even if &ldquo;everything&rdquo; is written using handles
+and you never pass raw pointers around, you still have <code>this</code>.  Here <code>bar</code> is called on a handle,
+and the body of <code>bar</code> is not passed the handle&mdash;only the raw pointer.</P>
+
+<P>So it is necessary to construct a handle around the pointer.  But this is not a newly-created object; it is an object that
+is already known to smart pointers and has a reference count that is not zero.  In this case, the <code>handle</code>
+constructor will deal with it correctly, and the library will understand that <code>self</code> is the same object as <code>h</code>.</P>
+
+<P>To make things even more interesting, notice that the complete <code>D</code> object does not have the same
+address as the <code>C</code> base class subobject.  Even though <code>h</code> and <code>self</code> have
+different declared types, and contain different addresses, the library understands that they are the <I>same object</I>.</P>
+
+<P>In general, handles of different declared types can be <A HREF="#handle_cast">cast or implicitly converted</A> in exactly the same way as raw pointers
+to those types.  It works with multiple inheritance, virtual inheritance, polymorphic objects or simple structures.  Basically, there
+is very little you can’t do with handles.</P>
+
+
+<H3 id="threads">Threading and Thread Safety</H3>
+
+<P>The handle library is specifically designed to use with threads.  The reference counting, both owning count and
+non-owning <A HREF="#baro">borrower</A> count, is not only thread-safe but
+non-blocking<A HREF="#footnote_blocking" class="footnoter" target="footer">2</A>.  Different threads may
+create, destroy, and copy handles to the same object, at the same time, and the library reliably determines the last
+owner that goes away.  Handing object lifetimes with multiple threads is the main reason for designing this library.</P>
+
+<P>Suppose thread A uses a handle <code>h1</code>, and thread B uses a handle <code>h2</code>, both pointing to the same
+underlying object.  When thread A is done with it, it lets <code>h1</code> go out of scope.  When thread B is done with it, it lets
+<code>h2</code> go out of scope.  Assuming there are no other handles to the object besides these two, you can be certain that
+the correct thread&mdash;the last one to be finished with it&mdash;will destroy the object.</P>
+
+<P>When it comes to <I>using</I> the object being handled, that is beyond the scope of the handle library.  If thread
+A calls <code>h1->foo()</code> and at the same time thread B calls <code>h2->foo()</code>, the handles take care
+of their part without any sweat.  But it is the implementation of <code>foo</code> that determines if the same object can be used
+simultainiously on two threads.  The handles manage the shared object’s lifetime only, and does not have anything to do
+with the thread safety of the object being handled.</P>
+
+<P>Two threads can each have their own separate handle to the same underlying object.  But two threads should not use
+the same handle itself.  If thread A and B both referred to a global <code>h3</code>, and thread A called <code>h3->foo()</code> at the
+same time that thread B called <code>h3=0</code>, you get undefined behavior.</P>
+
+<P>The only things you do to modify handle objects themselves (as opposed to dereferencing them and modifying the
+underlying object) are construct, destruct, and assign.</P>
+
+<P>When one thread is constructing an object, no other thread should know about it let alone be using it.  Likewise,
+if one thread is destructing an object then no other thread should be using it.  This is generally true in C++ and is
+not a special rule for the handle classes.  Finally, if one thread is assigning to a handle, no other thread should be
+using it.  Again, that is normal C++ behavior.  But, it happens to be about the only thing you can do to get the
+reference count messed up, short of knowingly dangerous constructs like <code>memcpy</code>.</P>
+
+<P>A <code>cow</code> (copy on write) handle has another subtle feature, though.  A multiple ownership is essentially a lazy
+or delayed copy.  When the <code>cow</code> is dereferenced, the actual copy is made.  This means that the innocent-looking
+<A HREF="handle.html#operator_arrow" class="code">operator-></A> is a modifying operation, just like assignment!  This is surprising and unintuative, and as of Public Build 8 (July 2006)
+the library deals with this transparantly.  Two threads that call <code>cow1->foo()</code> at the same time, on a shared <code>cow1</code> variable,
+with a pending lazy copy, will work itself out.</P>
+
+<H2 id="handle_cast">Casting &mdash; <code>handle_cast</code></H2>
+<H2 id="baro"><code>baro</code> &mdash Non-Owning References</H2>
+
+<H1>Footnotes</H1>
+<P id="footnote_must" class="footnote">A handle must point to a dynamically-allocated object, since the handle
+will call <code>delete</code> on it when the reference count hits zero.</P>
+<P>That is the <I>only</I> reason why you shouldn’t make handles to static or local variables.  The shared empty <code>vararray</code>,
+essentially a singleton, is indeed static.  It is never deleted because the reference count is artificially increased.  See
+<code>make_the_empty</code> in <span class="filename">data_t.h</span>.</P>
+<HR>
+<P id="footnote_blocking" class="footnote">Handles are non-blocking.</P>
+<P>The <code>cow</code> handle may need to wait if multiple threads trigger
+the delayed-copying of the same handle (not the same object, but the same handle variable) at the same time.  See
+notes at <A HREF="handle.html#make_unique" class="code" target="info">make_unique</A>.</P>
+<HR>
 </BODY>
-
 </HTML>

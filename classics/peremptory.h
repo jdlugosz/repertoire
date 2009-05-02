@@ -1,6 +1,6 @@
+// The Repertoire Project copyright 2006 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: classics\peremptory.h
-// The Repertoire Project copyright 2001 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
-// Revision: original
+// Revision: public build 8, shipped on 11-July-2006
 
 /* peremptory: \Per"emp*to*ry\ Not allowing contradiction or refusal; imperative.
   This template is used to ensure that a global variable is constructed either at

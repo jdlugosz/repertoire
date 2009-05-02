@@ -1,6 +1,6 @@
-// The Repertoire Project copyright 2001 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
+// The Repertoire Project copyright 2006 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: ratwin\window.cpp
-// Revision: 
+// Revision: public build 8, shipped on 11-July-2006
 
 #define RATWIN_EXPORT __declspec(dllexport)
 
@@ -17,6 +17,7 @@ namespace window {
 static  // compiler (VC6) couldn't find it in unnamed namespace!
 long __stdcall really_minimal_window_proc (types::HWND wnd, unsigned mess, unsigned p1, ulong p2)
  {
+ // >> idea: only do this if it is a top-level window.
  if (mess == WM_constants::WM_NCDESTROY) {
  	// November 2001: changed DESTROY to NCDESTROY to ensure that more cleanup is done.
     PostQuitMessage(0);
@@ -29,6 +30,7 @@ long __stdcall really_minimal_window_proc (types::HWND wnd, unsigned mess, unsig
 template<typename CharT>
 window_class<CharT>::window_class (const CharT* classname)
  {
+ // >> can factor out common-non template code.
  style= 0;
  lpfnWndProc= &really_minimal_window_proc;
  cbClsExtra= 0;

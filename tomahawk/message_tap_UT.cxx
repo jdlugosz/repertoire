@@ -1,3 +1,6 @@
+// The Repertoire Project copyright 2006 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
+// File: tomahawk\message_tap_UT.cxx
+// Revision: public build 8, shipped on 11-July-2006
 
 #include "tomahawk\message_tap.h"
 #include "ratwin\message.h"
