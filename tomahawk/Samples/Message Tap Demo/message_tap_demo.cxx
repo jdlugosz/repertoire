@@ -165,7 +165,7 @@ long testhook_2::handle_message (sMSG& msg)
        return process_COMMAND (MSG_cast<WM_COMMAND_msg>(msg));
        break;
     }
- return message_tap::handle_message (msg);  // pass it on to my base class.
+ return call_old_wndproc (msg);  // pass it on to my base class.
  }
 
 

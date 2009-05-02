@@ -4,7 +4,7 @@ H1 {
    clear: both;
    }
 H2 {
-   font-family: "Lucida Sans", "Lucida Sans Unicode", sans-serif;
+   font-family: /* "Lucida Sans", */  "Lucida Sans Unicode", sans-serif;
    text-indent:-1in;
    margin-left:1in;
    clear: both;
@@ -67,9 +67,13 @@ P EM {
 	}
 
 .code,CODE {
-	font-family: "Lucida Sans", "Lucida Sans Unicode", sans-serif;
+	font-family: /* "Lucida Sans", */ "Lucida Sans Unicode", sans-serif;
 	font-size: 0.9em;
 	color: #551122;
+	}
+
+P.footnote CODE {
+	color: #559022;
 	}
 
 A, A CODE, A.code {

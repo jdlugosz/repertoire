@@ -31,7 +31,7 @@ public:
    TOMAHAWK_EXPORT void hook (ratwin::types::HWND);
    TOMAHAWK_EXPORT bool unhook (bool force=true);
    void unhook_when_possible() { UnhookASAP= true;  }
-   TOMAHAWK_EXPORT virtual long handle_message (ratwin::message::sMSG& msg);
+//   TOMAHAWK_EXPORT virtual long handle_message (ratwin::message::sMSG& msg) =0;
    TOMAHAWK_EXPORT virtual int pre_translate_message (const ratwin::message::MSG& msg); // 0:no clue, 1:done&ate it, 2:done&proceed
    TOMAHAWK_EXPORT virtual void on_attach();  // called when hooked.
    TOMAHAWK_EXPORT long call_old_wndproc (ratwin::message::sMSG& msg);

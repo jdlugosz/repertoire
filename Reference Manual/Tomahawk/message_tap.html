@@ -16,7 +16,7 @@
    checkframe ("Tomahawk/message_tap_index.html");
 </SCRIPT>
 
-<META name="date" content="2007-03-01">
+<META name="date" content="2007-03-04">
 </HEAD>
 
 <BODY>
@@ -122,19 +122,21 @@ is better design, and passing by reference is more efficient than re-pushing all
 forwarding going on.</P>
 <P>The handling of <code>WM_NCDESTROY</code>, etc. as it relates to keeping up with this class
 is performed higher up in the plumbing before it calls this virtual function.  So, you are not compelled to chain
-back to this base class  implementation from your own class’s override.  Likewise, this function does not
-deal with the pre-translation step.  See <A HREF="#hook_handler" class="code">hook_handler</A> for a description of how these
+back to this base class  implementation from your own class’s override.  Actually, you can’t, due to technical
+limitations<A HREF="#footnote_1" class="footnoter">[1]</A> on the mix-in techniques.  So the way you
+should end the derived class’s implementation of this function is with <code>return <A HREF="#call_old_wndproc" class="code">call_old_wndproc</A>(msg);</code>
+or <code>return ratwin::window::DefWindowProc&lt;wchar_t>(msg);</code>
+</P>
+
+<P>Likewise, this function does not deal with the pre-translation step.
+See <A HREF="#hook_handler" class="code">hook_handler</A> for a description of how these
 are handled invisibly to you.</P>
 
-<P>This base class implementation simply calls the original WndProc of a subclassed window, or
-<code>DefWindowProc</code> if there wasn’t one, for all messages.  (see <A HREF="#call_old_wndproc" class="code">call_old_wndproc</A>.)</P>
-
-<P>Override this to do whatever you want, using the normal Win32 concepts of writing a WndProc.  Call this
-base class at the end of your overridden definition if you want to propagate messages down.  This is a Unicode
+<P>Override this to do whatever you want, using the normal Win32 concepts of writing a WndProc.  This is a Unicode
 WndProc, in that it should receive Unicode versions of messages.  This is because the <A HREF="#hook" class="code">hook</A>
 function used the -W form of <code>SetWindowLong</code> to install the thunk.</P>
 
-<P>Overriding this virtual function in a derived class is the main point of using the <code>message_tap</code>
+<P>Overriding this virtual function in a derived class (or mix-in) is the main point of using the <code>message_tap</code>
 class.</P>
 
 <HR  class="sep1">
@@ -279,6 +281,17 @@ objects that subclassed the window <I>after</I> this object have restored their 
 <code>WM_NCDESTROY</code> is seen, as described under <A HREF="#unhook" class="code">unhook</A>.</P>
 <P>See also: <A HREF="#unhook" class="code">unhook</A>,
 <A HREF="#destructor" class="code">~message_tap</A></P>
+
+<HR  class="sep1">
+
+<H1 id="footnotes">Footnotes</H1>
+<P id="footnote_1" class="footnote">Can’t call <code>message_tap::handle_message</code>:</P>
+<P>In order for the derived class to <I>automatically</I> hook up the sibling that uses the function (<code>message_tap</code>
+calls it) with the sibling that provides it (<code>message_parliament</code> defines it), only one sibling can define it.
+Even making it pure virtual in <code>message_tap</code> isn’t enough&mdash;it cannot be defined in <code>message_tap</code>
+at all.  Without this careful arrangement, the derived class would have to implement the function too, with
+a single line that calls the one in <code>message_parliament</code>.  By defining it in one sibling only, the compiler realizes
+that it is providing the meaning for all the other siblings that only call it.</P>
 
 
 <HR  class="sep1">

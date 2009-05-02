@@ -11,6 +11,7 @@
 #include "classics\pointers.h"
 #include "classics\exception.h"
 #include "classics\no_auto_copy.h"
+#include "ratwin\message=struct.h"
 
 STARTWRAP
 namespace tomahawk {
@@ -28,6 +29,7 @@ public:
    TOMAHAWK_EXPORT HWND_vpapa();
    virtual ~HWND_vpapa() {}
    ratwin::types::HWND window_handle() const { return WindowHandle; }
+   virtual long handle_message (ratwin::message::sMSG& msg) =0;
    TOMAHAWK_EXPORT virtual void report_error (const classics::exception&);
    };
 

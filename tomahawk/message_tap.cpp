@@ -172,14 +172,6 @@ long message_tap::hook_handler (ratwin::message::sMSG msg)
 
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
-long message_tap::handle_message (ratwin::message::sMSG& msg)
-// not inline because it's virtual.
- {
- return call_old_wndproc (msg);
- }
-
-/* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
-
 int message_tap::pre_translate_message (const ratwin::message::MSG&)
  {
  return 0;

@@ -24,8 +24,8 @@ message_parliament::~message_parliament()
 
 long message_parliament::handle_message (ratwin::message::sMSG& msg)
  {
- long retval= 0;
- return retval;
+ handle_message_return_code= 0;
+ return handle_message_return_code;
  }
 
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */

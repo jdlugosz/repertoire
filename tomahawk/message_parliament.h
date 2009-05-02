@@ -23,6 +23,7 @@ protected:
    TOMAHAWK_EXPORT int remove (const minister*, int id=-1);
 public:
    TOMAHAWK_EXPORT virtual long handle_message (ratwin::message::sMSG& msg);
+   long handle_message_return_code;
    TOMAHAWK_EXPORT message_parliament();
    TOMAHAWK_EXPORT ~message_parliament();
    };
