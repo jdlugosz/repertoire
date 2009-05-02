@@ -76,7 +76,7 @@ P.footnote CODE {
 	color: #559022;
 	}
 
-A, A CODE, A.code {
+A[HREF], A[HREF] CODE, A[HREF].code {
 	color: rgb(0,0,238);
 	text-decoration: inherit;
 	}
@@ -165,9 +165,9 @@ A:hover[TARGET=index], A:hover[TARGET=index] CODE {
 	}
 A:hover[HREF] { text-decoration: underline }
 
-H2:hover A { color: blue }
+H2:hover A[HREF] { color: blue }
 
-H2 A { color: black }
+H2 A[HREF] { color: #006 }
 
 .banner {
    background-color: #ffffdd;
@@ -237,7 +237,7 @@ HR.sep1 {
 	-moz-border-radius: 5px;
 	}
 
-.signame {
+.signame, TABLE *.shaded  {
 	background-color: #ffffdd;
 	}
 
@@ -364,6 +364,10 @@ TABLE.t1 TD {
 TABLE.t1 TH {
 	border-left-width: thin;
 	border-right-width: thin;
+	}
+
+.subtle {
+	color:darkgray;
 	}
 
 LI.nobul {

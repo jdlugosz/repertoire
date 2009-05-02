@@ -65,16 +65,29 @@ function within_book (alink)
  return true;  // stub for now.
  }
 
-function deframe_links (doc)
+
+function deframe_1_link (thislink)
  {
- var allLinks= document.evaluate ('//a[@href]', doc, null, XPathResult.UNORDERED_NODE_SNAPSHOT_TYPE, null);
- for (var i = 0; i < allLinks.snapshotLength; i++) {
-    var thislink = allLinks.snapshotItem(i);
-    var targ= thislink.target;
-    if (targ == 'info' || targ=='footer' || targ=='index')  thislink.target="";
+ var targ= thislink.target;
+ if (targ == 'info' || targ=='footer' || targ=='index')  {
+    thislink.target="";
     if (within_book(thislink)) {
        if (thislink.search == "") thislink.href += "?NOFRAMES";
        }
+    }
+ }
+
+function deframe_links (doc)
+ {
+ if (document.evaluate) {
+    var allLinks= document.evaluate ('//a[@href]', doc, null, XPathResult.UNORDERED_NODE_SNAPSHOT_TYPE, null);
+    for (var i = 0; i < allLinks.snapshotLength; i++) {
+       deframe_1_link (allLinks.snapshotItem(i))
+       }
+    }
+ else if (document.selectNodes) {  // for IE6
+    var list= document.selectNodes ('//a[@href]');
+    for (var i= 0; i < list.length; ++i)  deframe_1_link (list[i]);
     }
  }
 
@@ -93,5 +106,32 @@ function index_load()
     var destURL= relpath + "makeframe.html?documentation_info.html#toptop+" + URL_relative(document.location.href);
     link.href= destURL;
     }
+ }
+
+function adjustIFrameSize (iframeWindow)
+ {
+ var iframeElement = document.getElementById (iframeWindow.frameElement.id);
+ var height= iframeWindow.document.height;  // DOM Level 0
+ if (!height)  height= iframeWindow.document.body.clientHeight;  // Introduced by IE
+ if (!height) return;
+ // convert px to em
+ var suffix= "px";  // fallback if can't figure it out
+ var style;
+ if (window.getComputedStyle) style= window.getComputedStyle (iframeElement,"");
+ else style= iframeElement.currentStyle;
+ if (style) {  // so far so good
+    var oneline= style.fontSize;  // e.g. 20px
+    var onelinenum= oneline.substring (0, oneline.length-2);
+    height= (height+1) / onelinenum;
+    suffix= "em";
+    }
+ // set the result
+ iframeElement.style.height= height + suffix;
+ }
+
+function set_text (node, s)
+ {
+ node.textContent= s;
+ node.innerText= s;  // one of these is right
  }
 

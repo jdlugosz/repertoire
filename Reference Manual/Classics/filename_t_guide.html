@@ -1,15 +1,31 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"  "http://www.w3.org/TR/html4/loose.dtd">
 <HTML>
 <HEAD>
 <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=windows-1252">
 <TITLE>filename_t User's Guide</TITLE>
+<SCRIPT type= "text/javascript" src="../helpers.js"></SCRIPT>
+<LINK REL="Start" HREF="http://www.dlugosz.com/Repertoire/refman/mainframe.html">
+<LINK REL="Contents" HREF="../reper_index.html">
+<LINK REL="Index" HREF="../class_summary.html">
+<LINK REL="Chapter" HREF="class_index.html">
+<LINK REL="Help" HREF="../accessibility_statement.html">
+<LINK REL="Copyright" HREF="../policy.html">
 <LINK REL=STYLESHEET HREF="../info.css" TYPE="text/css">
+<SCRIPT type="text/javascript">
+   checkframe ("Classics/filename_t_index.html");
+</SCRIPT>
+
+<META name="date" content="2007-03-07">
+<!-- but content unchanged since 1998! -->
 </HEAD>
 
 <BODY>
-<H1>filename_t Users Guide</H1>
+<IFRAME id="page_banner" src="../page_banner.html" scrolling="no"></IFRAME>
+
+<H1 id="toptop">filename_t Users Guide</H1>
 <P>The <code>filename_t</code> is a class to manipulate file names.</P>
 
-<H2>Overview</H2>
+<H2 id="overview">Overview</H2>
 
 <P>A file name is typically manipulated in certain ways, unlike a typical
 string.  Strings will have characters inserted or removed in arbitrary
@@ -19,11 +35,27 @@ the extension, replace <code>".."</code> and <code>"."</code> parts, and so on.<
 
 <P>This class faciliates this by treating a file name as a high-level object.</P>
 
-Read about:</P>
-<!-- CONTENTS --!>
-<!-- END CONTENTS --!>
+<H2>Related Documents</H2>
+<UL>
+	<LI><A HREF="filename_t_index.html" target="index"><code>filename_t</code> index</A>
+	<LI><A HREF="filename_t.html#toptop"><code>filename_t</code> member reference</A>
+	<LI><A HREF="filesystem_t_index" target="index"><code>filesystem_t</code> index</A>
+</UL>
 
-<A NAME="1"><H2>Parts of a File Name</H2></A>
+<H2 id="contents">Contents</H2>
+<UL>
+<LI><A HREF="#parts">Parts of a File Name</A>
+<LI><A HREF="#class">The filesystem_t class</A>
+<LI><A HREF="#groups">Members By Category</A>
+<LI class="nobul"><UL>
+   <LI><A HREF="#getsetparts">Getting and Setting Parts</A>
+   <LI><A HREF="#higher">Higher Level Manipulation</A>
+   <LI><A HREF="#system">File System Aware Operations</A>
+   </UL>
+<LI><A HREF="#multiname">Multiple Name Parts</A>
+</UL>
+
+<H2 id="parts">Parts of a File Name</H2>
 
 <P>The file name's string is broken down into <I>parts</I>.</P>
 
@@ -33,33 +65,33 @@ four parts:, "C:", "foo", "bar", and "baz.txt".  Backing up to the
 parent directory is simply a matter of removing the last path part.</P>
 
 <P>This class recognises three different kinds of parts.  The <B>prefix</B>
-part comes first.  It can be the drive letter ("D:"), share name ("\\Server"), or 
-network service ("http:").</P>
+part comes first.  It can be the drive letter (<code>"D:"</code>), share name (<code>"\\Server"</code>), or
+network service (<code>"http:"</code>).</P>
 
 <P>The <B>path</B> parts are the various subdirectories.</P>
 
 <P>The <B>name</B> part is the actual name, and follows the path parts
-if the filename names a file rather than a subdirectory.  "D:\foo\bar.txt" has
-a name part of "bar.txt", but "D:\foo\" has no name part.</P>
+if the filename names a file rather than a subdirectory.  <code>"D:\foo\bar.txt"</code> has
+a name part of <code>"bar.txt"</code>, but <code>"D:\foo\"</code> has no name part.</P>
 
 <P>In addition, the class supports the concept of multiple name parts.
-For example, "D:\foo\*.exe;*.dll;*.ocx" has three name parts.</P>
+For example, <code>"D:\foo\*.exe;*.dll;*.ocx"</code> has three name parts.</P>
 
 
 
 
-<A NAME="3"><H2>The filesystem_t class</H2></A>
+<H2 id="class">The filesystem_t class</H2>
 
 <P>The <code>filename_t</code> class uses a helper class to supply details of the parsing
-and some control over the file system (e.g. the <code>exists()</code> function).</P>
+and some control over the file system (e.g. the <A HREF="filename_t.html#exists" class="code">exists</A> function).</P>
 
-<P>The concrete class derived from <code>filesystem_t</code> contains the code to
+<P>The concrete class derived from <A HREF="filesystem_t_index.html" target="index" class="code">filesystem_t</A> contains the code to
 split up a string into the various parts.  Since each <code>filename_t</code>
 object contains its own <code>filesystem_t</code>, each instance can
-handle any kind of "name" independently of the others.</P>
+handle any kind of “name” independently of the others.</P>
 
 <P>The PC Filesystem parser handles file names where the parts are
-separated by backslashes, and takes care of drive letters and UNC names.</P>
+separated by backslashes, and takes care of drive letters and <abbr title="Universal Naming Convention">UNC</abbr> names.</P>
 
 <P>The URL Filesystem parser, on the other hand, separates parts
 with forward slashes, and handles the <code>"http://"</code> prefix which is slightly
@@ -69,12 +101,12 @@ different than a drive letter syntax.</P>
 such as checking to see if a file exists and fully-qualifying a file name.</P>
 
 
-<A NAME="groups"><H2>Members By Category</H2></A>
+<H2 id="groups">Members By Category</H2>
 
-<A NAME="2"><H3>Getting and Setting Parts</H3></A>
+<H3 id="getsetparts">Getting and Setting Parts</H3>
 
-Much of what you want to do with a file name involves getting and
-setting <A HREF="#1">parts</A>.
+<P>Much of what you want to do with a file name involves getting and
+setting <A HREF="#parts">parts</A>.</P>
 
 <P><A class="code" style=font-weight:bold HREF="filename_t.html#text">text</A>
 &mdash;Gets the whole thing as a string.  To set the whole thing, use assignment.</P>
@@ -96,21 +128,21 @@ setting <A HREF="#1">parts</A>.
 <A class="code" style=font-weight:bold HREF="filename_t.html#remove_name">remove_name</A>
 &mdash;Gets or sets the name parts.</P>
 
-<A NAME="4"><H3>Higher Level Manipulation</H3></A>
+<H3 id="higher">Higher Level Manipulation</H3>
 
 <P>Beyond the simple getting and setting of parts, there are functions
 for higher-level manipulation of file names.</P>
 
 <P><A class="code" style=font-weight:bold HREF="filename_t.html#common_root">common_root</A>
-&mdash;"D:\foo\bar.txt" and "D:\foo\subdir\baz.html"
-have a common root of "D:\foo\".</P>
+&mdash;<code>"D:\foo\bar.txt"</code> and <code>"D:\foo\subdir\baz.html"</code>
+have a common root of <code>"D:\foo\"</code>.</P>
 
 <P><A class="code" style=font-weight:bold HREF="filename_t.html#concat">concat</A>
-&mdash;This is a fancy "change directory" feature.  Concat'ing a relative path
+&mdash;This is a fancy “change directory” feature.  Concat’ing a relative path
 onto an existing path will apply that subdirectory; see the reference for
 other cases.</P>
 
-<A NAME="5"><H3>File System Aware Operations</H3></A>
+<H3 id="system">File System Aware Operations</H3>
 
 <P><A class="code" style=font-weight:bold HREF="filename_t.html#fully_qualify">fully_qualify</A>
 &mdash;This takes a relative or otherwise abbreviated path name and
@@ -123,9 +155,10 @@ produces the fully-qualified name for the file.</P>
 &mdash;This creates multiple tiers of a subdirectory, if necessary, to
 assure that the path part of this filename exists.</P>
 
-<A NAME="6"><H2>Multiple Name Parts</H2></A>
-Multiple names are not fully implemented.
+<H2 id="multiname">Multiple Name Parts</H2>
+<P>Multiple names are not fully implemented.</P>
 
+<IFRAME id="page_footer" src="../page_footer.html"></IFRAME>
 </BODY>
 
 </HTML>

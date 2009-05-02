@@ -15,22 +15,24 @@
     var destURL= parent.location.href;
     if (!top.frames["index"]) {
        // offer to add frames
-       link.textContent= "Click to add navigation frames.";
+       set_text (link, "Click to add navigation frames.");
        destURL= destURL.replace (/\?.*$/,"");  // strip query, keep fragment
        if (!parent.window.document.checkframe_installed) {
           // generic
           destURL= "makeframe.html?" + URL_relative(destURL) + "+reper_index.html";
           }
-       deframe_links (parent.window.document);  // ? what exactly is the 'parent' object?
+       deframe_links (parent.window.document);
        }
     else {
        // offer to remove frames
        destURL += "?NOFRAMES";
-       link.textContent= "Click to remove navigation frames.";
+       set_text (link, "Click to remove navigation frames.");
        }
     link.href= destURL;
     link.target= "_top";
     document.body.appendChild (el);
+    // now make it size correctly
+    if (parent.adjustIFrameSize) parent.adjustIFrameSize(window);
     }
 </SCRIPT>
 
@@ -38,9 +40,12 @@
 	.frameoffer {
 		/* nothing special, but could be fancy here. */
 		}
+	BODY {
+		margin: 0;
+		}
 </STYLE>
 
-<META name="date" content="2007-02-27">
+<META name="date" content="2007-03-09">
 </HEAD>
 
 <BODY onload="info_load()">

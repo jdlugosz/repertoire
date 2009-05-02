@@ -4,7 +4,9 @@
 <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=windows-1252">
 <LINK REL=STYLESHEET HREF="info.css" TYPE="text/css">
 <LINK REL="Bookmark" HREF= "IEproblems.html" Title= "Internet Explorer Browser Problems">
+<META name="date" content="2007-03-13">
 <TITLE></TITLE>
+<SCRIPT type= "text/javascript" src="helpers.js"></SCRIPT>
 <SCRIPT type="text/javascript">
    function give_context ()
     {
@@ -13,8 +15,7 @@
     parentURL= parentURL.replace (/\?.*$/,"");
     parentURL= parentURL.replace (/#.*$/,"");
     var span= document.getElementById("loc");
-    span.textContent= parentURL;
-
+    set_text (span, parentURL);
     if (location.hostname == "www.dlugosz.com")
 		document.getElementById('vallink').href += '/check?uri=' + parentURL + "?NOFRAMES";
 
