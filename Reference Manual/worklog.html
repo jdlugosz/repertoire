@@ -7,6 +7,31 @@
 </HEAD>
 <BODY>
 <A NAME="changes"><H1>Changes</H1></A>
+
+<H2 id="PB8">Changes since release PB8</H2>
+<UL>
+	<LI>October 2006.
+	<LI>Smart-pointer COW fix re-worked, sue to a problem in the original July implementation.
+	<LI>Implemented 64-bit forms of <code>classics::internal::CompareAndSwap</code> and <code>Xexchange</code>.
+	<LI>September 2006.
+	<LI><code>ustring classics::as_string (const ratwin::GUID&amp; guid)</code> in <code>misc_API.cpp</code> was leaving
+  2 null characters at the end of the string.  Who cares&#8253;  It turns out that some code in <code>OLE32.DLL</code> checks the
+  length of the string as the first step in validating a GUID, and it didn’t like this.  This function was fixed, and internal error checking
+  added as well.
+  	<LI>Due to improved documentation for the Win32 API function <code>RegSetValueEx</code>, updated <code>registry_key::set_value</code>
+   for strings to <I>include</I> the terminating null in the value.  Previously it would exclude it.
+	<LI>August 2006.
+   <LI><code>ratwin::RegCreateKey</code> changed default access rights from <code>KEY_ALL_ACCESS</code> to <code>MAXIMUM_ALLOWED</code>.  This
+   trickles down to the <code>registry_key</code> class as well.
+   <LI>Bug found in <code>classics::registry_key::key_exists</code>.  The "Maybe" case had a typo, so it would always return <code>false</code>
+   if this was the first call made to the <code>registry_key</code> class, before it has determined if Unicode is available for
+   the registry API in Windows.
+	<LI>July 2006.
+	<LI>Smart pointers improved: semantic fix for COW in multiple threads (see documentation for <A HREF="Classics/handle.html#make_unique" class="code">make_unique</A>).
+	<LI>Full templated constructors and assignment operators introduced, at last!  Easy to comment out if you need to use a compiler older than 2003,
+   but no longer directly supported.
+</UL>
+
 <H2>Changes since release PB7</H2>
 <UL>
 	<LI><code>prothonotary</code> includes AppID.
@@ -137,7 +162,17 @@
 	<LI>Cover directory arrangement.
 	<LI>Write licence document.
 	<LI>"larger set" and "toptop" in manual pages
-	<LI>class_summary.html use styles instead of TT
+</UL>
+
+<H2>New Stuff</H2>
+<UL>
+	<LI>Trugs
+	<LI>Inherit enums in flagword
+</UL>
+
+<H2>Registry</H2>
+<UL>
+	<LI>rework
 </UL>
 
 <H2>Strings</H2>

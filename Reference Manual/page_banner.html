@@ -1,19 +1,54 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"  "http://www.w3.org/TR/html4/loose.dtd">
-<HTML>
+<HTML lang="en-US">
 <HEAD>
 <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=windows-1252">
 <TITLE></TITLE>
 <LINK REL=STYLESHEET HREF="info.css" TYPE="text/css">
+<SCRIPT type= "text/javascript" src="helpers.js"></SCRIPT>
+<SCRIPT type="text/javascript">
+   function info_load ()
+    {
+    var el= document.createElement ("P");
+    var link= document.createElement ("A");
+    el.className="frameoffer";
+    el.appendChild (link);
+    var destURL= parent.location.href;
+    if (!top.frames["index"]) {
+       // offer to add frames
+       link.textContent= "Click to add navigation frames.";
+       destURL= destURL.replace (/\?.*$/,"");  // strip query, keep fragment
+       if (!parent.window.document.checkframe_installed) {
+          // generic
+          destURL= "makeframe.html?" + URL_relative(destURL) + "+reper_index.html";
+          }
+       deframe_links (parent.window.document);  // ? what exactly is the 'parent' object?
+       }
+    else {
+       // offer to remove frames
+       destURL += "?NOFRAMES";
+       link.textContent= "Click to remove navigation frames.";
+       }
+    link.href= destURL;
+    link.target= "_top";
+    document.body.appendChild (el);
+    }
+</SCRIPT>
+
+<STYLE TYPE="text/css">
+	.frameoffer {
+		/* nothing special, but could be fancy here. */
+		}
+</STYLE>
+
+<META name="date" content="2006-11-03">
 </HEAD>
 
-<BODY>
-<!-- Standard banner at top of Reper file -->
+<BODY onload="info_load()">
 <P CLASS="banner">
 This document is one section of The Repertoire Reference, found at
-<A HREF="http://www.dlugosz.com/Repertoire/refman/mainframe.html" TARGET="_top">
+<A HREF="http://www.dlugosz.com/Repertoire/refman/mainframe.html" TARGET="_top" accesskey="1">
 http://www.dlugosz.com/Repertoire/refman/mainframe.html</A>.<BR>
-Copyright 2004 by <A HREF="mailto:john&#64;dlugosz.com">John M. Dlugosz</A>.
+Copyright <span class="docdate_year">2006</span> by <A HREF="mailto:john&#64;dlugosz.com">John M. Dlugosz</A>.
 </P>
 </BODY>
 </HTML>
-<!-- end of standard banner -->

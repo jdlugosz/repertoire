@@ -1,0 +1,144 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"  "http://www.w3.org/TR/html4/loose.dtd">
+<HTML lang="en-US">
+<HEAD>
+<META NAME="description"
+ CONTENT="Accessibility statement and document features for Repertoire HTML Documentation.">
+<META NAME="keywords"
+ CONTENT="Repertoire documentation accessibility statement HTML features">
+<TITLE>Accessibility Statement</TITLE>
+<LINK REL="STYLESHEET" HREF="info.css" TYPE="text/css">
+<META name="date" content="2006-11-06">
+</HEAD>
+
+<BODY>
+
+<H1>Accessibility Statement</H1>
+
+<!-- Credit to <a href="http://diveintoaccessibility.org/accessibility_statement.html">Accessibility statement for diveintoaccessibility.org</a> for rough template for this section.
+The author, Mark Pilgrim writes, "Feel free to use either of these as a template, including structure, wording, and links to further reading."
+-->
+
+<H2 id="accesskeys">Access Keys</H2>
+
+<p>Most browsers support jumping to specific links by typing keys defined on the web site.
+On Windows, you can press <kbd>ALT</kbd> + an access key; on Macintosh, you can press <kbd>Control</kbd> + an access key.</p>
+
+<p>All pages in this document define the following access keys:</p>
+
+<ul>
+<li>Access key 1 - Main entry point to the book</li>
+<li>Access key 2 - Skip to main content</li>
+<li>Access key 3 - Table of Contents in this document</li>
+<li>Access key 4 - Table of Related Documents in this document</li>
+<li>Access key 5 - Parent document in a set, if applicable</li>
+<li>Access key 9 - Feedback</li>
+<li>Access key 0 - Accessibility statement</li>
+</ul>
+
+<H2>Standards Compliance</H2>
+<P>These files are written using HTML 4.01.  HTML 4.01 Transitional is used, rather than XHTML, because that is what I started with and
+XHTML is harder to code by hand.  I&rsquo;ve not found any reason to change.  HTML doesn&rsquo;t have to mean horrible non-conforming code.
+Having some end tags optional, for example, is part of a formal specification, and the pages are validated against that specification.</P>
+
+<P><img STYLE="border-style:none;float:left;margin-right:0.8em" src="http://www.w3.org/Icons/valid-html401"
+ alt='"Valid HTML 4.01!" logo' height="31" width="88">
+Each page contains a HTML 4.01 validation logo in the footer.  Clicking on the logo will revalidate the page using the W3C&rsquo;s <A HREF="http://validator.w3.org/">Markup Validation Service</A>.
+If Javascript is disabled or the page is being served locally, it will go to the Validation Service main page but not automatically enter the URL to be checked.
+</P>
+<P><img style="border:0;width:88px;height:31px;float:left;margin-right:0.8em" src="http://jigsaw.w3.org/css-validator/images/vcss" alt='"Valid CSS!" logo'>
+Likewise, the CSS files are validated using the W3C <A HREF="http://jigsaw.w3.org/css-validator/">CSS Validation Service</A>.  These
+links will re-validate <A class="code" HREF="http://jigsaw.w3.org/css-validator/validator?uri=http://www.dlugosz.com/Repertoire/refman/info.css" title="check style sheet for validity">info.css</A>
+and <A class="code" HREF="http://jigsaw.w3.org/css-validator/validator?uri=http://www.dlugosz.com/Repertoire/refman/index.css" title="check style sheet for validity">index.css</A>.
+
+<H2 id="navlink">Navigation Aids</H2>
+<P>Browsers support navigational links that are coded in the page&rsquo;s header via <code>&lt;LINK REL= &hellip;></code> statements.  In addition
+to the visible hyperlinks in the document presentation, these provide standard hooks for shortcut keys, assistive technologies, text-only browsers, and browser user interface widgets.</P>
+
+<P>In the Firefox browser, you can use the <A HREF="https://addons.mozilla.org/firefox/2933">Link Widgets</A> or <A HREF="https://addons.mozilla.org/firefox/1324/">cmSiteNavigation Toolbar</A>
+to make direct use of these.  Note that they don&rsquo;t show up if the page is in a frame.  Firefox only uses these links if the page is loaded as the top-level document
+in the window.</P>
+
+<P>See <A HREF="http://www.w3.org/TR/html4/types.html#type-links">&sect;6.12 Link types</A> in the HTML 4.01 Specification.</P>
+
+<DL class="members spaceafter">
+<dt class="code">Start</dt>
+<dd>Points to the main frameset.</dd>
+
+<dt><code>Next</code>, <code>Prev</code></dt>
+<dd>Generally not used, as the documents are not linear.</dd>
+
+<dt class="code">Contents</dt>
+<dd>Points to the main Repertoire contents page.</dd>
+
+<dt class="code">Index</dt>
+<dd>Points to the class summary, which serves as a table of contents for the technical documentation.  It does not include meta-documentation
+about the project itself.</dd>
+
+<dt class="code">Chapter</dt>
+<dd>In any Classics library documentation, points to the Classics Library index.</dd>
+
+<dt class="code">Copyright</dt>
+<dd>Points to the Policy file.</dd>
+
+<dt><code>Section</code>, <code>Subsection</code></dt>
+<DD>Generally not used.</DD>
+
+<dt class="code">Help</dt>
+<dd>Points here.</dd>
+
+<dt class="code">Bookmark</dt>
+<dd>Makes accessible any links that are not obvious otherwise.</dd>
+
+<dt class="code">Up</dt>
+<dd>Not listed in the HTML Specification, but is used by the Firefox navigation buttons.
+If a document is further divided into sections in separate files, will point back to the parent document.
+</DL>
+
+<H2>Links</H2>
+<P>Links are typically written to make sence out of context.  I eschew link text like &ldquo;click here&rdquo;.  Usually a link will be the name of the thing being cross-referenced,
+as naturally mentioned in the text.  If the meaning of a link is not clear from the text enclosed in the <code>A</code> tags, then a <code>TITLE</code> attribute will be used.</P>
+
+<H2>Images</H2>
+<P>All images include descriptive <code>ALT</code> attributes.</P>
+
+<H2>CSS 2.1 for Presentation</H2>
+<P>These pages use cascading stype sheets, and avoid mixing content with presentation.  The text is marked up using proper semantic HTML tags, such as <code>UL</code>
+for a list, with CSS then used to make it pretty.</P>
+
+<P>The document will be readable with CSS disabled.</P>
+
+<H2>Visual Layout</H2>
+<P>No absolute font sizes or column widths are used!  Layout of text is fully &ldquo;liquid&rdquo; and will flow to fit your window size and
+your text size.</P>
+
+<P>Frames are used to provide navigation panes around a content window.  If frames are not available, or only one frame is (easily) used at a time, the document
+can be navigated through its own hyperlinks, &ldquo;See Also&rdquo; statements throughout the document, a &ldquo;Related Documents&rdquo; section at the top of
+each page, <A HREF="#navlink">Navigation Links</A> and <A HREF="#accesskeys">Access Keys</A>, and links back to the <A HREF="class_summary.html">Class Summary</A>
+and document <A HREF="http://www.dlugosz.com/Repertoire/refman/mainframe.html" TARGET="_top">main page</A>.
+
+
+<H1>Principles and HTML Coding Features</H1>
+
+<H2>Technology</H2>
+
+<P>The earliest design principle adopted was to make the entire documentation set downloadable and browsable locally.  That means it cannot be
+generated dynamically by code on the server, but must exist as a set of static HTML documents.</P>
+
+<P>Client-side scripting was originally not used at all, and as much functionality was provided as was practical.  Then, Javascript was added to
+enhance the usability and ease of development.  Javascript is not required to read this.  It meerly enhances it.  Specifically,</P>
+<UL>
+	<LI>Having a common page footer included into all pages.  Javascript fills in the text stating the page&rsquo;s own URL, and makes the
+	validation logo into a button that re-validates this specific page.
+	<LI>In order to make it easy to bookmark a single content page (or post a simple URL, or double-click a file locally), while still providing the frameset
+	for navigation, Javascript is used to open the other frames if one page is loaded in isolation.
+	<LI>Having done so, Javascript is also used to generate a link at the top of the page to undo it, and show the page alone without frames.
+</UL>
+
+
+<H2>Document-Set Organization</H2>
+
+<H2>Page Organization and Layout</H2>
+
+</BODY>
+</HTML>
+

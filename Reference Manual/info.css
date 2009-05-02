@@ -18,33 +18,15 @@ H3 {
    clear: both;
    }
 
-PRE { font-family: "Lucida Sans Typewriter", monospace }
-
-P EM {
-	background-color: #fffff0;
-	font-style: normal;
+P {	/* browser defaults differ, so set it up explicitly so I get consistant results when different elements
+	are adjecent, particularly using P for middle items (only) in a list. */
+	margin-top: 1em;
+	margin-bottom: 1em;
 	}
 
-.code,CODE {
-	font-family: "Lucida Sans", "Lucida Sans Unicode", sans-serif;
-	font-size: 0.9em;
-	}
-
-PRE.code {
-	background-color: #EEE;
-	color: #000;
-	border-style: solid;
-	padding: 0.5em;
-	}
-
-.filename {
-	font-family: "Arial Narrow",sans-serif;
-	font-stretch: condensed;
-	}
-
-PRE I , .PRElike I{
-	color: #006;
-	background-color: #EEE
+PRE {
+	font-family: "Lucida Sans Typewriter", monospace
+	overflow: auto;
 	}
 
 .PRElike { /* if I want to do something not allowed in a PRE */
@@ -52,12 +34,11 @@ PRE I , .PRElike I{
 	display: block;
 	font-family: "Lucida Sans Typewriter", monospace;
 	white-space: pre;
-	/* matches my P.code" style */
-	font-size: 0.9em;
-	background-color: #EEE;
+	overflow: auto;
 	color: #000;
 	border-style: solid;
 	padding: 0.5em;
+	page-break-inside: avoid;
 	}
 
 PRE.screenshot {
@@ -71,12 +52,64 @@ PRE.screenshot {
 	border-color: ActiveBorder;
 	border-style: solid ridge ridge;
 	border-width: thin thick thick;
+	page-break-inside: avoid;
 	}
 
 
 PRE.screenshot I {
 	color: #ff0;
 	background-color: inherit;
+	}
+
+P EM {
+	background-color: #fffff0;
+	font-style: normal;
+	}
+
+.code,CODE {
+	font-family: "Lucida Sans", "Lucida Sans Unicode", sans-serif;
+	font-size: 0.9em;
+	color: #551122;
+	}
+
+A, A CODE, A.code {
+	color: rgb(0,0,238);
+	text-decoration: inherit;
+	}
+
+PRE.code,  P[class~="code"][class~="PRElike"]{
+	background-color: #EEE;
+	color: #000;
+	border-style: solid;
+	padding: 0.5em;
+	page-break-inside: avoid;
+	}
+
+.filename {
+	font-family: "Arial Narrow",sans-serif;
+	font-stretch: condensed;
+	}
+
+PRE I , .PRElike I{
+	color: #006;
+	background-color: #EEE
+	}
+
+PRE.code EM {
+	background-color: #EEEED4;
+	font-style: inherit;
+	}
+
+.left {
+	float:left;
+	margin-top:0;
+	margin-right:1em
+	}
+
+.right {
+	float:right;
+	margin-top:0;
+	margin-left:1em
 	}
 
 .screenshot .prompt {
@@ -109,6 +142,7 @@ BODY {
    text-align:right;
    color: green;
    background-color: inherit;
+	page-break-inside: avoid;
    }
 
 .memof {  /* MEMber OF */
@@ -121,7 +155,7 @@ BODY {
 	}
 
 A:link, A:visited { text-decoration: none }
-A:hover[TARGET=index]{
+A:hover[TARGET=index], A:hover[TARGET=index] CODE {
 	background-color: green;
 	color: #fff;
 	}
@@ -139,6 +173,16 @@ H2 A { color: black }
    margin: 0;
    }
 
+@media print {
+.banner {
+   background-color: white;
+   font-weight:normal;
+   padding:0;
+   border-style: none;  /* this doesn't seem to have any effect */
+   margin: 0;
+   }
+	}
+
 .banner2 {
 	margin-left: 20%;
 	font-family: sans-serif;
@@ -154,6 +198,23 @@ H2 A { color: black }
 	padding:1em;
 	}
 
+.boxed {
+	background-color: #fffff8;
+	border-style: solid;
+	border-color: #888888;
+	padding:1em;
+	margin-left: 2.5em;
+	margin-right: 2.5em;
+	page-break-inside: avoid;
+	}
+
+OL.boxed {
+	}
+
+OL.boxed LI {
+	margin-left: 1em;
+	}
+
 .footnoter {
 	vertical-align: super;
 	font-size: smaller
@@ -167,7 +228,9 @@ P.footnote {
 
 HR.sep1 {
 	border:none;
-	background-color: black
+	background-color: black;
+	height: 10px;
+	-moz-border-radius: 5px;
 	}
 
 .signame {
@@ -215,4 +278,92 @@ IFRAME#page_banner {
 	color: #808000;
 	font-style: italic;
 	}
+
+.render_warning {
+	background-color: #ffffdd;
+	color: green;
+	font-weight: bold;
+	}
+
+.render_warning A:link, .render_warning A:visited {
+	text-decoration: underline;
+	}
+
+P.render_warning {
+	padding: 1em;
+	}
+
+.caption {
+	font-family: Verdana, Tahoma, sans-serif;
+	text-align:center;
+	font-style: normal;
+	font-weight: bold;
+	margin: 0;
+	display: none;
+	}
+
+.capref {
+	display: none;
+	}
+
+.capref2 { display:inline }
+
+.caption + PRE {
+	margin-top: 0;
+	}
+
+@media print {
+
+.caption { display: block }
+.capref { display: inline }
+}
+
+ABBR.subtle, ACRONYM.subtle {
+	border: none;
+	cursor: help;
+	}
+
+CODE > DFN, .code > DFN {
+	font: inherit;
+	}
+
+DL.members > DT {
+	font-weight: bold;
+	}
+
+DL.spaceafter > DD {
+	margin-bottom: 0.8em;
+	}
+
+DL.nobreak DT {
+	float: left;
+	}
+
+TABLE.t1 {
+	border-collapse: collapse;
+	border-style: solid;
+	margin-left: 1em;
+	border-color: grey;
+	}
+
+TABLE.t1 TD, TABLE.t1 TH {
+	padding-left: 0.3em;
+	padding-right: 0.3em;
+	border-style: solid;
+	border-color: grey;
+	}
+
+TABLE.t1 TD {
+	border-width: thin;
+	}
+
+TABLE.t1 TH {
+	border-left-width: thin;
+	border-right-width: thin;
+	}
+
+LI.nobul {
+	list-style-type: none;
+	}
+
 

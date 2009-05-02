@@ -30,7 +30,7 @@ void message_tap::prevent_duplicate_hook() const
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
 message_tap::message_tap()
- : WindowHandle(0), OldWndProc(0), EntryPoint (this, &message_tap::hook_handler), 
+ : WindowHandle(0), OldWndProc(0), EntryPoint (this, &message_tap::hook_handler),
    LastMessage (ratwin::WM_constants::WM_NCDESTROY), UnhookASAP(false),
    SaneCheck(SaneMask^reinterpret_cast<long>(this))
  {
@@ -47,7 +47,7 @@ message_tap::~message_tap()
     report_error (X);
     // If you get this, it might mean that you did not use the smart-pointer mechanism to control
     // the lifetime, but caused it to be destroyed before all references were dropped.
-    unhook();
+    unhook (true);
     }
  if (get_reference_count()) {
     exception X ("Tomahawk", "Bug found: object improperly destroyed.", __FILE__, __LINE__);
@@ -64,7 +64,7 @@ void message_tap::on_attach()
  {
  // does nothing here.  Virtual function for derived classes to use.
  }
- 
+
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
 void message_tap::hook (ratwin::types::HWND window)
@@ -74,7 +74,7 @@ void message_tap::hook (ratwin::types::HWND window)
  using namespace ratwin::window;
  WindowHandle= window;
  WindowOwnsMe= this;
- OldWndProc= static_cast<WNDPROC_2>( SetWindowLong (window, GWL_WNDPROC, EntryPoint.callptr()) );
+ OldWndProc= SetWindowLong<wchar_t> (window, GWL_WNDPROC, EntryPoint.callptr());
  on_attach();
  }
 
@@ -93,7 +93,7 @@ void message_tap::set_window_handle (ratwin::types::HWND window)
  if (window == WindowHandle)  return;  // redundant, harmless.
  prevent_duplicate_hook();
  WindowHandle= window;
- on_attach(); 
+ on_attach();
  }
 
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
@@ -105,7 +105,7 @@ bool message_tap::unhook (bool force)
  WNDPROC_2 current= static_cast<WNDPROC_2>( GetWindowLong (WindowHandle, GWL_WNDPROC) );
  bool graceful= (current == EntryPoint.callptr());
  if (!graceful && !force)  return false;  // can't do it.
- SetWindowLong (WindowHandle, GWL_WNDPROC, graceful ? OldWndProc : &::DefWindowProcA);
+ SetWindowLong<wchar_t> (WindowHandle, GWL_WNDPROC, graceful ? OldWndProc : &::DefWindowProcW);
  // reset the data members
  OldWndProc= 0;
  WindowHandle= 0;
@@ -137,7 +137,7 @@ long message_tap::hook_handler (ratwin::message::sMSG msg)
  try {
     if (!WindowHandle)  {  // automatically set upon first message.
        WindowHandle= msg.hwnd;
-       on_attach(); 
+       on_attach();
        }
     static unsigned const WM_TOMAHAWK= WM_TOMAHAWK_msg::get_TOMAHAWK_id();
     if (msg.message == WM_TOMAHAWK) {
@@ -148,7 +148,7 @@ long message_tap::hook_handler (ratwin::message::sMSG msg)
           }
        }
     int result= handle_message (msg);
-    if (msg.message == LastMessage) unhook();  // May have triggered deletion!
+    if (msg.message == LastMessage) unhook (true);  // May have triggered deletion!
     else if (UnhookASAP) unhook(false);  // *try* to unhook after every message.
     return result;
     }
@@ -190,8 +190,8 @@ int message_tap::pre_translate_message (const ratwin::message::MSG&)
 long message_tap::call_old_wndproc (ratwin::message::sMSG& msg)
  {
  if (OldWndProc)
-    return ratwin::window::CallWindowProc (OldWndProc, msg);
- else return ratwin::window::DefWindowProc (msg);
+    return ratwin::window::CallWindowProc<wchar_t> (OldWndProc, msg);
+ else return ratwin::window::DefWindowProc<wchar_t> (msg);
  }
 
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */

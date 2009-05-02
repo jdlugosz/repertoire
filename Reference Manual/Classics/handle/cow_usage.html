@@ -1,0 +1,320 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"  "http://www.w3.org/TR/html4/loose.dtd">
+<HTML lang="en-US">
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=windows-1252">
+<TITLE>handle User’s Guide &mdash; cow notes</TITLE>
+<LINK REL="STYLESHEET" HREF="../../info.css" TYPE="text/css">
+<LINK REL="Up" HREF="../handle_guide.html">
+<LINK REL="Start" HREF="http://www.dlugosz.com/Repertoire/refman/mainframe.html">
+<LINK REL="Contents" HREF="../../reper_index.html">
+<LINK REL="Index" HREF="../../class_summary.html">
+<LINK REL="Chapter" HREF="../class_index.html">
+<LINK REL="Help" HREF="../../accessibility_statement.html">
+<LINK REL="Copyright" HREF="../../policy.html">
+<META name="date" content="2006-11-10">
+</HEAD>
+
+<BODY>
+<IFRAME id="page_banner" src="../../page_banner.html" scrolling="no">banner</IFRAME>
+<H1 id="toptop">Copy-On-Write Handles</H1>
+
+<P>The <A class="code" href="../../class_summary.html#cow">classics::cow</A> class provides a reference-counted
+smart pointer having <i>Copy-On-Write</i> semantics.
+</P>
+
+<H2>Contents</H2>
+<UL class="TOC">
+	<LI><A href="#purpose">Purpose for Copy-On-Write Semantics</A></LI>
+	<LI><A href="#semantics">Detailed Semantics of C.O.W.</A></LI>
+	<LI class="nobul"><UL>
+		<LI><A href="#old_semantics">Old Semantics, prior to PB10</A>
+		<LI><A href="#current_semantics">Current Semantics</A>
+		</UL>
+	<LI><A href="#threading">Threading Issues</A>
+</UL>
+
+<H2>Related Documents</H2>
+
+<UL>
+	<LI><A HREF="../handle_guide.html">Handle Guide</A> (Parent document)
+</UL>
+<H2 id="purpose">Purpose for Copy-On-Write Semantics</H2>
+
+<P>A <code>cow</code> handle is intended to appear just like value-based semantics, except that unnecessary copies are
+avoided.</P>
+
+<P>Most commonly, this is seen with returning values from functions.  Returning from a function entails copying
+the prepared return value out to an area prepared by the caller (using the copy constructor), and then deleting the
+original as it goes out of scope.  If the object is large and expesive to copy, this is wasteful.  It would be much
+more efficient to just give the caller control over the object that is about to vanish, instead.  A direct way of doing
+this is with the <A class="code" href="../../class_summary.html#trug">trug</A> class.  A <code>cow</code> handle is a more
+general solution.</P>
+
+<DIV style="float:left; width:100%; padding-left:5%; padding-right:5%">
+<DIV class="left">
+<H4 class="caption">Listing 1</H4>
+<PRE class="code" lang="x-Cpp" title="Listing 1">
+C foo()
+ {
+ C retval;
+ <I>//blah bah blah</I>
+ return retval;
+ }
+
+<I>// Caller:</I>
+C result= retval;
+</PRE>
+</DIV>
+<P style="margin-top:0">Annotation shows to the right of the code.<span class="capref">(see Listing 1)</span></P>
+</DIV>
+
+<P>When used in this manner, their behavior is simple and it takes very little thought to implement something
+that does this, and little thought to understand its nuances.  However, cow handles in Classics can be used
+for more general issues, and in advanced or even tricky uses it becomes important to understand the nuances,
+and quite benificial to have a library that copes with such details in a useful way.</P>
+
+<H2 id="semantics">Detailed Semantics of C.O.W.</H2>
+
+<H3 id="old_semantics">Old Semantics, prior to <A HREF="../../worklog.html#PB8">PB10</A></H3>
+
+<P>Originally, the meaning of a copy-on-write was that every time such a handle was dereferenced
+(using <A class="code" href="../handle.html#operator_arrow">operator-></A> or
+<A class="code" href="../handle.html#make_unique">make_unique</A>), it would ensure that no other
+cow was sharing the same underlying object.  In PB9, improvements were made to make the meaning
+of <A class="code" href="../handle.html#data">data</A> consistent, and a race condition was fixed
+regarding overlapping execution of <code>make_unique</code> on the same cow on different threads.</P>
+
+
+<object data="thread-cow-1.svg" type="image/svg+xml" title="title" style="float:left; margin-right:1em; margin-left:1em; width:141px; height:222px">
+	<div style="float:left; margin-right:1em; margin-left:1em; width:141px; height:222px">
+	<B>SVG file is not displayed.</B>
+	Illustration of threading issue</div>
+</object>
+
+<P>However, further analysis showed that the issue was not unique to overlapping execution of calls to
+<code>make_unique</code>, but could still occur, without involving any thread-safety features of any
+one function!</P>
+
+<P>The drawing to the left illustrates the events taking place on three threads, all accessing the same
+global <code>cow1</code>.</P>
+
+<P>The first thread calls <code>cow1->foo()</code>.  Upon making the call to <code>operator-></code>,
+we know that <code>cow1</code> is now uniquely holding its underlying object.  The tail extending downwards
+from this point represents the time still inside the execution of <code>foo</code>.</P>
+
+<P>Where the tail turns <span style="color:#D00">red</span>,
+the program crashes, citing an access violation inside <code>foo</code>!
+What happened?  This would be enough to shake your faith in smart pointers, or at least wonder if global
+variables<A HREF="#footnote_global" class="footnoter" target="footer">1</A> are such a good idea.</P>
+
+<UL>
+<LI><P>When <code>foo</code> is called, the underlying object (which we'll call <code>Ob1</code>) is referenced only by
+<code>cow1</code>, and has an owned reference count of 1.  That's what <code>operator-></code> ensured
+before calling <code>foo</code>.</P>
+<LI><P>Later, in another thread, a variable <code>cow2</code> is initialized with <code>cow1</code>.  Now they
+share <code>Ob1</code>, which has an owned reference count of 2.</P>
+<LI><P>Then, <code>cow1</code> is dereferenced again.  Since it is sharing <code>Ob1</code>, it is updated in-place to
+point to a fresh clone of <code>Ob1</code>, which we'll call <code>Ob2</code>.  When <code>operator-></code> is
+done, <code>cow1</code> points to <code>Ob2</code> and <code>cow2</code> points to <code>Ob1</code>.  The
+this pointer of <code>foo</code> is pointing at <code>Ob1</code>, and whether or not <code>foo</code> cares that
+<code>cow1</code> has changed is another issue.</P>
+<LI><P>Finally, <code>cow2</code> goes out of scope, or gets assigned a different (unrelated) value.  Its underlying object,
+<code>Ob1</code>, has its reference count decremented from 1 to zero, triggering object destruction.</P>
+</UL>
+
+<P>The <code>this</code> pointer of <code>foo</code>, still in progress, now points to freed memory!</P>
+
+<P>This is something not easily prevented automatically by the compiler.  The issue involved resembles that of the
+<A class="code" href="../../class_summary.html#baro">baro</A> class, so an attempt to prevent this issue by
+means of compiler tricks like having a temporary intermediate object, would end up doing what a <code>baro</code>
+does, and would be a lot of complexity for such a rare possibility.  So, it is better handled at the conceptual level,
+to eliminate the problem.</P>
+
+<H3 id="current_semantics">Current Semantics</H3>
+
+<P>Instead of spitting off additional clones each time a <code>cow</code> is dereferenced, the object is only
+cloned the <i>first</i> time it is dereferenced.</P>
+
+<P>This is understood as the natural consequence of making a cow handle behave just like a simple value-based
+object, only avoiding copying when it doesn&rsquo;t need to.</P>
+
+<!--[if lt IE 7]>
+<P class="render_warning">Internet Explorer shows the cow-spot background with grey instead
+of matching the (white) background of the BODY element.  If you see grey, you might want to upgrade your browser.
+<![endif]-->
+
+<DIV id="cow_rules" style="background-image:url('cowspot.png')">
+<P><span style="background:white">The rules are:</span></P>
+<OL class="boxed">
+	<LI>When a <code>cow</code> is given a value (construction or assignment), it points to the same object as the
+	right-hand-side, and is put in a <I>pending</I> state.
+	<LI><P>In the <I>pending</I> state, when (and only if!) the cow is dereferenced with <code>operator-></code> or <code>data</code>,
+	it makes sure it is the sole owner of the underlying object.  Having done so, it enters a <I>performed</I>
+	state.</P>
+	<LI>In the <I>performed</I> state, the handle behaves exactly like a <code>classics::handle</code>, and
+	does not re-check to see if it is still unique.
+</OL>
+<P>&nbsp;</P>
+</DIV>
+
+<P>This will behave just like pure value semantics, except for one subtlety that will be explained later.</P>
+<DIV class="left">
+<H4 class="caption">Listing 2A</H4>
+<PRE class="code" lang="x-Cpp" title="Listing 2A">
+C original (1);
+C one= original;
+C two= one;
+
+original.set_x(2);
+int result= two.get_x();
+   <I>// still sees 1</I>
+</PRE></DIV>
+<DIV class="right">
+<H4 class="caption">Listing 2B</H4>
+<PRE class="code" lang="x-Cpp" title="Listing 2B">
+cow&lt;C> original (new C (1));
+cow&lt;C> one= original;
+cow&lt;C> two= one;
+
+original->set_x(2);
+int result= two->get_x();
+   <I>// still sees 1</I>
+</PRE></DIV>
+<P>Working strictly with values, as in the listing to the left, <span class="capref">Listing 2A,</span>
+it is obvious exactly <I>where</I> a copy is made, and if all the operations are
+on a single thread, it is equally clear <I>when</I> relative to other operations.  So it is obvious that <code>result</code>
+will obtain <code>1</code>, since that&rsquo;s what it was when <code>two</code> copied it from <code>one</code>,
+because that&rsquo;s what it was when <code>one</code> copied it from <code>original</code>.  Setting a new
+value in <code>original</code>, well after it was used to initialize <code>one</code>, is irrelevent.</P>
+
+<P>Working with cow handles, as on the right, <span class="capref">Listing 2B,</span>
+how does it work?  Presumably no copy is made for <code>one</code> because
+it ends up not being used<A HREF="#footnote_2" class="footnoter" target="footer">2</A>.
+But what about <code>two</code>?  The
+value does not get duplicated until <I>after</I> the original has changed.  Yet we still get the same result!</P>
+
+<P>After all three <code>cow</code> handles are created, all three are pointing to the same single <code>C</code> instance, and all three
+are in the <I>pending</I> state.  The handle <code>two</code> is not remembering that it came from <code>one</code>,
+but rather all three are peers, sharing in the ownership (owned reference count is 3) of a single instance of <code>C</code>.</P>
+
+<P>When a member function is called through <code>two</code> (via <code>operator-></code>), it makes a copy of
+the original object.  The original object drops its owned reference count to 2, and the <code>orignal</code> handle is
+the sole owner of the fresh clone.  It is this newly-created copy that is passed to <code>set_x</code>.  So, both
+<code>two</code> and <code>one</code> are unaffected.</P>
+
+<P>When <code>two->get_x()</code> is called, the same thing happens.  It makes a copy, another copy of the
+original object, and then calls <code>get_x()</code> on that.  So it still returns <code>1</code>, as expected.
+Even if we went out of our way to avoid making a copy to call a meer accessor, by writing <code>two->const_object()->get_x()</code>
+instead, it would still return <code>1</code> because the still-shared instance of <code>C</code> was never
+affected by the call to <code>set_x</code>.</P>
+
+<P>To summarize, <EM>a <code>cow</code> initialized (or assigned) from another that&rsquo;s still in the <I>pending</I>
+state is unaffected by subsequent commitment of the original.</EM>  It will work just like pure value copies, with the value being
+&ldquo;sensed&rdquo; at the time the assignment is made, not when it is actually performed due to delayed copying.</P>
+
+<P>Here is another example which illustrates the same concept.</P>
+
+<DIV class="left">
+<H4 class="caption">Listing 3A</H4>
+<PRE class="code" lang="x-Cpp" title="Listing 3A">
+C original (1);
+C one= original;
+original.set_x(2);
+C two= one;
+
+int result1= one.get_x();
+   <I>// still sees 1</I>
+int result2= two.get_x();
+   <I>// still sees 1</I>
+</PRE></DIV>
+<DIV class="right">
+<H4 class="caption">Listing 3B</H4>
+<PRE class="code" lang="x-Cpp" title="Listing 3B">
+cow&lt;C> original (new C(1));
+cow&lt;C> one= original;
+original->set_x(2);
+cow&lt;C> two= one;
+
+int result1= one->get_x();
+   <I>// still sees 1</I>
+int result2= two->get_x();
+   <I>// still sees 1</I>
+</PRE></DIV>
+<P>Again, the pure value-based code on the left <span class="capref">(Listing 3A)</span>
+is obvious.  The variable <code>one</code> is made before
+the <code>original</code> is changed, and the variable <code>two</code> is made after the <code>original</code>
+is changed.  But, changing <code>orignal</code> has no effect on <code>one</code>, so it doesn&rsquo;t mean
+anything when <code>two</code> is initialized.</P>
+
+<P>With the <code>cow</code> handles, the result is again the same.  When <code>set_x</code> is called,
+the two handles are separated.  The change to <code>original</code> does not affect the value in <code>one</code>.</P>
+
+<P style="clear:both">Now look at another example, where the right-hand-side is no longer in the <I>pending</I> state.</P>
+
+<DIV class="left">
+<H4 class="caption">Listing 4A</H4>
+<PRE class="code" lang="x-Cpp" title="Listing 4A">
+C original (1);
+original.set_x(2);
+C one= original;
+C two= original;
+orignal.set_x(3);
+int result1= one.get_x(); <I>// gets <B>2</B></I>
+original.set_x(4);
+int result2= two.get_x(); <I>// gets 4</I>
+result1= one.get_x();  <I>// still 2</I>
+</PRE></DIV>
+<DIV class="right">
+<H4 class="caption">Listing 4B</H4>
+<PRE class="code" lang="x-Cpp" title="Listing 4B">
+cow&lt;C> original (new C(1));
+original->set_x(2); <I>// no longer pending</I>
+cow&lt;C> one= original;
+cow&lt;C> two= original;
+orignal->set_x(3);
+int result1= one->get_x(); <I>// gets <B style="color:#D00">3</B></I>
+original->set_x(4);
+int result2= two->get_x(); <I>// gets 4</I>
+result1= one->get_x();  <I>// still 3</I>
+</PRE></DIV>
+
+<P>Now, the results are different using delayed copies then they were using pure value semantics.</P>
+
+<P><EM>If a <code>cow</code> is made from an original that is in the <I>performed</I> state, then additional changes
+made to the original are seen by the copy, as long as the copy is still <I>pending</I></EM>.  When the copy is
+<I>performed</I>, it clones the <U>current</U> value from the original.</P>
+
+<P style="clear:both">The semantics of <code>cow</code> handles are not exactly like the semantics of ordinary values.
+However, it is simple and understandable, and it is guaranteed not to cause deadlocks, and it will never destroy an
+object that&rsquo;s in the middle of a member function call, will never destroy an object that it&rsquo;s given out
+the raw pointer to, and is very efficient.</P>
+
+<!-- link up 'lock' after function reference is ready
+   Use a regular handle with it as a changing exemplar -->
+<P>There are situations where the subtlety of pending vs. performed states will simply not matter.  To guarantee
+scenareos work as you planned, you can <code>lock</code> a <code>cow</code> handle (see examples
+for the <code>lock</code> function).  Sometimes, this
+is exactly what you want and will be counting on it.  Understanding the state model then becomes essential.  If these
+operations are spread over multiple threads, then exactly when a copy is made, relative to operations being done on
+other threads, is flexible anyway.</P>
+
+<H2 id="threading">Threading Issues</H2>
+
+
+<H1 id="footnotes">Footnotes</H1>
+<P id="footnote_global" class="footnote">A cow as a global variable:</P>
+<P>Problems only occur when the same <code>cow</code> object is
+accessed on multiple threads.  Having multiple handles (of any flavor) to the same underlying object, and
+using a different handle on each thread, is never a problem.</P>
+<HR>
+
+<P id="footnote_2" class="footnote">No copy is made for <code>one</code>:</P>
+<P>Actually, just as many copies are made, and <code>one</code> ends up pointing to its own copy in the end!
+Indeed, no copy was made <I>for</I> <code>one</code>.  Rather, copies were made for everyone else, leaving
+<code>one</code> as the only remaining owner of the initially created instance.</P>
+
+<HR>
+<IFRAME id="page_footer" src="../../page_footer.html" scrolling="no">Copyright etc.</IFRAME>
+</BODY>
+</HTML>
+

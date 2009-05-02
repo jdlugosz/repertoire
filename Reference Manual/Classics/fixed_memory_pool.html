@@ -1,24 +1,30 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"  "http://www.w3.org/TR/html4/loose.dtd">
-<HTML>
+<HTML lang="en-US">
 <HEAD>
 <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=windows-1252">
 <TITLE>Fixed Memory Pool complete documentation</TITLE>
 <META http-equiv="Content-Script-Type" content="text/javascript">
 <SCRIPT type= "text/javascript" src="../helpers.js"></SCRIPT>
 <LINK REL="STYLESHEET" HREF="../info.css" TYPE="text/css">
+<LINK REL="Start" HREF="http://www.dlugosz.com/Repertoire/refman/mainframe.html">
+<LINK REL="Contents" HREF="../reper_index.html">
+<LINK REL="Index" HREF="../class_summary.html">
+<LINK REL="Chapter" HREF="class_index.html">
+<LINK REL="Help" HREF="../accessibility_statement.html">
+<LINK REL="Copyright" HREF="../policy.html">
+
 <SCRIPT type="text/javascript">
    checkframe ("Classics/class_index.html");
 </SCRIPT>
-<META name="date" content="2006-06-13">
+<META name="date" content="2006-11-10">
 </HEAD>
 
 <BODY>
 <IFRAME id="page_banner" src="../page_banner.html" scrolling="no"></IFRAME>
 
-
-<H1 id="toptop">Fixed Memory Pool</H1>
+<H1 id="toptop" >Fixed Memory Pool</H1>
 <P>Contains the following:</P>
-<UL><LI>template class <code>general_static_fixed_memory_pool</code>
+<UL class="nobul"><LI>template class <code>general_static_fixed_memory_pool</code>
 	<LI>class <code>static_fixed_memory_pool</code>
 	<LI>class <code>ts_static_fixed_memory_pool</code>
 	<LI>template class <code>pool_mixin</code>
@@ -31,17 +37,18 @@ is ideal for implementing a class-specific <CODE>operator new</CODE> and
 <CODE>operator delete</CODE>.</P>
 
 <!-- CONTENTS -->
+<A accesskey="3"></A>
 	<UL>
-		<LI><A HREF="#General">General</A>
+		<LI><A HREF="#General" accesskey="2">General</A>
 		<LI><A HREF="#threads">Thread Safety</A>
 		<LI><A HREF="#ordering">No Order Dependancies</A>
 		<LI><A HREF="#class-specific">Using as a class-specific memory manager</A>
-		<UL>
+		<UL class="nobul">
 			<LI>Implement <code>operator new</code> and <code>operator delete</code>
 			<LI>A canned Solution
 		</UL>
 		<LI><A HREF="#testing">Testing and Debugging</A>
-		<UL>
+		<UL class="nobul">
 			<LI>Callback Hook
 			<LI>“Internal” Data
 			<LI>Heap Checking
@@ -50,7 +57,7 @@ is ideal for implementing a class-specific <CODE>operator new</CODE> and
 	</UL>
 <!-- END CONTENTS -->
 
-<H2 id="General">General</H2>
+<H2 id="General" >General</H2>
 
     <P>These classes are specially designed for use as class-specific memory
       managers, especially for primitive types used deep inside the system (such
@@ -66,6 +73,8 @@ is ideal for implementing a class-specific <CODE>operator new</CODE> and
       objects at image load time</B>. That is why it’s named <CODE><B>static</B>_fixed_memory_pool</CODE>,
       to emphasize that it’s designed for use as a static member.</P>
 
+    <P class="prognote">This affects the destructor too.  Make a section explaining this in detail.</P>
+
     <P>In addition, the class provides some minimal support for auditing and
       debugging memory leaks, without adding significantly to the overhead or
       requiring a special debug version.</P>
@@ -75,13 +84,13 @@ is ideal for implementing a class-specific <CODE>operator new</CODE> and
       declared as a static variable or static member, or explicitly filled with
       zeros, in order to work properly.</P>
 
-    <P>To allocate memory, call <B><CODE>void* alloc(int size)</CODE></B>.
+    <P>To allocate memory, call <B><CODE>void* <DFN>alloc</DFN>(int size)</CODE></B>.
       The <CODE>size</CODE> must use the same size on every call
       to this object.</P>
 
-    <P>To free memory, call <B><CODE>void free(void*)</CODE></B>.</P>
+    <P>To free memory, call <B><CODE>void <DFN>free</DFN>(void*)</CODE></B>.</P>
 
-    <P>In addition, there is a <B><CODE>void clean()</CODE></B> function that
+    <P>In addition, there is a <B><CODE>void <DFN>clean</DFN>()</CODE></B> function that
       tries to release unneeded memory back to the system. The ability to
       support this kind of incremental cleaning is fundamental to the design. To
       understand the need, consider an example: you have a peak load of a
@@ -94,18 +103,18 @@ is ideal for implementing a class-specific <CODE>operator new</CODE> and
 
 <H2 id="threads">Thread Safety</H2>
 
-<P>The <CODE>static_fixed_memory_pool</CODE> class is not thread-safe (it
+<P>The <CODE><DFN>static_fixed_memory_pool</DFN></CODE> class is not thread-safe (it
 has <A HREF="../threadcat.html">I-OTT</A> semantics), because a class
 that is itself OTT or higher may draw upon it, and thread safety is
 unnecessary in this situation. The purpose of this class is to be fast,
 and the presence of a critical section slows it down enormously because
 it’s so simple to begin with.</P>
 
-<P>The <CODE>ts_static_fixed_memory_pool</CODE> is a thread-safe version.
+<P>The <CODE><DFN>ts_static_fixed_memory_pool</DFN></CODE> is a thread-safe version.
 Use this to allow safe free-threaded access to the heap.</P>
 
-<P>These are both derived from the <code>general_static_fixed_memory_pool</code>, which
-can have thread-safety turned on and off on the fly during run-time by assigning to the <code>single_thread_only</code>
+<P id="single_thread_only">These are both derived from the <code><dfn>general_static_fixed_memory_pool</dfn></code>, which
+can have thread-safety turned on and off on the fly during run-time by assigning to the <code><dfn>single_thread_only</dfn></code>
 member.</P>
 
 <P>Using the <code>general_static_fixed_memory_pool</code> is thread-safe by default.
@@ -151,13 +160,14 @@ has already been destroyed?  This is also supported.  It will fill the request g
 to implement a class’s <CODE>operator new</CODE> and
 <CODE>operator delete</CODE> is rather simple:</P>
 
-<PRE class="code">
+<H4 class="caption">Listing 1</H4>
+<PRE class="code" lang="x-Cpp">
 class C {
 public:
    static ts_static_fixed_memory_pool <B>pool</B>;
    static void* <B>operator new</B> (size_t size) { return pool.alloc (size); }
    static void <B>operator delete</B> (void* p)  { pool.free(p); }
-   //...etc.
+   <I>//&hellip;etc.</I>
    };
 
  <I>// in one CPP file:</I>
@@ -186,12 +196,12 @@ with the wrong size.  Define <CODE>operator new</CODE> and
 <CODE>operator delete</CODE> in the derived class as well, to use
 a different pool or to go back to the regular heap.</P>
 
-<H3 id="canned">A canned Solution</H3>
+<H3 id="canned">A Canned Solution (deprecated)</H3>
 
 <P>It would seem that adding three members to a class, especially when
 exactly the same text is used every time, is something that can be
 provided as a unit. There are actually some technical difficultites in
-doing this, but a mix-in class <CODE>pool_mixin</CODE> (and <CODE>ts_pool_mixin</CODE>
+doing this, but a mix-in class <CODE><dfn>pool_mixin</dfn></CODE> (and <CODE><dfn>ts_pool_mixin</dfn></CODE>
 for the thread-safe version) is provided for this purpose.</P>
 
 <P>Ideally, the class simply contains the same three members discussed
@@ -204,16 +214,18 @@ member. Instead, each class needs its own <CODE>fixed_memory_pool</CODE>,
 which means it must declare its own static data member. To get around
 this, each class can mix-in a <I>different</I> base class. This is easily
 done with a template. This example usage can be found in
-<code>memory_pool_benchmark.cxx</code>:</P>
+<code>memory_pool_benchmark.cxx</code><span class="capref"> (Listing 2)</span>:</P>
 
-<PRE class="code">
+<DIV class="left">
+<H4 class="caption">Listing 2</H4>
+<PRE class="code" lang="x-Cpp">
 class C2 : public <B>classics::pool_mixin</B>&lt;C2&gt; {
    const void* addr;
    int value;
 public:
    C2 (int x) : addr(this), value(x) {}
    };
-</PRE>
+</PRE></DIV>
 
 <P>The template argument given to <code>pool_mixin</code> doesn’t do anything.  It’s just there
 to allow the use of a template to generate as many unique base classes as may be needed.  Each
@@ -244,6 +256,10 @@ The bottom line:  Use this mix-in in a code that will go into the EXE only; that
 Think carefully before using it when writing a DLL.  Since the use of the mix-in only saves four simple lines
 of code, it’s not worth coming up with a better and more complex solution.</P>
 
+<P class="boxed">Because of this problem, these classes are removed as of <ABBR class="subtle" title="Public Build 10">PB10</ABBR>.
+To access this class anyway, define the preprocessor symbol <code>POOL_MIXIN</code> before any <code>#include</code>
+directives.</P>
+
 <H2 id="testing">Testing and Debugging</H2>
 
     <P>We all know that sometimes using the &ldquo;debug version&rdquo; makes the
@@ -253,7 +269,7 @@ of code, it’s not worth coming up with a better and more complex solution.</P>
 <H3>Callback Hook</H3>
 
     <P>In order to test this class, a debugging hook is provided. The member
-      <B><CODE>callback</CODE></B> points to a function which will be called at
+      <B><CODE><dfn>callback</dfn></CODE></B> points to a function which will be called at
       various strategic points in the class’s execution. This provides a way to
       monitor the class’s behavior, without causing a significant amount of
       additional overhead when the hook is not needed.</P>
@@ -263,7 +279,8 @@ of code, it’s not worth coming up with a better and more complex solution.</P>
       callback;</CODE><BR>
       if un-commented, will enable callbacks to this function:</P>
 
-<PRE class="code">
+<H4 class="caption">Listing 3</H4>
+<PRE class="code" lang="x-Cpp">
 void callback (int mode, void* p)
  {
  static bool internal= false;
@@ -301,23 +318,23 @@ the <code>callback</code> must be cleared (set the pointer to 0) before returnin
 <P>The following member data and functions are available for testing, debugging, trouble-shooting, and performance
 monitoring.  They are not part of the “normal” interface, and should only be used for these auxilary purposes.</P>
 
-<DL>
-<DT>use_count
+<DL class="members">
+<DT class="code">get_use_count()
 <DD><P>This shows how many objects have been returned by <code>alloc</code> but not yet <code>free</code>'d.</P>
-<DT>callback
+<DT><code>callback</code>
 <DD><P>Set this to your callback function, explained above.</P>
-<DT>wait_count
+<DT class="code">wait_count
 <DD><P>Indicates how many times a function has needed to wait for another thread before it could proceed.  For
 unit testing, seeing a non-zero value proves that you did in fact have threads get in each other’s way during testing.</P>
-<DT>get_nodelist()
+<DT class="code">get_nodelist()
 <DD><P>This exposes (read-only) the internal <code>nodelist</code> member.  Note that the type it returns is
 not defined in the header.</P>
-<DT>get_Recsize()
+<DT class="code">get_Recsize()
 <DD><P>This returns the size of the objects allocated by this pool.  It is set when the first <code>alloc</code> is made.</P>
-<DT>get_chunklist()
+<DT class="code">get_chunklist()
 <DD><P>This exposes (read-only) the internal <code>chunklist</code> member.  Note that the type it returns is
 not defined in the header.</P>
-<DT>check_address()
+<DT class="code">check_address()
 <DD><P>This returns true if the argument is a pointer to a record that is part of this pool.  It reports that the pointer
 <I>could</I> be something that was returned by <code>alloc</code> (though it might currently be on the free list).  On a valid
 pointer, this will reliably distinguish whether it was allocated on this pool as opposed to allocated by some other means.</P>
@@ -325,34 +342,34 @@ pointer, this will reliably distinguish whether it was allocated on this pool as
 
 <H3>Heap Checking</H3>
 
-<P>There are functions for validating the integrety of the pool, for debugging.  A call to check_heap will tell you that
+<P>There are functions for validating the integrety of the pool, for debugging.  A call to <code><dfn>check_heap</dfn></code> will tell you that
 something was freed twice, a freed object was written to (the first four bytes anyway), or other stray pointer problems.
 It is intended as a debugging aid, not a perminant part of a program.</P>
 
 <P>There are two implementations:  The normal way, and a fast way that can be useful if a program contains
-a very large number of checks.  The normal/FAST_HEAP_CHECK behavior can be enabled on a per-instance basis, using the template
+a very large number of checks.  The normal/<code>FAST_HEAP_CHECK</code> behavior can be enabled on a per-instance basis, using the template
 argument to <code>general_static_fixed_memory_pool</code>.</P>
 
-<P>These functions are also thread-safe, but unlike simultainious calls to <code>alloc</code> and <code>free</code>,
+<P>These functions are also thread-safe (when <A href="#single_thread_only" class="code">single_thread_only</A> is not set), but unlike simultainious calls to <code>alloc</code> and <code>free</code>,
 these may cause other threads to be locked out of using this pool for a more substantial period of time.
 </P>
 
-<DL>
-<DT>check_heap()
+<DL class="members">
+<DT class="code">check_heap()
 <DD>
 <P>This examines the freelist and reports <code>false</code> if any problems were found.  The normal form will
-traverse the freelist and call check_address on each node, and also make sure the linked list doesn’t point
+traverse the freelist and call <code>check_address</code> on each node, and also make sure the linked list doesn’t point
 back to itself forming a closed loop.</P>
-<P>The <I>FAST_HEAP_CHECK</I> form does not have to call <code>check_address()</code> on every free node, but simply
+<P>The <code>FAST_HEAP_CHECK</code> form does not have to call <code>check_address()</code> on every free node, but simply
 makes a checksum of all the nodes present.  If enabled, each <code>alloc</code> or <code>free</code> incrementally
 adjusts the expected checksum, so those operations are slightly more expensive.</P>
 
 </DD>
-<DT>check_heap_p()
+<DT class="code">check_heap_p()
 <DD><P>This is similar to <code>check_heap()</code>, but returns the address of the bad node rather than
 just false.  It returns <code>0</code> if nothing wrong was found.  In addition, it returns the special values <code>1</code>
 if the freelist is empty, or <code>2</code> if an infinite loop is detected.</P>
-<P>This form is unaffected by the FAST_HEAP_CHECK option.  By its nature, it has to do a full check.  When using
+<P>This form is unaffected by the <code>FAST_HEAP_CHECK</code> option.  By its nature, it has to do a full check.  When using
 the fast <code>check_heap()</code>, you can follow it up with <code>check_heap_p()</code> if an error is detected.
 Or, you can do fast checks more often and a full check every once in a while.</P>
 </DL>
@@ -365,10 +382,13 @@ Or, you can do fast checks more often and a full check every once in a while.</P
 you’ll find out that the fixed memory pool is <I>much</I> faster than the standard new/delete code.  On my
 machine when originally developed (in 1998 I think), I get:</P>
 
-<TABLE BORDER>
+<TABLE class="t1">
 <CAPTION>Original Benchmark Results</CAPTION>
 <TR>
-	<TH>version<TH>time<TH>adj. time<TH>relative speed
+	<TH scope="col">version
+	<TH scope="col">time
+	<TH scope="col"><abbr title="adjusted" class="subtle">adj.</abbr> time
+	<TH scope="col">relative speed
 <TR>
 	<TD>stub (no allocation)
 	<TD>40
@@ -408,10 +428,13 @@ compilers, and/or improvements to the implementation of the Win32 functions <cod
 in Windows XP compared to older versions of Windows, the compiler-supplied allocation is
 more efficient than it used to be.</P>
 
-<TABLE BORDER>
+<TABLE class="t1">
 <CAPTION>October 2004 Benchmark Results</CAPTION>
 <TR>
-	<TH>version<TH>time<TH>adj. time<TH>relative speed
+	<TH scope="col">version
+	<TH scope="col">time
+	<TH scope="col"><abbr title="adjusted" class="subtle">adj.</abbr> time
+	<TH scope="col">relative speed
 <TR>
 	<TD>stub (no allocation)
 	<TD>??
@@ -451,10 +474,13 @@ per alloc or free.</P>
 <P>If it is set for single-threaded usage, it does not use any atomic operation.  You can switch the need
 for thread safety on and off during the program, individually for each pool.</P>
 
-<TABLE BORDER>
+<TABLE class="t1">
 <CAPTION>June 2006 Benchmark Results</CAPTION>
 <TR>
-	<TH>version<TH>time<TH>adj. time<TH>relative speed
+	<TH scope="col">version
+	<TH scope="col">time
+	<TH scope="col"><abbr title="adjusted" class="subtle">adj.</abbr> time
+	<TH scope="col">relative speed
 <TR>
 	<TD>stub (no allocation)
 	<TD>??
@@ -477,6 +503,6 @@ for thread safety on and off during the program, individually for each pool.</P>
 </TABLE>
 
 <HR>
-<IFRAME id="page_footer" src="../page_footer.html"></IFRAME>
+<IFRAME id="page_footer" src="../page_footer.html" scrolling="no"></IFRAME>
 </BODY>
 </HTML>

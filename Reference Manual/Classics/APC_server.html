@@ -1,40 +1,50 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"  "http://www.w3.org/TR/html4/loose.dtd">
 <HTML>
 <HEAD>
 <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=windows-1252">
-<TITLE>APC_server complete documentation</TITLE>
+<META NAME="description"
+ CONTENT="User's Guide for the APC_server class, part of John Dlugosz's Repertoire Project.">
+<META NAME="keywords"
+ CONTENT="Repertoire documentation user's guide APC_server Classics">
+<TITLE>APC_server Complete Documentation</TITLE>
 <LINK REL=STYLESHEET HREF="../info.css" TYPE="text/css">
+<LINK REL="STYLESHEET" HREF="../info.css" TYPE="text/css">
+<META name="date" content="2006-07-26">
 </HEAD>
 
 <BODY>
-<H1>APC_server</H1>
+<IFRAME id="page_banner" src="../page_banner.html" scrolling="no"></IFRAME>
+<H1 id="toptop">APC_server</H1>
 
-It's fairly easy to start a thread, especially if you simplify the CreateThread function or
-encapsulate even more with the thread_launcher.  But what do you do with a thread once it's
+<P>It’s fairly easy to start a thread, especially if you simplify the <code>CreateThread</code> function or
+encapsulate even more with the <A HREF="launch_thread.html#toptop" class="code">launch_thread</A> class.  But what do you do with a thread once it’s
 started?  If you want to send it commands, you have a generic server situation.  This class
 does all the work to make a simple server.</P>
 
 <UL>
-<LI>You create a server thread by declaring an APC_server.  The actual thread is created
+<LI>You create a server thread by declaring an <code>APC_server</code>.  The actual thread is created
     by the constructor.
 <LI>You tell the server to do things by giving it a command object via its <code>send</code> member.
 <LI>You shut down the server by calling <code>quit</code> (which will return immediatly), or simply
-   by destructing the APC_server object (the destructor blocks until the server thread completes shutdown).
+   by destructing the <code>APC_server</code> object (the destructor blocks until the server thread completes shutdown).
 </UL>
 
 <H2>Server Commands</H2>
 
-Dynamically allocate (i.e. use <code>new</code>) an object derived from <A HREF="abstract_command_object.html">abstract_command_object</A>.
-Pass this pointer to the <code>send</code> function.  The command object is queued and it's virtual operator() will
+<P>Dynamically allocate (i.e. use <code>new</code>) an object derived from <A HREF="abstract_command_object.html#toptop" class="code">abstract_command_object</A>.
+Pass this pointer to the <code>send</code> function.  The command object is queued and its virtual <code>operator()</code> will
 be called eventually.  Then the server deletes the command object.</P>
 
 <P>The command queue is inherantly asynchronous.  If you want to get results back or wait for the command
 to complete, you have to provide for that as part of the command object.</P>
 
-<P>Since the command object is deleted by the server, you can't have it hold result data.  Instead,
-include a pointer to the result area in the command object.  You can also include an <A HREF="event_flag.html">event_flag</A>
+<P>Since the command object is deleted by the server, you can’t have it hold result data.  Instead,
+include a pointer to the result area in the command object.  You can also include an <A HREF="event_flag.html#toptop" class="code">event_flag</A>
 in the command object in order to wait for completion.</P>
 
 
+<HR>
+<IFRAME id="page_footer" src="../page_footer.html"></IFRAME>
 </BODY>
 </HTML>
 

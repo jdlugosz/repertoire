@@ -1,0 +1,75 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"  "http://www.w3.org/TR/html4/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=windows-1252">
+<TITLE>eagduru User’s Guide</TITLE>
+<META http-equiv="Content-Script-Type" content="text/javascript">
+<SCRIPT type= "text/javascript" src="../helpers.js"></SCRIPT>
+<LINK REL=STYLESHEET HREF="../info.css" TYPE="text/css">
+<LINK REL="Start" HREF="http://www.dlugosz.com/Repertoire/refman/mainframe.html">
+<LINK REL="Contents" HREF="../reper_index.html">
+<LINK REL="Index" HREF="../class_summary.html">
+<LINK REL="Chapter" HREF="class_index.html">
+<LINK REL="Help" HREF="../accessibility_statement.html">
+<LINK REL="Copyright" HREF="../policy.html">
+<LINK REL=STYLESHEET HREF="../info.css" TYPE="text/css">
+<SCRIPT type="text/javascript">
+   checkframe ("Tomahawk/eagduru_index.html");
+</SCRIPT>
+
+<META name="date" content="2007-02-17">
+</HEAD>
+
+<BODY>
+<IFRAME id="page_banner" src="../page_banner.html" scrolling="no"></IFRAME>
+
+<H1 id="toptop">eagduru User’s Guide</H1>
+
+<H2>Related Documents</H2>
+<UL>
+	<LI><A HREF="message_tap_index.html" TARGET="index"><code>message_tap</code> index</A>
+</UL>
+
+<H2>Contents</H2>
+<UL>
+	<LI><A HREF="#overview">Overview</A>
+	<LI><A HREF="#threading">Threading Issues</A>
+	<LI><A HREF="#housekeeping">Housekeeping Issues</A>
+	<LI><A HREF="#howtouse"><B>How to Use</B></A>
+</UL>
+
+<H2 id="overview">Overview</H2>
+
+<H3> Etymology</H3>
+<P>The Old English words for <I>window</I> were <I>eagþyrl</I>, which literally means "eye-hole," and <I>eagduru</I>, "eye-door."
+The former has a better meaning for windows that are used to view through, as opposed to those that
+let air in.  But, I didn't want to worry about having to type the "þ" (thorn) character, which is no longer in the English alphabet
+and not in ASCII.</P>
+
+<H2 id="threading">Threading Issues</H2>
+
+<H2 id="housekeeping">Housekeeping Issues</H2>
+<P><IMG src="../images/oneway-sign-50U.png" ALIGN="right" ALT="One Way road sign" TITLE="This icon indicates that you must create objects in the proscribed manner">
+All instances of concrete types derived from <code>message_tap</code>, which is a base class of <code>eagduru</code>, <em>must use
+<code>new</code> to create instances</em>.  The code within the class uses smart pointers
+and will <code>delete</code> this object when the reference count drops to zero.  So, you must
+not create an instance on the stack or in static data.</P>
+<P>Instances cannot be assigned or copied.</P>
+<P>Instances use smart pointers to control their lifetime.  As you would expect, the object is destroyed when the
+last smart pointer holding it is dropped.  However, the Windows primitive <code>HWND</code> window also participates in the ownership
+of this object.  Effectively (though the actual implementation is more circuitous), the window contains a smart pointer to
+this object.  The interesting ramifications of this are:</P>
+<UL>
+	<LI>You don’t have to keep a pointer to the object if you don’t otherwise need one.
+	<LI>Even if you don’t have any pointers to the object, it will not be destroyed until the
+		window is closed.
+</UL>
+
+<H2 id="howtouse">How to Use</H2>
+<H3>Derive Your Class</H3>
+
+<IFRAME id="page_footer" src="../page_footer.html"></IFRAME>
+</BODY>
+
+</HTML>
+

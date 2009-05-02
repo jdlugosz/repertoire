@@ -1,36 +1,47 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"  "http://www.w3.org/TR/html4/loose.dtd">
-<HTML>
+<HTML lang="en-US">
 <HEAD>
 <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=windows-1252">
 <LINK REL=STYLESHEET HREF="info.css" TYPE="text/css">
+<LINK REL="Bookmark" HREF= "IEproblems.html" Title= "Internet Explorer Browser Problems">
 <TITLE></TITLE>
 <SCRIPT type="text/javascript">
    function give_context ()
     {
     var parentURL= parent.location.href;
-    // >> strip query and add ?NOFRAMES
-    var pos= parentURL.indexOf ('?');
-    
-    if (is_home_url())
-       document.links.vallink.href += '/check?uri=' + parentURL;
-       
+    // >> strip query,fragment and add ?NOFRAMES
+    parentURL= parentURL.replace (/\?.*$/,"");
+    parentURL= parentURL.replace (/#.*$/,"");
+    var span= document.getElementById("loc");
+    span.textContent= parentURL;
+
+    if (location.hostname == "www.dlugosz.com")
+		document.getElementById('vallink').href += '/check?uri=' + parentURL + "?NOFRAMES";
+
     }
 </SCRIPT>
+<META name="date" content="2006-11-10">
 </HEAD>
 
 <BODY onload="give_context()">
 <!-- Stock footer-->
     <p>
-      <a id="vallink" href="http://validator.w3.org">
-          <img STYLE="border-style:none; padding-right:10px" 
+      <a id="vallink" href="http://validator.w3.org" target="validwin">
+          <img STYLE="border-style:none; padding-right:10px"
           src="http://www.w3.org/Icons/valid-html401"
           alt="Valid HTML 4.01!" height="31" width="88"
           align="left"></a>
     </p>
-<P STYLE="font-size:xx-small">Page content copyright 2004 by John M. Dlugosz.
-Home:<A HREF="http://www.dlugosz.com">http://www.dlugosz.com</A>,
-email:<A HREF="mailto:john&#64;dlugosz.com">mailto:john&#64;dlugosz.com</A>
+<P STYLE="font-size:xx-small">Page content copyright <span class="docdate_year">2006</span> by John M. Dlugosz.
+Home: <A HREF="http://www.dlugosz.com">http://www.dlugosz.com</A>,&nbsp;
+email: <A HREF="mailto:john&#64;dlugosz.com">mailto:john&#64;dlugosz.com</A><BR>
+<span id="loc">Javascript is not available.</span><BR>
+<a href="accessibility_statement.html" title="accessibility features of this site" accesskey="0" target="_parent">Accessibility statement</a>
 </P>
+<!--[if IE]>
+<P class="render_warning">Internet Explorer gets <A HREF="IEproblems.html" target="_parent">a lot of rendering wrong</A>.  This site does not coddle to support
+such behavior.  You might consider upgrading your browser to one that undergoes unit testing against standards.
+<![endif]-->
 <!-- End footer-->
 </BODY>
 </HTML>

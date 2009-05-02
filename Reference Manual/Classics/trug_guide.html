@@ -9,6 +9,7 @@
 <SCRIPT type="text/javascript">
    checkframe ("Classics/trug_index.html");
 </SCRIPT>
+<META name="date" content="2006-08-08">
 </HEAD>
 
 <BODY>
@@ -31,7 +32,7 @@ and the actual template named trug has a few supplied specializations.</P>
 <P>A trug of a pointer type, e.g. <code>trug&lt;int&></code>, provides strict ownership semantics
 and automatic destruction for pointers, similarly to the standard <code>std::auto_ptr</code> class.</P>
 
-<P>A trug of a Windows <code>HANDLE</code> type provides strict ownership and automatic destruction in an analogous way 
+<P>A trug of a Windows <code>HANDLE</code> type provides strict ownership and automatic destruction in an analogous way
 to the pointers.  For example, <code>trug&lt;HKEY></code> knows to call the Win32 API function <code>RegCloseKey</code>
 when &ldquo;freed&rdquo;.</P>
 
@@ -44,7 +45,7 @@ when &ldquo;freed&rdquo;.</P>
 		<LI><A HREF="#what-pointers">Using Pointers</A>
 		<LI><A HREF="#what-HANDLEs">Using HANDLEs</A>
 	</UL>
-	
+
 	<LI><A HREF="#hypothetical">the <code>hypothetical_trug</code> class</A>
 	<LI><A HREF="#trug_for_pointers">specialized <code>trug</code> for pointers</A>
 	<LI><A HREF="#trug_for_HANDLEs">specialized <code>trug</code> for Windows HANDLEs</A>
@@ -81,7 +82,7 @@ handy often-used container lives up to its namesake.</P>
 <H2 id="what">What Do I Do With It?</H2>
 
 <UL>
-	<LI>Pass and return pointers or HANDLEs without losing track of who’s responsibility it is to delete it.
+	<LI>Pass and return pointers or HANDLEs without losing track of whose responsibility it is to delete it.
 	<LI>Make local variables of these types safe for exceptions.
 	<LI>Add destructor semantics to pointers or HANDLEs, for ease in making them members of a class.
 	<LI>Have pointers that need to be deleted in an unusual way automatically do so.
@@ -91,7 +92,7 @@ handy often-used container lives up to its namesake.</P>
 <H3 id="what-pointers">Using Pointers</H3>
 
 <P>Consider the following examples.  The trug is being used to hold a primitive pointer, and you can see
-it gives the same benifits as the <code>std::auto_ptr</code>.</P>
+it gives the same benefits as the <code>std::auto_ptr</code>.</P>
 
 <PRE class="code" style="float:left; margin-right:2em">
 typedef array_trug&lt;int*> atp;
@@ -163,7 +164,9 @@ function to know; it is certainly not known to the compiler.</P>
 
 <P>On the other hand, calling <code>f3 (p1.eject())</code> is legal, because you are
 being explicit about what the ownership semantics are.  You are saying that <code>p1</code> is to
-give up ownership (which also sets <code>p1</code> to null) when it passes the raw pointer to <code>f3</code>.
+give up ownership (which also sets <code>p1</code> to null) when it passes the raw pointer to <code>f3</code>.</P>
+<P class="prognote">Make it null-out p1 only if p1 doesn't throw an exception!</P>
+
 
 <P>Alternativly, calling <code>f3 (p1.get_r())</code> indicates that p1 will <I>not</I> give up
 ownership.  So, you can’t simply use a trug where a raw pointer is expected, but you can use
@@ -216,13 +219,14 @@ pointer it was holding.  Note that when initializing, you must use the initializ
 the = syntax because the constructor is <code>explicit</code>.</P>
 
 <PRE class="code" style="float:right; margin-left:1.5em">
+</PRE>
 
 <P>The reason the constructor is declared <code>explicit</code> is to prevent the mistake
 illustrated in the listing to the right.
 
 <H3 id="what-HANDLEs">Using HANDLEs</H3>
 
-<P>The trug isn’t only for pointers.  
+<P>The trug isn’t only for pointers.
 
 <H2 id="hypothetical" style="clear:left">the <code>hypothetical_trug</code> class</H2>
 

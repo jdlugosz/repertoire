@@ -8,7 +8,7 @@ H2 {
    font-family: Verdana, Tahoma, sans-serif;
    }
 
-P { white-space=nowrap }
+P { white-space: nowrap }
 
 SMALL {
 	font-size: .5em;
@@ -38,5 +38,10 @@ A:hover[TARGET=info]{
 A:hover[TARGET=index]{
 	background-color: green;
 	color: #fff;
+	}
+
+TT {
+	font-family: "Lucida Typewriter", "Lucida Console", monospace;
+	font-weight: bold;
 	}
 

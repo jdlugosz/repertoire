@@ -6,9 +6,17 @@
 <META http-equiv="Content-Script-Type" content="text/javascript">
 <SCRIPT type= "text/javascript" src="../helpers.js"></SCRIPT>
 <LINK REL=STYLESHEET HREF="../info.css" TYPE="text/css">
+<LINK REL="Start" HREF="http://www.dlugosz.com/Repertoire/refman/mainframe.html">
+<LINK REL="Contents" HREF="../reper_index.html">
+<LINK REL="Index" HREF="../class_summary.html">
+<LINK REL="Chapter" HREF="class_index.html">
+<LINK REL="Help" HREF="../accessibility_statement.html">
+<LINK REL="Copyright" HREF="../policy.html">
 <SCRIPT type="text/javascript">
    checkframe ("Tomahawk/message_tap_index.html");
 </SCRIPT>
+
+<META name="date" content="2007-02-23">
 </HEAD>
 
 <BODY>
@@ -18,17 +26,17 @@
 
 
 <H1 id="overview" >message_tap</H1>
-<P>Base class: <A HREF="../class_summary.html#can_handle" style="code">can_handle</A></P>
+<P>Base class: <A HREF="../class_summary.html#can_handle" class="code">can_handle</A></P>
 <P>This class provides a WinProc that adds a <I>this</I> pointer and calls a virtual function on
-an object.  It provides the mechanisms for subclassing an <code>HWND</code>.</P>  
+an object.  It provides the mechanisms for subclassing an <code>HWND</code>.</P>
 
 <P>
-See the <A HREF="message_tap_guide.html#toptop">User's Guide</A>
+See the <A HREF="message_tap_guide.html#toptop">User’s Guide</A>
 for more discussion.</P>
 
 
 
-<HR SIZE=10 class="sep1">
+<HR class="sep1">
 
 <H2 id="constructor"><SPAN class="signame">message_tap</span>()</H2>
 <A HREF="message_tap_index.html" TARGET="index" class="memof">message_tap</A>
@@ -36,259 +44,268 @@ for more discussion.</P>
 <P>The constructor is unsurprising.</P>
 
 
-<HR SIZE=10 class="sep1">
+<HR  class="sep1">
 
 <H2 id="destructor"><SPAN class="signame">~message_tap</span>()</H2>
 <A HREF="message_tap_index.html" TARGET="index" class="memof">message_tap</A>
-<P class="mematt">destructor, public</P>
-<P>The destructor will <A HREF="#unhook" class="code">unhook</A> the class, to ensure that subsequent 
-messages don’t get sent to a nonexistant object.  The WinProc itself is a thunk that’s a member of this class, 
-so the WinProc function pointer becomes invalid!  Normally, the window owns this object so it won’t be 
-destructed until after the window is destroyed, but usage can vary and the situation could be complex, 
+<P class="mematt">destructor, virtual, public</P>
+<P>The destructor will <A HREF="#unhook" class="code">unhook</A> the class, to ensure that subsequent
+messages don’t get sent to a nonexistant object.  The WinProc itself is a thunk that’s a member of this class,
+so the WinProc function pointer becomes invalid!  Normally, the window owns this object so it won’t be
+destructed until after the window is destroyed, but usage can vary and the situation could be complex,
 so this is there just to be safe.</P>
 
 
-<HR SIZE=10 class="sep1">
+<HR  class="sep1">
 
-<H2 id="call_old_wndproc">long <SPAN class="signame">call_old_wndproc</span> 
+<H2 id="call_old_wndproc">long <SPAN class="signame">call_old_wndproc</span>
 	(<A HREF="../class_summary.html#sMSG">sMSG</A>&amp; msg)</H2>
 <A HREF="message_tap_index.html" TARGET="index" class="memof">message_tap</A>
 <P class="mematt">public</P>
-<P>This calls the WndProc that the window had before it was subclassed by 
+<P>This calls the WndProc that the window had before it was subclassed by
 a call to <A HREF="#hook" class="code">hook</A>, or calls <code>DefWndProc</code> if there wasn’t
 one.</P>
-<P><strong>This will be updated later!</strong> This implementation always uses the ANSI form of the Win32 functions.  
-      It is unclear what the effective difference between the -A and -W forms are, 
-      and issues dealing with mixing ANSI and Unicode WndProc’s have yet to be 
-      explored.</P>
+<P>This calls the -W form of the Win32 <code>CallWindowProc</code> or <code>DefWindowProc</code>.
+This assumes that the current WndProc calling this is itself a Unicode form; that is, it is being sent
+Unicode-style messages.  This is correct if called from <A HREF="#handle_message" class="code">handle_message</A>,
+because <A HREF="#hook" class="code">hook</A> installed it using the -W form of <code>SetWindowLong</code>.</P>
 
+<HR  class="sep1">
 
-<HR SIZE=10 class="sep1">
-
-<H2 id="get_object_count">int <SPAN class="signame">get_object_count</span>()</H2>
-<A HREF="message_tap_index.html" TARGET="index" class="memof">message_tap</A>
-<P class="mematt">public, static</P>
-<P>This returns a count of how many objects exist.  A thread-safe counter is incremented in the constructor and
-decremented in the destructor.</P>
-<P>This means you can verify that the count is zero on program completion, to make sure you are not leaking.
-It might also be used to exit the program when the last window is closed.</P>
-
-<HR SIZE=10 class="sep1">
-
-<H2 id="get_WndProc">Proc <SPAN class="signame">get_WndProc</span>()</H2>
+<H2 id="get_WndProc">
+	<A HREF="../class_summary.html#WNDPROC_2">WNDPROC_2</A>
+	<SPAN class="signame">get_WndProc</span>()</H2>
 <A HREF="message_tap_index.html" TARGET="index" class="memof">message_tap</A>
 <P class="mematt">public</P>
-<P>This returns the generated callback function that is a thunk to turn a <code>WNDPROC</code> or 
-<code>WNDPROC_2</code> signature into a call to 
+<P>This returns the generated callback function that is a thunk to turn a <code>WNDPROC</code> or
+<A HREF="../class_summary.html#WNDPROC_2" class="code">WNDPROC_2</A> signature into a call to
 <A HREF="#handle_message" class="code">handle_message</A> on this instance.</P>
-<P>Call this to obtain a value to use as the WinProc when creating a window or dialog box, as opposed to subclassing (hooking)
-an existing WndProc.</P>
-<P>You can call <A HREF="#set_window_handle" class="code">set_window_handle</A> at first opportunity 
+
+<P>This is the value that <A HREF="#hook" class="code">hook</A> will use as the WndProc to install.
+If you want to create a "window class" or dialog box using this function directly, then follow these
+guidelines to correctly attach this instance with the HWND.</P>
+
+<P>You can call <A HREF="#set_window_handle" class="code">set_window_handle</A> at first opportunity
 to complete the process, but the hook will automatically set it when it processes the first message, so it is
 guarenteed to be set by the time <A HREF="#handle_message" class="code">handle_message</A> is called.</P>
-<P>Note that you need to specify the WndProc when registering the "window class" (wndclass), and then all 
-windows created will use the same WndProc.  Unless the wndclass was designed for only a single window, 
-this is not suitable for this class, since you must use a different instance of <code>message_tap</code> for 
-each window created.  So, you may want to call <A HREF="#hook" class="code">hook</A> anyway, even in 
-cases when you designed the wndclass, and using a generic (dummy) WndProc in the wndclass.</P>
-<P>For dialog boxes, you specify the DlgProc when you create the specific dialog box.  
-This mechanism works well in this case.  However, you do not want to call <code>DefWindowProc</code>, 
-so should never call the base <code>handle_message</code> from your class’s override!  Recall that a 
-Dialog Proc returns TRUE/FALSE (most of the time) to specify whether the message was handled.  Your 
-<code>handle_message</code> should do this when used as a Dialog Proc.  So use 
-<A HREF="Dialog_message_tap_index.html" Target="index" class="code">Dialog_message_tap</A>, which is 
+
+<P>Note that you need to specify the WndProc when registering the "window class" (wndclass), and then all
+windows created will use the same WndProc.  Unless the wndclass was designed for only a single window,
+this is not suitable for this class, since you must use a different instance of <code>message_tap</code> for
+each window created.  So, you may want to call <A HREF="#hook" class="code">hook</A> anyway, even in
+cases when you designed the wndclass, and use a generic (dummy) WndProc in the wndclass.  That is,
+don’t try and avoid calling <code>hook</code> just because you are not subclassing an existing
+window class.</P>
+
+<P>For dialog boxes, on the other hand, you specify the DlgProc when you create the specific dialog box.
+This mechanism works well in this case.  However, you do not want to call <code>DefWindowProc</code>,
+so should never call the base <code>handle_message</code> from your class’s override!  Recall that a
+Dialog Proc returns TRUE/FALSE (most of the time) to specify whether the message was handled.  Your
+<code>handle_message</code> should do this when used as a Dialog Proc.  So use
+<A HREF="Dialog_message_tap_index.html" Target="index" class="code">Dialog_message_tap</A>, which is
 designed specifically for this and takes care of these details and others.</P>
+
 <P>It is an error to call this function after calling <A HREF="#set_window_handle">set_window_handle</A>
-(including implicitly setting the window handle upon getting the first message).  This catches errors from duplicate 
+(including implicitly setting the window handle upon getting the first message).  This catches errors from duplicate
 use of the same instance.</P>
 
-<HR SIZE=10 class="sep1">
+<HR  class="sep1">
 
 <H2 id="handle_message">long <SPAN class="signame">handle_message</span> (<A HREF="../class_summary.html#sMSG">sMSG</A>&amp; msg)</H2>
 <A HREF="message_tap_index.html" TARGET="index" class="memof">message_tap</A>
 <P class="mematt">public, virtual</P>
-<P>This function is called by the WinProc of the window to which it is attached.  
-The <A HREF="../class_summary.html#sMSG" class="code">sMSG</A> structure (short MSG, since it is a subset (base class) of the 
-<code>MSG</code> structure) is used to pass the <code>hwnd</code>, <code>message</code>, 
+<P>This function is called by the WndProc of the window to which it is attached.
+The <A HREF="../class_summary.html#sMSG" class="code">sMSG</A> structure (short MSG, since it is a subset (base class) of the
+<code>MSG</code> structure) is used to pass the <code>hwnd</code>, <code>message</code>,
 <code>wParam</code>, and <code>lParam</code>.  Passing a structure rather than four parameters
-is better design, and passing by reference is more efficient than re-pushing all the parameters with all the 
+is better design, and passing by reference is more efficient than re-pushing all the parameters with all the
 forwarding going on.</P>
-<P>The handling of <code>WM_NCDESTROY</code>, etc. as it relates to keeping up with this class 
-is performed higher up in the plumbing before it calls this virtual function.  So, you are not compelled to chain 
+<P>The handling of <code>WM_NCDESTROY</code>, etc. as it relates to keeping up with this class
+is performed higher up in the plumbing before it calls this virtual function.  So, you are not compelled to chain
 back to this base class  implementation from your own class’s override.</P>
-<P>This base class definition simply calls the original WinProc of a subclassed window, or
-<code>DefWindowProc</code> if there wasn’t one, for all messages.</P>
-<P>Override this to do whatever you want, using the normal Win32 concepts of writing a WinProc.  Call this 
-base class at the end of your overridden definition if you want to propagate messages down.</P>
+
+<P>This base class implementation simply calls the original WndProc of a subclassed window, or
+<code>DefWindowProc</code> if there wasn’t one, for all messages.  (see <A HREF="#call_old_wndproc" class="code">call_old_wndproc</A>.)</P>
+
+<P>Override this to do whatever you want, using the normal Win32 concepts of writing a WndProc.  Call this
+base class at the end of your overridden definition if you want to propagate messages down.  This is a Unicode
+WndProc, in that it should receive Unicode versions of messages.  This is because the <A HREF="#hook" class="code">hook</A>
+function used the -W form of <code>SetWindowLong</code> to install the thunk.</P>
+
 <P>Overriding this virtual function in a derived class is the main point of using the <code>message_tap</code>
 class.</P>
 
-<HR SIZE=10 class="sep1">
+<HR  class="sep1">
 
 <H2 id="hook">void <SPAN class="signame">hook</span> (HWND)</H2>
 <A HREF="message_tap_index.html" TARGET="index" class="memof">message_tap</A>
 <P class="mematt">public</P>
-<P>This function associates this object with the specified Window.  Call this after calling Win32 
+<P>This function associates this object with the specified Window.  Call this after calling Win32
 <code>CreateWindow</code> or otherwise obtaining an <code>HWND</code> to a valid Window.</P>
-<P>This function will “subclass” the window, pointing the WinProc back to this class and remembering the
-old WinProc.</P>
+<P>This function will “subclass” the window, pointing the WndProc back to this instance’s
+<A HREF="#handle_message" class="code">handle_message</A> function and remembering the old WndProc.</P>
 <P>It is an error to call this more than once.</P>
-<P>See also: <A HREF="#set_window_handle" class="code">set_window_handle</A>, 
+<P>See also: <A HREF="#set_window_handle" class="code">set_window_handle</A>,
 <A HREF="#unhook" class="code">unhook</A><P>
 
-<HR SIZE=10 class="sep1">
+<HR class="sep1">
+
+<H2 id="LastMessage">unsigned short <SPAN class="signame">LastMessage</SPAN></H2>
+
+<P class="mematt"><EM>protected</EM>, data</P>
+<P>This contains the message code number that is seen as the “last message”, and to unhook when it
+is processed.  It is set at construction time to <code>WM_NCDESTROY</code>, but it may be changed
+if necessary.
+</P>
+
+<HR  class="sep1">
 
 <H2 id="on_attach">void <SPAN class="signame">on_attach</span>()</H2>
 <A HREF="message_tap_index.html" TARGET="index" class="memof">message_tap</A>
 <P class="mematt">public, virtual</P>
-<P>This virtual function is called after the window and object are put 
-together.  It fills the role of <code>WM_CREATE</code> or <code>WM_INITDIALOG</code>, which can’t 
+<P>This virtual function is called after the window and object are put
+together.  It fills the role of <code>WM_CREATE</code> or <code>WM_INITDIALOG</code>, which can’t
 be used because the call to <A HREF="#hook" class="code">hook</A> is made after the window has
 been created.</P>
-<P>Note that if you directly supply a <code>message_tap</code> as a WndProc, then 
-<code>on_attach</code> is called much earlier than <code>WM_CREATE</code>, so your 
+<P>Note that if you directly supply a <code>message_tap</code> as a WndProc, then
+<code>on_attach</code> is called much earlier than <code>WM_CREATE</code>, so your
 <A HREF="#handle_message" class="code">handle_message</A> function will in this case
-receive <code>WM_CREATE</code>.  But if a window is created, 
+receive <code>WM_CREATE</code>.  But if a window is created,
 then <A HREF="#hook" class="code">hook</A> is called, then <A HREF="#handle_message" class="code">handle_message</A>
 will never get a <code>WM_CREATE</code> because it was issued long before this class became involved.<P>
-<P>So, if this function is used to  interact with the Window, not just complete its own data setup, it needs 
-to be aware of when it might be invoked.  For other uses, it needs only count on the fact that it’s called 
+<P>So, if this function is used to  interact with the Window, not just complete its own data setup, it needs
+to be aware of when it might be invoked.  For other uses, it needs only count on the fact that it’s called
 at first oppertunity once the window handle and object are put together.</P>
 
-<HR SIZE=10 class="sep1">
+<HR  class="sep1">
 
 <H2 id="pre_translate_message">int <SPAN class="signame">pre_translate_message</span> (const <A HREF="../class_summary.html#MSG">MSG</A>&amp; msg)</H2>
 <A HREF="message_tap_index.html" TARGET="index" class="memof">message_tap</A>
 <P class="mematt">public, virtual</P>
 <P>This is called when the Tomahawk <code>pre_translate_message</code>
-message is processed.  It basically does the same thing that you could do yourself by handling a 
-<code>WM_TOMAHAWK</code> message from within your <A HREF="#handle_message" class="code">handle_message</A> 
-function, but it’s such a common case, and needed for the <A HREF= "Dialog_message_tap_index.html" target="index" class="code">Dialog_message_tap</A> 
+message is processed.  It basically does the same thing that you could do yourself by handling a
+<code>WM_TOMAHAWK</code> message from within your <A HREF="#handle_message" class="code">handle_message</A>
+function, but it’s such a common case, and needed for the <A HREF= "Dialog_message_tap_index.html" target="index" class="code">Dialog_message_tap</A>
 class, that it’s already separated out for you.</P>
+<P>This should be implemented by derived classes, for those windows that need some kind of message transformation
+done before dispatching.  Specifically, the window that is a modeless dialog box, and any window that
+uses an Accelerator Table.
+</P>
 <P>For regular windows, call the Win32 primitive <code>TranslateAccelerator</code> here.
 For modeless dialog boxes, call the Win32 primitive <code>IsDialogMessage</code>
-(that is what <A HREF= "Dialog_message_tap.html#pre_translate_message" class="code">Dialog_message_tap</A>’s override  does).  
-For either, return 1 if the translate call returned <code>true</code>, or return 2 if the translate call returned 
+(that is what <A HREF= "Dialog_message_tap.html#pre_translate_message" class="code">Dialog_message_tap</A>’s override  does).
+For either, return 1 if the translate call returned <code>true</code>, or return 2 if the translate call returned
 <code>false</code>.</P>
 <P>More generally, the return codes for this function are:</P>
-      <DL>
+      <DL class="members nobreak spaceafter">
          <DT>0</DT>
-         <DD>I have no clue! I might not even be aware that this mechanism 
+         <DD>I have no clue! I might not even be aware that this mechanism
          exists.  The caller will see this and keep looking elsewhere.</DD>
          <DT>1</DT>
-         <DD>The message was processed, and should be discarded.  
-         Return this when Win32 <code>TranslateAccelerator</code> or Win32 <code>IsDialogMessage</code> produce <code>true</code>.  
+         <DD>The message was processed, and should be discarded.
+         Return this when Win32 <code>TranslateAccelerator</code> or Win32 <code>IsDialogMessage</code> produce <code>true</code>.
          The caller will see this value and know not to call Win32 <code>DispatchMessage</code> etc.</DD>
          <DT>2</DT>
-         <DD>The message was processed and should <I>not</I> be discarded, or 
+         <DD>The message was processed and should <I>not</I> be discarded, or
          I’m sure it does not need to be processed.  Return this when Win32 <code>TranslateAccelerator</code>
-         or Win32 <code>IsDialogMessage</code> produce <code>false</code>. The caller will see this 
-         value and stop searching for something to pre-translate the message, 
-         and will continue with the other steps in the message pump (including 
+         or Win32 <code>IsDialogMessage</code> produce <code>false</code>. The caller will see this
+         value and stop searching for something to pre-translate the message,
+         and will continue with the other steps in the message pump (including
          Win32 <code>DispatchMessage</code>).</DD>
       </DL>
 <P>This base implementation always returns 0 and does nothing.</P>
+<P>This is called by <A HREF="simple_message_pump.html#pre_translate" class="code">simple_message_pump::pre_translate</A>.</P>
 
-<HR SIZE=10 class="sep1">
-
-<H2 id="Proc">typedef long (__stdcall* <SPAN class="signame">Proc</span>)(<A HREF="../class_summary.html#sMSG">sMSG</A>)</H2>
-<A HREF="message_tap_index.html" TARGET="index" class="memof">message_tap</A>
-<P class="mematt">public, typename</P>
-<P>This is typedef'ed here because the compiler could not handle the written-out form as a return
-value for a function.  I don’t want to reference the <code>ratwin::window::WNDPROC_2</code> type because
-that would mean pulling in another include file just for that.  Since typedefs are synonyms not definitions,
-they can be used interchangably.</P>
-
-<HR SIZE=10 class="sep1">
+<HR  class="sep1">
 
 <H2 id="report_error">void <SPAN class="signame">report_error</span> (const <A HREF="../class_summary.html#exception">classics::exception</A>&amp; X)</H2>
 <A HREF="message_tap_index.html" TARGET="index" class="memof">message_tap</A>
 <P class="mematt">public, virtual</P>
-<P>This function is called to log non-fatal errors generated within the class, and any exceptions caught by the 
+<P>This function is called to log non-fatal errors generated within the class, and any exceptions caught by the
 internal hook handler.</P>
-<P>The supplied implementation calls <code>X.show()</code>.  This probably does not 
-need to be changed, since you can customize the meaning of <code>show</code> already, 
+<P>The supplied implementation calls <code>X.show()</code>.  This probably does not
+need to be changed, since you can customize the meaning of <code>show</code> already,
 on an application-wide basis.</P>
 
-<HR SIZE=10 class="sep1">
+<HR  class="sep1">
 
 <H2 id="sane_check">void <SPAN class="signame">sane_check</span>() const</H2>
 <A HREF="message_tap_index.html" TARGET="index" class="memof">message_tap</A>
 <P class="mematt">public</P>
-<P>This uses a simple and cheap test to verify that the <code>this</code> pointer is indeed pointing to a 
+<P>This uses a simple and cheap test to verify that the <code>this</code> pointer is indeed pointing to a
 non-destructed object of (or derived from) class <code>message_tap</code>.</P>
 
-<P>This is used to trap Windows messages sent after the object is destructed, and to verify that untyped 
+<P>This is used to trap Windows messages sent after the object is destructed, and to verify that untyped
 data (such as a generic lParam received in a message) correctly contains a pointer to an object as expected.</P>
 
-<P>The test is not 100% reliable, as random memory <I>could</I> mimic the signature by coincedence, but is 
+<P>The test is not 100% reliable, as random memory <I>could</I> mimic the signature by coincedence, but is
 handy for spotting bugs and usage errors during development.</P>
 
-<HR SIZE=10 class="sep1">
+<HR  class="sep1">
 
 <H2 id="set_window_handle">void <SPAN class="signame">set_window_handle</span> (HWND)</H2>
 <A HREF="message_tap_index.html" TARGET="index" class="memof">message_tap</A>
 <P class="mematt">public</P>
-<P>This function performs half the work needed to associate this object with the 
-specified Win32 Window handle. It sets the data member so that subsequent calls to 
+<P>This function performs half the work needed to associate this object with the
+specified Win32 Window handle. It sets the data member so that subsequent calls to
 <A HREF="#window_handle" class="code">window_handle</A> will return the specified window handle.</P>
 <P>It is used to complete the circuit if you used <A HREF="#get_WndProc" class="code">get_WndProc</A>
 to directly specify the window proc or dialog proc, as opposed to subclassing an existing window.  Specifically,
-<A HREF="#hook" class="code">hook</A> calls this for you and you.</P>
-<P>It is an error to call this function more than once (unless it is 
+<A HREF="#hook" class="code">hook</A> calls this for you.</P>
+<P>It is an error to call this function more than once (unless it is
 redundant&mdash;the parameter is the same).  This catches errors from duplicate use of the same instance.</P>
 <P>See also: <A HREF="#get_WndProc" class="code">get_WndProc</A></P>
 
-<HR SIZE=10 class="sep1">
+<HR  class="sep1">
 
-<H2 id="unhook">bool <SPAN class="signame">unhook</span> (bool force=false)</H2>
+<H2 id="unhook">bool <SPAN class="signame">unhook</span> (bool force=true)</H2>
 <A HREF="message_tap_index.html" TARGET="index" class="memof">message_tap</A>
 <P class="mematt">public</P>
-<P>You are not expected to unhook a window explicitly, but to leave it hooked until the window is destroyed.  
+<P>You are not expected to unhook a window explicitly, but to leave it hooked until the window is destroyed.
 You may call this function to unhook the window, but it will be called automatically in the destructor or when
-the HWND is closed.</P>
-<P>To properly coordinate destroying the object, you must stop sending messages to it once the object 
-is destroyed! So, part of the shutdown is to attempt to unhook the window proc.  If nothing else had hooked 
-the window after this class, then it restores the old pointer.  Otherwise, (if <code>force</code> is 
-<code>true</code>) it supplies a <code>DefWinProc</code>, breaking the chain.</P>
-<P>It returns <code>true</code> if it gracefully restored the window to its prehooked state, 
+the <code>HWND is closed</code>.</P>
+<P>To properly coordinate destroying the object, you must stop sending messages to it once the object
+is destroyed! So, part of the shutdown is to attempt to unhook the window proc.  If nothing else had hooked
+the window after this class, then it restores the old pointer.  Otherwise, (if <code>force</code> is
+<code>true</code>) it supplies a <code>DefWindowProc</code>, breaking the chain.</P>
+<P>It returns <code>true</code> if it gracefully restored the window to its prehooked state,
 <code>false</code> if it had to be blunt and cut the chain (when <code>force</code> is <code>true</code>)
 or failed (when <code>force</code> is <code>false</code>).</P>
-<P>This is automatically called when a <code>WM_NCDESTROY</code> message is handled, which is 
-supposedly the last message processed.  But who knows?  Even if Microsoft’s docs are correct, what’s to stop 
-other code from sending messages directly?  This unhooking hardens the code against this case.  Also, derived 
-classes can change this behavior.</P>
+<P>This is automatically called when a <code>WM_NCDESTROY</code> message is handled, which is
+supposedly the last message processed.  But who knows?  Even if Microsoft’s docs are correct, what’s to stop
+other code from sending messages directly?  This unhooking hardens the code against this case.  Also, derived
+classes can change this behavior by changing the value in <A HREF="#LastMessage" class="code">LastMessage</A>.</P>
 <P>A future version might go to greater lengths to ensure it really is called last, even with other activity going on.</P>
-<P>See also: <A HREF="#unhook_when_possible" class="code">unhook_when_possible</A>, 
+<P>See also: <A HREF="#unhook_when_possible" class="code">unhook_when_possible</A>,
 <A HREF="#destructor" class="code">~message_tap</A></P>
 
 
-<HR SIZE=10 class="sep1">
+<HR  class="sep1">
 
-<H2 id="unhook_when_possible">bool <SPAN class="signame">unhook_when_possible</span>()</H2>
+<H2 id="unhook_when_possible">void <SPAN class="signame">unhook_when_possible</span>()</H2>
 <A HREF="message_tap_index.html" TARGET="index" class="memof">message_tap</A>
 <P class="mematt">public</P>
-<P>Calling this function sets a flag, which instructs the class to unhook itself  as soon as it is able, after all 
+<P>Calling this function sets a flag, which instructs the class to unhook itself  as soon as it is able, after all
 objects that subclassed the window <I>after</I> this object have restored their WndProc pointers.</P>
-<P>This does not change the fact that the object will be forcably unhooked when 
+<P>This does not change the fact that the object will be forcably unhooked when
 <code>WM_NCDESTROY</code> is seen, as described under <A HREF="#unhook" class="code">unhook</A>.</P>
-<P>See also: <A HREF="#unhook" class="code">unhook</A>, 
+<P>See also: <A HREF="#unhook" class="code">unhook</A>,
 <A HREF="#destructor" class="code">~message_tap</A></P>
 
 
-<HR SIZE=10 class="sep1">
+<HR  class="sep1">
 
 <H2 id="window_handle">HWND <SPAN class="signame">window_handle</span>() const</H2>
 <A HREF="message_tap_index.html" TARGET="index" class="memof">message_tap</A>
 <P class="mematt">public</P>
 <P>This returns the Win32 window handle of the window to which this class is paired with.</P>
-<P>Note that this is a <code>const</code> member, as the state of this object is not 
-affected. However, you can still modify the corresponding window object 
+<P>Note that this is a <code>const</code> member, as the state of this object is not
+affected. However, you can still modify the corresponding window object
 through this <code>HWND</code>, since there is no const-ness concept on <code>HANDLE</code>’s.</P>
 <P>See also: <A HREF="#set_window_handle" class="code">set_window_handle</A>,
 <A HREF="#hook" class="code">hook</A>
 
-<HR SIZE=10 class="sep1">
+<HR  class="sep1">
 
 <IFRAME id="page_footer" src="../page_footer.html"></IFRAME>
 </BODY>

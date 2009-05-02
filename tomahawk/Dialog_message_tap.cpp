@@ -21,7 +21,7 @@ using classics::exception;
 static int __stdcall dlg_stub (HWND w, unsigned message, unsigned p1, unsigned long p2)
  {
  if (message == ratwin::WM_constants::WM_INITDIALOG) {
-    ratwin::window::SetWindowLong (w, DWL_DLGPROC, (void*)0);
+    ratwin::window::SetWindowLong<wchar_t> (w, DWL_DLGPROC, (void*)0);
     Dialog_message_tap* object= reinterpret_cast<Dialog_message_tap*>(p2);
     try { object->sane_check(); }
     catch (classics::exception& X) {  // add do that.
@@ -39,7 +39,7 @@ Dialog_message_tap::Dialog_message_tap()
 : isModal(false)
  {
  }
- 
+
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
 Dialog_message_tap::~Dialog_message_tap()
@@ -48,19 +48,47 @@ Dialog_message_tap::~Dialog_message_tap()
 
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
-HWND Dialog_message_tap::ModelessDialogBox (ratwin::types::HINSTANCE module_for_resource, ratwin::NumOrName<char> resource, HWND parent)
+template <typename CharT>
+HWND Dialog_message_tap::ModelessDialogBox (ratwin::types::HINSTANCE module_for_resource, const CharT* resource, HWND parent)
  {
  HWND dialogbox= CreateDialogParam (module_for_resource, resource, parent, 0,0);
  hook (dialogbox);
  return dialogbox;
  }
 
+// provide char* and wchar_t* forms in the DLL
+template TOMAHAWK_EXPORT HWND Dialog_message_tap::ModelessDialogBox<char> (ratwin::types::HINSTANCE module_for_resource, const char* resource, HWND parent);
+template TOMAHAWK_EXPORT HWND Dialog_message_tap::ModelessDialogBox<wchar_t> (ratwin::types::HINSTANCE module_for_resource, const wchar_t* resource, HWND parent);
+
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
-int Dialog_message_tap::ModalDialogBox (ratwin::types::HINSTANCE module_for_resource, ratwin::NumOrName<char> resource, HWND parent)
+HWND Dialog_message_tap::ModelessDialogBox (ratwin::types::HINSTANCE module_for_resource, unsigned short resource, HWND parent)
+ {
+ HWND dialogbox= CreateDialogParam (module_for_resource, ratwin::NumOrName<char>(resource), parent, 0,0);
+ hook (dialogbox);
+ return dialogbox;
+ }
+
+/* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
+
+template <typename CharT>
+int Dialog_message_tap::ModalDialogBox (ratwin::types::HINSTANCE module_for_resource, const CharT* resource, HWND parent)
  {
  isModal= true;
  int result= DialogBoxParam (module_for_resource, resource, parent, dlg_stub, this);
+ return result;
+ }
+
+// provide char* and wchar_t* forms in the DLL
+template TOMAHAWK_EXPORT int Dialog_message_tap::ModalDialogBox<char> (ratwin::types::HINSTANCE module_for_resource, const char* resource, HWND parent);
+template TOMAHAWK_EXPORT int Dialog_message_tap::ModalDialogBox<wchar_t> (ratwin::types::HINSTANCE module_for_resource, const wchar_t* resource, HWND parent);
+
+/* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
+
+int Dialog_message_tap::ModalDialogBox (ratwin::types::HINSTANCE module_for_resource, unsigned short resource, HWND parent)
+ {
+ isModal= true;
+ int result= DialogBoxParam (module_for_resource, ratwin::NumOrName<char>(resource), parent, dlg_stub, this);
  return result;
  }
 
@@ -87,7 +115,7 @@ void Dialog_message_tap::EndDialog (int result)
 static int __stdcall dlg_stub_prop (HWND w, unsigned message, unsigned p1, unsigned long p2)
  {
  if (message == ratwin::WM_constants::WM_INITDIALOG) {
-    ratwin::window::SetWindowLong (w, DWL_DLGPROC, (void*)0);
+    ratwin::window::SetWindowLong<wchar_t> (w, DWL_DLGPROC, (void*)0);
     ratwin::property_sheet::PROPSHEETPAGE<char>* page= reinterpret_cast<ratwin::property_sheet::PROPSHEETPAGE<char>*>(p2);
     Dialog_message_tap* object= reinterpret_cast<Dialog_message_tap*>(page->lParam);
     try { object->sane_check(); }

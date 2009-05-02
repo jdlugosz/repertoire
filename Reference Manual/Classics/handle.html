@@ -9,7 +9,7 @@
 <SCRIPT type="text/javascript">
    checkframe ("Classics/handle_index.html");
 </SCRIPT>
-<META name="date" content="2006-06-28">
+<META name="date" content="2006-10-18">
 </HEAD>
 
 <BODY>
@@ -345,12 +345,12 @@ assignment&mdash;it replaces the content with a pointer to a newly-created objec
 <P style="float:left; margin-right:1.5em; width:40%" class="sidebar">To clarify, two handles (e.g. <code>cow1</code> and <code>cow2</code>)
 pointing to the same shared underlying object (<code>cow1=cow2</code>) are fully thread-independant and non-blocking.  One
 thread can use <code>cow1</code> and another thread can use <code>cow2</code>, either or both might need to clone the object,
-but <code>make_unique</code> never blocks.  It is only when two threads use the <I>same</I> object, such as two threads using the same
+but <code>make_unique</code> never blocks.  It is only when two threads use the <I>same</I> handle object, such as two threads using the same
 global <code>cow1</code>, that concern us here.<P>
 <P>If left alone, this makes multiple threads using the <I>same</I> handle variable run into the same thread-safety issue
 as assignment.  It is doing the assignment, delayed from when it was actually specified.  However, making <A HREF="#operator_arrow" class="code">operator-></A>
-subject to the same threading restrictions as assignment is unintuative and error-prone.  So, as of PB8, <code>make_unique</code>
-is implemented to be thread-safe if called on multiple threads at the same time for the same object.  The case illustrated here is handled
+subject to the same threading restrictions as assignment is unintuative and error-prone.  So, as of Public Build 9, <code>make_unique</code>
+is implemented to be thread-safe if called on multiple threads at the same time for the same <code>cow</code> object.  The case illustrated here is handled
 transparantly, but unlike other handle operarations one thread may have to wait for the other to complete the cloning.</P>
 <TABLE style="clear:both; border-collapse:collapse;">
 <TR><TH>prior to starting threads
@@ -376,21 +376,32 @@ cow2= cow1;
 </PRE>
 </TABLE>
 
-<P>An underlying object is pointed to by three handles, including <code>cow1</code>.  Two threads each trigger copy-on-write at the
+<P>In this example, an underlying object is pointed to by three handles, including <code>cow1</code>.  Two threads each trigger copy-on-write at the
 same time (ignore Thread 3 for now), so each thread wants to make <code>cow1</code> point to a unique copy of the original shared object.  When the execution of
-the two calls to <code>cow1.make_unique()</code> overlap, one thread will do the cloning and the other will wait for it to finish.  The waiting is done by
-simply calling the Win32 <code>Sleep</code> function with a minimal time.</P>
+the two calls to <code>cow1.make_unique()</code> overlap, one thread will do the cloning and the other will wait for it to finish.  The waiting is currently done by
+simply calling the Win32 <code>Sleep</code> function with a minimal time; in the future it will use a general-purpose threading transaction class or
+a &micro;-mutex class, not yet part of Classics.</P>
+<P>This waiting is not as bad a general-purpose blocking of threads.  Thread 2 needs to wait for thread 1 to finish, but it is not waiting
+for thread 1 to finish its own work so thread 2 can do something else that can't be done at the same time.  Rather, what thread 1 is
+doing is exactly what thread 2 wants done, too!  Thread 2 is not blocked unable to make progress, but is delegating its completion to
+thread 1.  Both threads do make progress.  This situation cannot lead to deadlock or starvation.</P>
+
 <P>Now look at Thread 3, an assignment <I>from</I> <code>cow1</code>.  Again, using an object on the right-hand-side of an assignment is
-not normally something that either modifies the object or causes threading issues.  But, it affects the reference count, and needs to interoperate
-with the locking done by <code>make_unique</code>.  So, this assignment-from (or initialization-from) may also need to wait.</P>
+not normally something that either modifies the object or causes threading issues.  But, it affects the reference count, so does modify the
+internal state of the smart pointer.  The implementation guarantees that thread 3 proceeds (with a single atomic increment of the reference
+count) without any special knowedge of the cloneing in progress or the dance done by multiple calls to <code>make_unique</code>.  This is true for all
+possible (legal) operations on the same <code>cow</code> object that is undergoing the call to <code>make_unique</code>.  Only other calls to
+<code>make_unique</code> on the same <code>cow</code> object are affected.  The cost of this feature is that <code>cow</code> handles are slightly
+larger than other types of handles, containing one additional field for use by the locking mechanism.</P>
+
 <P>If all threads do their things at the same time, it’s possible that Thread 1 will proceed first, making <code>cow1</code> distinct from <code>cow3</code>
 or <code>ch4</code>; then Thread 3 proceeds and makes <code>cow1</code> non-unique again; then Thread 2 proceeds.  Thread 2 makes <code>cow1</code>
 unique again, and <code>bar</code> is called on a different object from <code>foo</code>.  If the execution of the threads don’t overlap their
 locked regions of code, this could indeed happen, just like writing sequential code to do things in that order:</P>
-<PRE class="code">
-C* temp1= cow1.operator->();
+<PRE class="code" style="float:left; margin-right:1.5em; margin-top:0em; margin-bottom:2pt" >
+C* temp1= cow1.make_unique();
 cow2= cow1;
-C* temp2= cow1.operator->();
+C* temp2= cow1.make_unique();
 temp1->foo();
 temp2->bar();
 </PRE>

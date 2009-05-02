@@ -4,29 +4,40 @@
 <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=windows-1252">
 <TITLE>Message Cracker System documentation</TITLE>
 <LINK REL=STYLESHEET HREF="../info.css" TYPE="text/css">
+<LINK REL="Start" HREF="http://www.dlugosz.com/Repertoire/refman/mainframe.html">
+<LINK REL="Contents" HREF="../reper_index.html">
+<LINK REL="Index" HREF="../class_summary.html">
+<LINK REL="Chapter" HREF="class_index.html">
+<LINK REL="Help" HREF="../accessibility_statement.html">
+<LINK REL="Copyright" HREF="../policy.html">
+<SCRIPT type= "text/javascript" src="../helpers.js"></SCRIPT>
+<SCRIPT type="text/javascript">
+   checkframe ("Tomahawk/class_index.html");
+</SCRIPT>
+
+<META name="date" content="2007-02-17">
 </HEAD>
 
 <BODY>
 <IFRAME id="page_banner" src="../page_banner.html" scrolling="no"></IFRAME>
-<A NAME="toptop"></A>
 
-<H1>Message Cracker System Complete Documentation</H1>
+<H1 id="toptop">Message Cracker System Complete Documentation</H1>
 
 <P>This describes the RatWin/Tomahawk system of extracting meaningful parameter information
 from the message information passed to a WinProc.</P>
 
-<H2>Related Documents</H2>
-<UL>
-	<LI><A HREF="../Tomahawk/message_tap_index.html" TARGET="index">Class <code>message_tap</code></A>
-	<LI><A HREF="../Tomahawk/WM_TOMAHAWK.html#toptop"><code>WM_TOMAHAWK</code> documentation</A>
+<H2>Contents</H2>
+<UL class="TOC">
+	<LI><A HREF="#overview">Overview</A>
+	<LI><A HREF="#sMSG" class="code">sMSG</A>
+	<LI><A HREF="#WM_xxx" class="code">WM_ &hellip;_msg</A>
+	<LI><A HREF="#MSG_cast" class="code">MSG_cast</A>
 </UL>
 
-<H2>Contents</H2>
+<H2>Related Documents</H2>
 <UL>
-	<LI><A HREF="#overview">Overview</A>
-	<LI><A HREF="#sMSG">sMSG</A>
-	<LI><A HREF="#WM_xxx">WM_ ..._msg</A>
-	<LI><A HREF="#MSG_cast">MSG_cast</A>
+	<LI><A HREF="message_tap_index.html" TARGET="index">Class <code>message_tap</code></A>
+	<LI><A HREF="WM_TOMAHAWK.html#toptop"><code>WM_TOMAHAWK</code> documentation</A>
 </UL>
 
 <H2 id="overview">Overview</H2>
@@ -48,7 +59,7 @@ can’t be hidden away somewhere.</P>
 <P>To this end, I wanted something like the old Message Crackers.  Only, do so without macros, and with
 as much type-safety as practical.</P>
 
-<P>The resulting system is centered around the Message Cast mechanism.</P>
+<P>The resulting system is centered around the <A HREF="#MSG_cast">Message Cast</A> mechanism.</P>
 
 
 <H2 id="sMSG">The <code>sMSG</code> structure</H2>
@@ -64,17 +75,21 @@ a <code>sMSG</code> and Windows indeed passes you one!</P>
 <H3>Why pass a structure?</H3>
 
 <P>There are several motives behind passing a single structure rather than 4 individual parameters.
-First, it ties in with the concept behind the thunk class which only handles one parameter because multiple
-parameters could always be combined into a single structure. [[XREF the passage in the thunk docs]]</P>
+Originally, it tied in with the concept behind the thunk class which, at the time, only handled one parameter.
+This is really all that is needed, because multiple parameters can always be combined into a single structure.
+This is no longer an issue because there is now a distinct template for closures with each number of arguments.
+However, what started out as a limitation/work-around turned into an inspiration.  It was better as a structure
+than it ever was as four loose arguments!</P>
 
-<P>Second, it makes sence to combine the parameters that are always passed as a group.  It makes
+<P>It makes sence to combine the parameters that are always passed as a group.  It makes
 engineering sence that these ought to be grouped together into one named entity, and it is more efficient
 to pass the whole structure (by reference) to deeper functions rather than re-pushing the same parameters
 over and over.  The code handling messages will often contain only a little code and then call another function
 with the same message data, and call the base class version, and call the default, etc.  The message is
 <I>routed</I> to modular code, so it gets passed a lot and treated as a lump.</P>
 
-<P>Finally, putting the items together makes the idea of the <A HREF="#MSG_cast" class="code">MSG_cast</A> very clean and elegant.</P>
+<P>Finally, putting the items together makes the idea of the <A HREF="#MSG_cast" class="code">MSG_cast</A>
+very clean and elegant.  In comparison, it would be awkward to deal with loose parameters.</P>
 
 <H3>Why is it so plain?</H3>
 
@@ -135,7 +150,7 @@ purpose, and the compiler can catch some kinds of mistakes.  In Tomahawk there i
 that matches the syntax of the C++ casting operators.  It is more limited than a C-style cast in that the compiler
 ensures that <I>only different kinds of message structures are cast to other message structures</I>.</P>
 
-<P>That is, you could code <code>process_Size (MSG_cast&ldquo;WM_SIZE_msg>(msg));</code> and
+<P>That is, you could code <code>process_Size (MSG_cast&lt;WM_SIZE_msg>(msg));</code> and
 the compiler makes two checks:  it checks that <code>process_Size</code> is expecting a <code>WM_SIZE</code> message, and
 it also checks that <code>msg</code> is some message structure.  You can’t pass just anything to a message
 cast&mdash;it only works between message structures, and this is a compile-time check.</P>
@@ -143,23 +158,25 @@ cast&mdash;it only works between message structures, and this is a compile-time 
 <P>What it doesn’t do is make sure that the <code>msg</code> is in fact a <code>WM_SIZE</code>
 message.  Since it is typically used like this:</P>
 
-<PRE class="code">
+<H4 class="caption">Listing 1</H4>
+<PRE class="code" lang="x-Cpp" title="Listing 1">
  switch (msg.message) {
     case WM_MOUSEMOVE:
-       process_MouseMove (MSG_cast&ldquo;WM_MOUSEMOVE_msg>(msg));
+       process_MouseMove (<EM>MSG_cast</EM>&lt;WM_MOUSEMOVE_msg>(msg));
        break;
     case WM_SIZE:
-       process_Size (MSG_cast&ldquo;WM_SIZE_msg>(msg));
+       process_Size (<EM>MSG_cast</EM>&lt;WM_SIZE_msg>(msg));
        break;
     }
 </PRE>
 
 <P>misusing it is generally not a problem.  However, there’s nothing to stop you from writing</P>
-<PRE class="code">
+<H4 class="caption">Listing 2</H4>
+<PRE class="code" lang="x-Cpp" title="Listing 2">
 void C::process_Size (const WM_SIZE_msg&amp; msg)
  {
  assert (msg.message == WM_SIZE);
- // ... get on with the real work.
+ <I>// ... get on with the real work.</I>
  }
 </PRE>
 
@@ -167,12 +184,13 @@ void C::process_Size (const WM_SIZE_msg&amp; msg)
 making the structure define its own id would not be generally helpful for coding.  But, what about templates?
 To make it possible to make generic code like:</P>
 
-<PRE class="code">
+<H4 class="caption">Listing 3</H4>
+<PRE class="code" lang="x-Cpp" title="Listing 3">
 template &lt;typename T>
 void foo (const T&amp; msg)
  {
- assert (msg.message == T::message_constant);
- // ...
+ assert (msg.message == <EM>T::message_constant</EM>);
+ <I>// ...</I>
  }
 </PRE>
 

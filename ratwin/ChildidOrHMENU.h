@@ -17,6 +17,7 @@ public:
    ChildidOrHMENU (types::HMENU hmenu) : fourbytes( reinterpret_cast<arg::arg32>( hmenu ) ) {}
    operator arg::arg32() { return fourbytes; }
    };
-   
+
 }
+ENDWRAP
 

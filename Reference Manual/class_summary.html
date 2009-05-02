@@ -1,4 +1,5 @@
-<HTML>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"  "http://www.w3.org/TR/html4/loose.dtd">
+<HTML lang="en-US">
 <HEAD>
 <META NAME="description"
  CONTENT="master class concordance for John Dlugosz's Repertoire Project.">
@@ -6,27 +7,8 @@
  CONTENT="Repertoire documentation class index">
 <TITLE>Class Summary</TITLE>
 <LINK REL="STYLESHEET" HREF="info.css" TYPE="text/css">
-<META name="date" content="2006-06-16">
-</HEAD>
-
-<BODY>
-<!-- Standard banner at top of Reper file -->
-<P CLASS="banner">
-This document is one section of The Repertoire Reference, found at
-<A HREF="http://www.dlugosz.com/Repertoire/refman/mainframe.html" TARGET="_top">
-http://www.dlugosz.com/Repertoire/refman/mainframe.html</A>.<BR>
-Copyright 2006 by <A HREF="mailto:john&#64;dlugosz.com">John M. Dlugosz</A>.
-</P>
-<TABLE>
-<TR>
-	<TD><A HREF="class_summary_index.html" TARGET="index"><IMG SRC="../../img/blueleft.gif"></A>
-	<TD><A HREF="class_summary_index.html" TARGET="index">click to put Class Index into the index pane</A>
-</TABLE>
-<A NAME="toptop">
-<!-- end of standard banner -->
-
-
-<STYLE>
+<META name="date" content="2006-10-27">
+<STYLE TYPE="text/css">
 .ib /* info block */ {
    white-space: pre;
    color: green;
@@ -35,24 +17,58 @@ Copyright 2006 by <A HREF="mailto:john&#64;dlugosz.com">John M. Dlugosz</A>.
    font-size: 1em;
    margin-left: 0.5in;
    }
+
+.ib EM {
+	font-weight: bold;
+	background: inherit;
+	}
+
+HR	{
+	border: solid;
+	background-color: black;
+	height: 10px;
+	border-radius: 5px;
+	-moz-border-radius: 5px;
+   }
 </STYLE>
+</HEAD>
+
+<BODY>
+<IFRAME id="page_banner" src="page_banner.html" scrolling="no">banner</IFRAME>
+
+<P><A HREF="class_summary_index.html" TARGET="index"><IMG SRC="../../img/blueleft.gif" ALT="left-pointing blue arrow"> click to put Class Index into the index pane</A></P>
+
+<A NAME="toptop"></A>
+
+
 
 <A NAME="A"></A>
 
-<HR SIZE=10 COLOR="black">
+<HR id="Ab">
 <H2 id="abstract_command_object">abstract_command_object</H2>
 <P class="ib">library: classics
 header: command_object.h
 usage: main API</P>
-<P>
-This is a common interface used for command objects.  It has a virtual <code>operator()</code> function,
-which is to be invoked by the consumer of the command.
-</P>
-See <A HREF="Classics/abstract_command_object.html"><code>abstract_command_object</code></A> documentation.</P>
+
+<P>This is a common interface used for command objects.  It has a virtual <code>operator()</code> function,
+which is to be invoked by the consumer of the command.</P>
+<P>See <A HREF="Classics/abstract_command_object.html#toptop"><code>abstract_command_object</code></A> documentation.</P>
 <P>See also class <A HREF="#APC_server"><code>APC_server</code></A>.</P>
 
 
-<HR SIZE=10 COLOR="black">
+<HR id="Ad">
+<H2>address_t</H2>
+<P class="ib">library: classics
+header: common.h
+usage: main API</P>
+<P>
+A typedef for an integer that is the same size as a pointer.  It is designed for clairity when manipulating pointers as ints,
+and for portability between 32-bit and 64-bit platforms.  It is defined as <code>unsigned</code> <code>int</code> under
+Win32.  It is also defined as <code>__int64</code> for 64-bit windows, but this is provisional since that is not supported yet.
+</P>
+
+
+<HR id="Ap">
 <H2 id="APC_server">APC_server</H2>
 <P class="ib">library: classics
 header: APC_server.h
@@ -61,11 +77,11 @@ usage: main API</P>
 This class creates and manages a thread that can then be fed work via
 a queue of command objects.
 </P>
-See <A HREF="Classics/APC_server.html"><code>APC_server</code></A> documentation.</P>
-<P>See also class <A HREF="#abstract_command_object"><code>abstract_command_object</code></A>.</P>
+<P>See <A HREF="Classics/APC_server.html#toptop" class="code">APC_server</A> documentation.</P>
+<P>See also class <A HREF="#abstract_command_object" class="code">abstract_command_object</A>.</P>
 
 
-<HR SIZE=10 COLOR="black">
+<HR id="At">
 <H2 id="atomic_counter">atomic_counter</H2>
 <P class="ib">library: classics
 header: atomic_counter.h
@@ -75,9 +91,9 @@ This provides a counter that can be incremented (or decremented) and tested
 in a single thread-safe unbroken operation.  It is specifically needed for
 reference counting in the <A HREF="Classics/handle_index.html" TARGET="index" class="code">handle</A> classes.
 </P>
-See <A HREF="Classics/atomic_counter_index.html" TARGET="index"><code>atomic_counter</code></A> class index.</P>
+<P>See <A HREF="Classics/atomic_counter_index.html" TARGET="index"><code>atomic_counter</code></A> class index.</P>
 
-<HR SIZE=10 COLOR="black">
+<HR id="Au">
 <H2>auto_COM_ptr</H2>
 <P class="ib">library: classics
 header: auto_COM_ptr.h
@@ -89,7 +105,7 @@ usage: template, main API</P>
 
 <A NAME="B"></A>
 
-<HR SIZE=10 COLOR="black">
+<HR id="Ba">
 <H2 id="baro">baro</H2>
 <P class="ib">library: classics
 header: pointers.h
@@ -99,7 +115,7 @@ handle class index</A> for more information.
 </P>
 
 
-<HR SIZE=10 COLOR="black">
+<HR id="By">
 <H2>byte</H2>
 <P class="ib">library: classics
 header: common.h
@@ -112,7 +128,7 @@ distinguish it from character strings.
 
 <A NAME="C"></A>
 
-<HR SIZE=10 COLOR="black">
+<HR id="Ca">
 <H2 id="exception::callback">callback, exception</H2>
 <P class="ib">library: classics
 header: exception.h
@@ -125,7 +141,7 @@ See the <A HREF="Classics/exception_callback.html">documentation</A> for details
 </P>
 
 
-<HR SIZE=10 COLOR="black">
+<HR>
 <H2 id="can_handle">can_handle</H2>
 <P class="ib">library: classics
 header: pointers.h
@@ -137,7 +153,7 @@ more information.
 </P>
 
 
-<HR SIZE=10 COLOR="black">
+<HR id="Ch">
 <H2>chdata</H2>
 <P class="ib">library: classics
 header: vararray.h
@@ -147,7 +163,16 @@ usage: internal</P>
 </P>
 
 
-<HR SIZE=10 COLOR="black">
+<HR id="Cl">
+<H2>cloaked_pointer</H2>
+<P class="ib">library: classics
+header: cloaked_pointer.h
+usage: template, main API</P>
+
+<P>NEEDS DOCUMENTATION
+</P>
+
+<HR>
 <H2>close_Kernel_HANDLE</H2>
 <P class="ib">library: classics
 header: close_handle.h
@@ -158,7 +183,7 @@ closes the handle when it goes out of scope.
 </P>
 
 
-<HR SIZE=10 COLOR="black">
+<HR>
 <H2 id="closure_stdcall_to_thiscall">closure_stdcall_to_thiscall</H2>
 <P class="ib">library: classics
 header: Classics/closure.h
@@ -167,7 +192,8 @@ usage: internal</P>
 
 <P>See the <A HREF="Classics/closure.html#toptop">Closure Documentation</A> for more details.</P>
 
-<HR SIZE=10 COLOR="black">
+
+<HR id="Co">
 <H2 id="const_baro">const_baro</H2>
 <P class="ib">library: classics
 header: pointers.h
@@ -177,7 +203,7 @@ handle class index</A> for more information.
 </P>
 
 
-<HR SIZE=10 COLOR="black">
+<HR>
 <H2 id="const_iterator">const_iterator</H2>
 <P class="ib">library: classics
 header: vararray.h
@@ -189,28 +215,27 @@ or the <A HREF="Classics/iterator.html">reference</A>.
 </P>
 
 
-<HR SIZE=10 COLOR="black">
+<HR>
 <H2 id="const_handle">const_handle</H2>
 <P class="ib">library: classics
 header: pointers.h
 usage: template, main API</P>
-<P>A reference-counted smart pointer.  See the <A HREF="Classics/handle_index.html" TARGET="index">
-handle class index</A> for more information.
-</P>
+<P>A reference-counted smart pointer.  For more information, see <A HREF="Classics/handle_index.html" TARGET="index">
+handle class index</A>.</P>
 
 
-<HR SIZE=10 COLOR="black">
+<HR>
 <H2 id="cow">cow</H2>
 <P class="ib">library: classics
 header: pointers.h
 usage: template, main API</P>
 <P>A reference-counted smart pointer having <I>Copy-On-Write</I> semantics.
-See the <A HREF="Classics/handle_index.html" TARGET="index">
-handle class index</A> for more information.
+For more information, see the <A HREF="Classics/handle_index.html" TARGET="index">
+handle class index</A>  or the <A HREF="Classics/handle/cow_usage.html#toptop" TARGET="info"><code>cow</code> User&rsquo;s Guide</A>.
 </P>
 
 
-<HR SIZE=10 COLOR="black">
+<HR id="Cr">
 <H2 id="critical_section">critical_section</H2>
 <P class="ib">library: classics
 header: critical_section.h
@@ -224,7 +249,7 @@ A simple mechanism for mutual exclusion, based on the NT <code>CriticalSection</
 
 <A NAME="D"></A>
 
-<HR SIZE=10 COLOR="black">
+<HR id="Da">
 <H2 id="data_t">data_t</H2>
 <P class="ib">library: classics
 header: vararray.h
@@ -237,7 +262,7 @@ implementations.
 </P>
 
 
-<HR SIZE=10 COLOR="black">
+<HR id="De">
 <H2 id="debug_object_count_t">debug_object_count_t</H2>
 <P class="ib">library: classics
 header: debug_object_count.h
@@ -247,7 +272,7 @@ This allows leaked objects to be reported automatically at program termination.
 </P>
 
 
-<HR SIZE=10 COLOR="black">
+<HR id="Di">
 <H2>Dialog_message_tap</H2>
 <P class="ib">library: Tomahawk
 header: Dialog_message_tap.h
@@ -257,7 +282,7 @@ model dialog boxes, modeless dialog boxes, and property page sheets.</P>
 <P>See <A HREF="Tomahawk/Dialog_message_tap_index.html" TARGET="index"><code>Dialog_message_tap</code></A> documentation.</p>
 
 
-<HR SIZE=10 COLOR="black">
+<HR>
 <H2>dimensional</H2>
 <P class="ib">library: classics
 header: dimensional.h
@@ -273,7 +298,18 @@ Time as distinct types without loss of efficiency.
 
 <A NAME="E"></A>
 
-<HR SIZE=10 COLOR="black">
+<HR id="Ea">
+<H2 id="eagduru">eagduru</H2>
+<P class="ib">library: tomahawk
+header: eagduru.h
+usage: main API</P>
+<P>
+</P>
+<p>See <A HREF="Tomahawk\eagduru_index.html" TARGET="index"><code>eagduru</code> class index</a> for
+more information.</p>
+
+
+<HR id="Ev">
 <H2 id="event_flag">event_flag</H2>
 <P class="ib">library: classics
 header: event_flag.h
@@ -287,7 +323,7 @@ error checking.
 <P>See also class <A HREF="#critical_section"><code>critical_section</code></A>.</P>
 
 
-<HR SIZE=10 COLOR="black">
+<HR id="Ex">
 <H2 id="exception">exception</H2>
 <P class="ib">library: classics
 header: exception.h
@@ -300,7 +336,7 @@ an error.  Note that <code>classics::exception</code> is derived from <code>std:
 more information.</p>
 
 
-<HR SIZE=10 COLOR="black">
+<HR>
 <H2 id="exception_value_logger">exception_value_logger</H2>
 <P class="ib">library: classics
 header: exception.h
@@ -317,7 +353,7 @@ declared inside classes.</P>
 
 <A NAME="F"></A>
 
-<HR SIZE=10 COLOR="black">
+<HR id="Fi">
 <H2 id="filename_t">filename_t</H2>
 <P class="ib">library: classics
 header: filename.h
@@ -329,7 +365,7 @@ a list of parts.  It can handle either a PC file system name, a URL, or others.<
 <code>filename_t</code> class index</A> for more information.</P>
 
 
-<HR SIZE=10 COLOR="black">
+<HR>
 <H2 id="filename_t_base">filename_t_base</H2>
 <P class="ib">library: classics
 header: filename.h
@@ -340,7 +376,7 @@ makes it simple to redo the underlying implementation of how <I>parts</I> are
 stored and parsed, without affecting the higher-level functionality.  Splitting
 it up this way also helps define testing requirements.
 
-<HR SIZE=10 COLOR="black">
+<HR>
 <H2 id="filename_t::filesystem_t">filesystem_t</H2>
 <P class="ib">library: classics
 <B>nested in: filename_t</B>
@@ -355,7 +391,7 @@ for more information.</P>
 and <A HREF="#filename_t::URL_filesystem_t"><code>URL_filesystem_t</code></A>.</P>
 
 
-<HR SIZE=10 COLOR="black">
+<HR>
 <H2>fixed_auto_buffer</H2>
 <P class="ib">library: classics
 header: fixed_auto_buffer.h
@@ -367,7 +403,7 @@ classes.
 </P>
 
 
-<HR SIZE=10 COLOR="black">
+<HR id="Fl">
 <H2 id="flagword">flagword</H2>
 <P class="ib">library: classics
 header: flagword.h
@@ -381,7 +417,7 @@ of options passed as a single parameter.
 
 <A NAME="G"></A>
 
-<HR SIZE=10 COLOR="black">
+<HR>
 <H2 id="g_data_t">g_data_t</H2>
 <P class="ib">library: classics
 header: vararray.h
@@ -394,7 +430,7 @@ use a <code>g_data_t&lt;complex&gt;</code> to match.
 </P>
 
 
-<HR SIZE=10 COLOR="black">
+<HR id="Ge">
 <H2>generic_2D_point</H2>
 <P class="ib">library: classics
 header: 2D_point.h, point_ios.h
@@ -405,7 +441,7 @@ flavors of “points” needed, including <code>long</code>, <code>short</code>, and
 </P>
 
 
-<HR SIZE=10 COLOR="black">
+<HR>
 <H2>generic_string</H2>
 <P class="ib">library: classics
 header: string.h
@@ -413,13 +449,12 @@ usage: template, main API</P>
 <P>
 This is a general string class.  See <A HREF="#string"><code>string</code></A> and
 <A HREF="#wstring"><code>wstring</code></A>.</P>
-See <A HREF="Classics/string.html"><code>generic_string</code></A> documentation</P>
-</P>
+<P>See <A HREF="Classics/string.html"><code>generic_string</code></A> documentation</P>
 
 
 <A NAME="H"></A>
 
-<HR SIZE=10 COLOR="black">
+<HR id="Ha">
 <H2 id="handle">handle</H2>
 <P class="ib">library: classics
 header: pointers.h
@@ -429,7 +464,7 @@ usage: template, main API</P>
 </P>
 
 
-<HR SIZE=10 COLOR="black">
+<HR>
 <H2>handle_structure</H2>
 <P class="ib">library: classics
 header: pointers.h
@@ -443,7 +478,7 @@ templates, including
 <A HREF="#const_baro" class="code">const_baro</A>.
 
 
-<HR SIZE=10 COLOR="black">
+<HR>
 <H2>handle_structure_nt</H2>
 <P class="ib">library: classics
 header: pointers.h
@@ -451,7 +486,27 @@ usage: internal</P>
 <P>A non-template base class to bring out common code from the <code>handle_structure</code> class.
 </P>
 
-<HR SIZE=10 COLOR="black">
+
+<HR id="Hs">
+<H2 id="hsoft">hsoft</H2>
+<P class="ib">library: ratwin
+header: base.h
+namespace:  ratwin::base
+usage: template
+</P>
+<P>
+This goes with the various Windows <code>HANDLE</code> types.  It is a soft-typed <code>HANDLE</code>, allowing you to
+use the proper kind of <code>HANDLE</code>, or a generic untyped <code>HANDLE</code>, but <I>not</I> a known improper
+type of <code>HANDLE</code>.</P>
+<P>Making a parameter of type <code>HANDLE</code> would accept any kind of <code>HANDLE</code>:
+<code>Kernel_HANDLE</code>, <code>HMENU</code>, <code>HKEY</code>, etc.  That is
+usually too weakly typed, and defeats the purpose of having strong <code>HANDLE</code> types.  But a parameter of type
+<code>hsoft&lt;HMENU&gt;</code> would allow you to pass a <code>HMENU</code> or a <code>HANDLE</code> only, and
+reject a <code>HKEY</code>, <code>Kernel_HANDLE</code>, and all the rest at compile time.
+</P>
+
+
+<HR id="Hy">
 <H2 id="hypothetical_trug">hypothetical_trug</H2>
 <P class="ib">library: classics
 header: trug.h
@@ -470,7 +525,7 @@ or <I>interface</I> is for run-time polymorphism.</P>
 <A NAME="I"></A>
 
 
-<HR SIZE=10 COLOR="black">
+<HR id="In">
 <H2>index_t</H2>
 <P class="ib">library: classics
 <B>nested in: filename_t</B>
@@ -482,7 +537,7 @@ string it is holding.
 
 
 
-<HR SIZE=10 COLOR="black">
+<HR>
 <H2>intermediate</H2>
 <P class="ib">library: classics
 header: vararray.h
@@ -492,7 +547,7 @@ This class is used internally by the <A HREF="#vararray"><code>vararray</code></
 </P>
 
 
-<HR SIZE=10 COLOR="black">
+<HR id="It">
 <H2>iterator (global)</H2>
 <P class="ib">library: classics
 header: vararray.h
@@ -505,7 +560,7 @@ or the <A HREF="Classics/iterator.html">Iterator Reference</A>.
 </P>
 
 
-<HR SIZE=10 COLOR="black">
+<HR>
 <H2 id="exception::iterator">iterator (exception::iterator)</H2>
 <P class="ib">library: classics
 <B>nested in: <A HREF="#exception">exception</A></B>
@@ -519,7 +574,15 @@ This is used to easily access the information in an <A HREF="#exception" class="
 
 <A NAME="L"></A>
 
-<HR SIZE=10 COLOR="black">
+<HR id= "La">
+<H2 id="launch_thread">launch_thread</H2>
+<P class="ib">library: classics
+header: thread.h
+usage: template, main API</P>
+<P>Provides an easy way to start a thread.  See the <A HREF="Classics/launch_thread.html#toptop">documentation page</A> for this class.
+</P>
+
+<HR id="Li">
 <H2 id="lifetime">lifetime</H2>
 <P class="ib">library: classics
 header: pointers.h
@@ -527,7 +590,7 @@ usage: protected or advanced API</P>
 
 <A NAME="M"></A>
 
-<HR SIZE=10 COLOR="black">
+<HR id="Ma">
 <H2>make_alias_t</H2>
 <P class="ib">library: classics
 header: vararray.h
@@ -538,7 +601,7 @@ the <code>vararray</code> User’s Guide.
 </P>
 
 
-<HR SIZE=10 COLOR="black">
+<HR id="Me">
 <H2 id="member_callback_thunk">member_callback_thunk</H2>
 <P class="ib">library: classics
 header: Classics/closure.h
@@ -549,7 +612,7 @@ and jumps to a member function.</P>
 <P>See the <A HREF="Classics/closure.html#toptop">Closure Documentation</A> for more details.</P>
 
 
-<HR SIZE=10 COLOR="black">
+<HR>
 <H2 id="message_tap">message_tap</H2>
 <P class="ib">library: Tomahawk
 header: message_tap.h
@@ -561,7 +624,7 @@ in the index pane.
 
 
 
-<HR SIZE=10 COLOR="black">
+<HR id="Mf">
 <H2>MFC_CString</H2>
 <P class="ib">library: classics
 header: MFC_CString.h
@@ -581,7 +644,7 @@ or as a static library.  The single Classics.DLL handles all cases.</P>
 in the <code>ustring</code> documentation.
 </P>
 
-<HR SIZE=10 COLOR="black">
+<HR id="Ms">
 <H2 id="MSG">MSG</H2>
 <P class="ib">library: RatWin
 header: message=struct.h or message.h
@@ -593,7 +656,7 @@ usage: public</P>
 
 <A NAME="N"></A>
 
-<HR SIZE=10 COLOR="black">
+<HR id="No">
 <H2>noisy1</H2>
 <P class="ib">library: classics
 header: debug.h
@@ -603,7 +666,7 @@ and destruction.
 </P>
 
 
-<HR SIZE=10 COLOR="black">
+<HR id="Nt">
 <H2>nt_base</H2>
 <P class="ib">library: classics
 header: vararray.h
@@ -613,7 +676,7 @@ usage: internal</P>
 </P>
 
 <A NAME="O"></A>
-<HR SIZE=10 COLOR="black">
+<HR>
 <H2>OleItemContainer_impl</H2>
 <P class="ib">library: classics
 header: COM\OleItemContainer_impl.h
@@ -625,7 +688,7 @@ usage: main API</P>
 
 <A NAME="P"></A>
 
-<HR SIZE=10 COLOR="black">
+<HR id="Pc">
 <H2 id="filename_t::PC_filesystem_t">PC_filesystem_t</H2>
 <P class="ib">library: classics
 header: filename.h
@@ -638,7 +701,7 @@ file system.  An instance to this class is provided in the static member
 </P>
 
 
-<HR SIZE=10 COLOR="black">
+<HR id="Pe">
 <H2>peremptory</H2>
 <P class="ib">library: classics
 header: peremptory.h
@@ -656,18 +719,18 @@ usage: main API</P>
 </P>
 
 
-<HR SIZE=10 COLOR="black">
+<HR id="Po">
 <H2 id="pool_mixin">pool_mixin</H2>
 <P class="ib">library: classics
 header: fixed_memory_pool.h
-usage: main API
+usage: main API, <EM>deprecated</EM>
 </P>
 <P>A helper class for ease of using the <A HREF="#static_fixed_memory_pool" class="code">static_fixed_memory_pool</A>. See
 <A HREF="fixed_memory_pool.html#canned" class="code">fixed memory pool</A> documentation.
 </P>
 
 
-<HR SIZE=10 COLOR="black">
+<HR id="Pr">
 <H2>profile_timer</H2>
 <P class="ib">library: classics
 header: profile_timer.h
@@ -679,7 +742,7 @@ so it’s primarily used to profile code.
 <p>See <A HREF="Classics/profile_timer.html" class="code">profile_timer</a> documentation.</p>
 
 
-<HR SIZE=10 COLOR="black">
+<HR>
 <H2>prothonotary</H2>
 <P class="ib">library: classics
 header: COM\prothonotary.h
@@ -691,7 +754,7 @@ This registers and unregisters a COM server.
 
 <A NAME="R"></A>
 
-<HR SIZE=10 COLOR="black">
+<HR id="Re">
 <H2 id="exception::register_callback">register_callback, exception</H2>
 <P class="ib">library: classics
 header: exception.h
@@ -704,7 +767,7 @@ See the <A HREF="Classics/exception_callback.html">documentation</A> for details
 </P>
 
 
-<HR SIZE=10 COLOR="black">
+<HR>
 <H2 id="registry_key">registry_key</H2>
 <P class="ib">library: classics
 header: registry.h
@@ -717,7 +780,7 @@ See the <A HREF="Classics/registry_guide.html#toptop">documentation</A> for deta
 
 <A NAME="S"></A>
 
-<HR SIZE=10 COLOR="black">
+<HR>
 <H2 id="s_data_t">s_data_t</H2>
 <P class="ib">library: classics
 header: vararray.h
@@ -729,7 +792,17 @@ implementation is shared among all species of <A HREF="#vararray_s" class="code"
 </P>
 
 
-<HR SIZE=10 COLOR="black">
+<HR id="Sc">
+<H2>schedule_t</H2>
+<P class="ib">library: classics
+header: schedule_t.h
+usage: main API</P>
+<P>This enumeration holds a priority value.  16 bits are used to provide for
+fine-grained control.  High bits (in a 32-bit word) are used as flags.
+</P>
+
+
+<HR id="Sm">
 <H2 id="sMSG">sMSG</H2>
 <P class="ib">library: RatWin
 header: message=struct.h or message.h
@@ -742,7 +815,7 @@ defines that name as a larger structure, so RatWin uses <code>MSG</code> for the
 <P>The <code>sMSG</code> struct and the specific message-cracker structs are described in the
 RatWin <A HREF="RatWin/message_crack_index.html" TARGET="index">Message Cracker</A> documentation.</P>
 
-<HR SIZE=10 COLOR="black">
+<HR id="Sn">
 <H2>snoop_t</H2>
 <P class="ib">library: classics
 header: vararray.h
@@ -753,39 +826,28 @@ function to spy on the internal state of the <code>vararray</code>.
 </P>
 
 
-<HR SIZE=10 COLOR="black">
-<H2>schedule_t</H2>
-<P class="ib">library: classics
-header: schedule_t.h
-usage: main API</P>
-<P>This enumeration holds a priority value.  16 bits are used to provide for
-fine-grained control.  High bits (in a 32-bit word) are used as flags.
-</P>
-
-
-<HR SIZE=10 COLOR="black">
+<HR id="St">
 <H2 id="static_fixed_memory_pool">static_fixed_memory_pool</H2>
 <P class="ib">library: classics
 header: fixed_memory_pool.h
 usage: main API
 </P>
 <P>Efficient small block allocation, including support for global static objects.  See
-<A HREF="fixed_memory_pool.html">fixed memory pool</A> documentation.
+<A HREF="Classics/fixed_memory_pool.html#toptop">fixed memory pool</A> documentation.
 </P>
 
-<HR SIZE=10 COLOR="black">
+<HR>
 <H2 id="string">string</H2>
 <P class="ib">library: classics
 header: string.h, string_ios.h
 usage: main API</P>
-This is a typedef for <code>generic_string&lt;char&gt;</code>.  It is a string of 8-bit characters.</P>
-See <A HREF="Classics/string.html">string</A> documentation</P>
-</P>
+<P>This is a typedef for <code>generic_string&lt;char&gt;</code>.  It is a string of 8-bit characters.</P>
+<P>See <A HREF="Classics/string.html">string</A> documentation</P>
 
 
 <A NAME="T"></A>
 
-<HR SIZE=10 COLOR="black">
+<HR id="Tr">
 <H2 id="trug">trug</H2>
 <P class="ib">library: classics
 header: trug.h
@@ -795,7 +857,7 @@ usage: template, main API</P>
 concrete implementation of the proper interface (see <A HREF="#hypothetical_trug" class="code">hypothetical_trug</A>),
 and the actual template named trug has a few supplied specializations.</P>
 
-<P>A trug of a pointer type, e.g. <code>trug&lt;int&></code>, provides strict ownership semantics
+<P>A trug of a pointer type, e.g. <code>trug&lt;int*></code>, provides strict ownership semantics
 and automatic destruction for pointers, similarly to the standard <code>std::auto_ptr</code> class.</P>
 
 <P>A trug of a Windows <code>HANDLE</code> type provides strict ownership and automatic destruction in an analogous way
@@ -806,7 +868,7 @@ when &ldquo;freed&rdquo;.</P>
 
 
 
-<HR SIZE=10 COLOR="black">
+<HR>
 <H2>tristate</H2>
 <P class="ib">library: classics
 header: misc_types.h
@@ -819,7 +881,7 @@ Used for 3-value logic, particularly in representing user’s settings.  Values ar
 </P>
 
 
-<HR SIZE=10 COLOR="black">
+<HR id="Ts">
 <H2 id="ts_pool_mixin">ts_pool_mixin</H2>
 <P class="ib">library: classics
 header: fixed_memory_pool.h
@@ -830,13 +892,13 @@ usage: main API
 </P>
 
 
-<HR SIZE=10 COLOR="black">
+<HR>
 <H2 id="ts_static_fixed_memory_pool">ts_static_fixed_memory_pool</H2>
 <P class="ib">library: classics
 header: fixed_memory_pool.h
 usage: main API
 </P>
-<P>A thread-safe version of <A HREF="#static_fixed_memory_pool" class="code">static_fixed_memory_pool<A>.  See
+<P>A thread-safe version of <A HREF="#static_fixed_memory_pool" class="code">static_fixed_memory_pool</A>.  See
 <A HREF="fixed_memory_pool.html">fixed memory pool</A> documentation.
 </P>
 
@@ -844,7 +906,7 @@ usage: main API
 
 <A NAME="U"></A>
 
-<HR SIZE=10 COLOR="black">
+<HR id="Ul">
 <H2>ulong</H2>
 <P class="ib">library: classics
 header: common.h
@@ -854,7 +916,7 @@ A typedef for <code>unsigned long</code>.
 </P>
 
 
-<HR SIZE=10 COLOR="black">
+<HR id="Ur">
 <H2 id="filename_t::URL_filesystem_t">URL_filesystem_t</H2>
 <P class="ib">library: classics
 header: filename.h
@@ -868,7 +930,7 @@ An instance to this class is provided in the static member
 </P>
 
 
-<HR SIZE=10 COLOR="black">
+<HR id="Us">
 <H2>ushort</H2>
 <P class="ib">library: classics
 header: common.h
@@ -878,7 +940,7 @@ A typedef for <code>unsigned</code> <code>short</code>.
 </P>
 
 
-<HR SIZE=10 COLOR="black">
+<HR>
 <H2 id="ustring">ustring</H2>
 <P class="ib">library: classics
 header: ustring.h
@@ -894,7 +956,7 @@ narrow strings, and to translate between string classes from any library.</P>
 
 <A NAME="V"></A>
 
-<HR SIZE=10 COLOR="black">
+<HR id="Va">
 <H2 id="vararray">vararray</H2>
 <P class="ib">library: classics
 header: vararray.h
@@ -909,7 +971,7 @@ or <A HREF="Classics/vararray_guide.html" TARGET="info">User’s Guide</A>.
 
 
 
-<HR SIZE=10 COLOR="black">
+<HR>
 <H2 id="vararray_g">vararray_g</H2>
 <P class="ib">library: classics
 header: vararray.h
@@ -924,7 +986,7 @@ the general vararray class.
 </P>
 
 
-<HR SIZE=10 COLOR="black">
+<HR>
 <H2>vararray_s</H2>
 <P class="ib">library: classics
 header: vararray.h
@@ -943,7 +1005,7 @@ the general vararray class.
 
 <A NAME="W"></A>
 
-<HR SIZE=10 COLOR="black">
+<HR id="Wi">
 <H2 id="win_exception">win_exception</H2>
 <P class="ib">library: classics
 header: exception.h
@@ -953,26 +1015,37 @@ This is derived from <A HREF="#exception">classics::exception</A>.  It is used f
 about <code>GetLastError</code> and how to look up the description for an error code.
 </P>
 
+<HR id="Wn">
+<H2 id="WNDPROC_2">WNDPROC_2</H2>
+<P class="ib">library: ratwin
+header: window=struct.h
+namespace: ratwin::window
+usage: main API</P>
+<P>
+This is the same as a WNDPROC, except it is declared to take a <A HREF="#sMSG" class="code">sMSG</A>
+structure instead of four separate arguments.</P>
+<PRE class="code">
+typedef long (__stdcall* WNDPROC_2)(message::sMSG);
+</PRE>
 
-<HR SIZE=10 COLOR="black">
+
+<HR id="Ws">
 <H2><A NAME="wstring">wstring</A></H2>
 <P class="ib">library: classics
 header: string.h, string_ios.h
 usage: main API</P>
-This is a typedef for <code>generic_string&lt;wchar_t&gt;</code>.  It is a string of 16-bit characters.</P>
-See <A HREF="Classics/string.html" class="code">wstring</A> documentation</P>
-</P>
+<P>This is a typedef for <code>generic_string&lt;wchar_t&gt;</code>.  It is a string of 16-bit characters.</P>
+<P>See <A HREF="Classics/string.html" class="code">wstring</A> documentation</P>
 
 <A NAME="X"></A>
 
-<HR SIZE=10 COLOR="black">
+<HR id="Xw">
 <H2 id="xwstring">xwstring</H2>
 <P class="ib">library: classics
 header: string.h, string_ios.h
 usage: main API</P>
-This is a typedef for <code>generic_string&lt;unsigned __int32&gt;</code>.  It is a string of 32-bit characters.</P>
-See <A HREF="Classics/string.html" class="code">xwstring</A> documentation</P>
-</P>
+<P>This is a typedef for <code>generic_string&lt;unsigned __int32&gt;</code>.  It is a string of 32-bit characters.</P>
+<P>See <A HREF="Classics/string.html" class="code">xwstring</A> documentation</P>
 
 
 </BODY>

@@ -14,16 +14,16 @@ STARTWRAP
 namespace ratwin {
 namespace window {
 
-static  // compiler (VC6) couldn't find it in unnamed namespace!
-long __stdcall really_minimal_window_proc (types::HWND wnd, unsigned mess, unsigned p1, ulong p2)
+template<typename CharT>
+long __stdcall really_minimal_window_proc (message::sMSG ms)
  {
  // >> idea: only do this if it is a top-level window.
- if (mess == WM_constants::WM_NCDESTROY) {
- 	// November 2001: changed DESTROY to NCDESTROY to ensure that more cleanup is done.
+ if (ms.message == WM_constants::WM_NCDESTROY) {
+    // November 2001: changed DESTROY to NCDESTROY to ensure that more cleanup is done.
     PostQuitMessage(0);
     return 0;
     }
- else return DefWindowProc (wnd, mess, p1, p2);
+ else return DefWindowProc<CharT> (ms);
  }
 
 
@@ -32,7 +32,7 @@ window_class<CharT>::window_class (const CharT* classname)
  {
  // >> can factor out common-non template code.
  style= 0;
- lpfnWndProc= &really_minimal_window_proc;
+ WndProc2= &really_minimal_window_proc<CharT>;
  cbClsExtra= 0;
  cbWndExtra= 0;
  hInstance= util::get_Instance();

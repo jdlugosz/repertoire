@@ -6,16 +6,24 @@
 <META http-equiv="Content-Script-Type" content="text/javascript">
 <SCRIPT type= "text/javascript" src="../helpers.js"></SCRIPT>
 <LINK REL=STYLESHEET HREF="../info.css" TYPE="text/css">
+<LINK REL="Start" HREF="http://www.dlugosz.com/Repertoire/refman/mainframe.html">
+<LINK REL="Contents" HREF="../reper_index.html">
+<LINK REL="Index" HREF="../class_summary.html">
+<LINK REL="Chapter" HREF="class_index.html">
+<LINK REL="Help" HREF="../accessibility_statement.html">
+<LINK REL="Copyright" HREF="../policy.html">
+<LINK REL=STYLESHEET HREF="../info.css" TYPE="text/css">
 <SCRIPT type="text/javascript">
    checkframe ("Tomahawk/message_tap_index.html");
 </SCRIPT>
+
+<META name="date" content="2007-02-17">
 </HEAD>
 
 <BODY>
 <IFRAME id="page_banner" src="../page_banner.html" scrolling="no"></IFRAME>
-<A NAME="toptop"></A>
 
-<H1>message_tap User’s Guide</H1>
+<H1 id="toptop">message_tap User’s Guide</H1>
 
 <H2>Related Documents</H2>
 <UL>
@@ -42,7 +50,7 @@
 <H2 id="overview">Overview</H2>
 
 <P>This class provides a WinProc that adds a <I>this</I> pointer and calls a virtual function on
-an object.</P>
+a C++ object.</P>
 
 <P>Many libraries provide some mechanism for associating a C++ object with a Win32 primitive <code>HWND</code>.
 When the WinProc is called for that window, it needs to find the associated C++ object and call the
@@ -52,9 +60,9 @@ code that goes in the &ldquo;real&rdquo; WinProc.</P>
 <P>Windows provides a couple such mechanisms, including:</P>
 <UL>
 	<LI>Reserving extra bytes in the <code>WNDCLASS</code>.  This is the most straightforward, but
-	is only applicable when you designed the <code</code>>WNDCLASS for this purpose.  It cannot work
+	is only applicable when you designed the <code>WNDCLASS</code> for this purpose.  It cannot work
 	on subclassed windows or controls.
-	<LI>Use the <code>GWL_USERDATA</code>.  But only if no other code is already using it
+	<LI>Use the <code>GWL_USERDATA</code>.  But only if no other code is already using it.
 	<LI>Use the <code>DWL_USER</code> data or other data area as provided by various <code>WNDCLASS</code>’s.  But
 	each <code>WNDCLASS</code> has its own way of doing it, so this is not general purpose.
 	<LI>Use a named window property.  With a unique name (e.g. a GUID) this should work on
@@ -83,9 +91,10 @@ the <A HREF="../class_summary.html#member_callback_thunk" class="code">member_ca
 and all the related housekeeping issues.</P>
 
 <P>That’s <I>all</I> this class does: take care of the housekeeping of using the thunk as a WndProc.  What it
-ends up calling is a simple function called <A HREF="message_tap.html#handle_message" class="code">handle_message</A>.
+ends up calling is a virtual function called <A HREF="message_tap.html#handle_message" class="code">handle_message</A>.
 It does not implement any kind of fancy message dispatching system or other things.  It has amost no policy imposed,
-and can be used as a building-block for any kind of message handing system.</P>
+and can be used as a building-block for any kind of message handing system.  For a more elaborate class that
+builds on this, see the <A HREF="../class_summary.html#eagduru">eagduru</A> class.</P>
 
 <H2 id="threading">Threading Issues</H2>
 <P>Most of what this class does is associated with constructor/destructor activity, and as such
@@ -105,7 +114,7 @@ not create an instance on the stack or in static data.</P>
 <P>Instances cannot be assigned or copied.</P>
 <P>Instances use smart pointers to control their lifetime.  As you would expect, the object is destroyed when the
 last smart pointer holding it is dropped.  However, the Windows primitive <code>HWND</code> window also participates in the ownership
-of this object.  Effectively (though the actual implementation is more circuitous), the window contains a smart pointer to 
+of this object.  Effectively (though the actual implementation is more circuitous), the window contains a smart pointer to
 this object.  The interesting ramifications of this are:</P>
 <UL>
 	<LI>You don’t have to keep a pointer to the object if you don’t otherwise need one.
@@ -128,7 +137,7 @@ which shows how to use the <code>message_tap</code>.  The basic steps are:</P>
 class are bound 1:1 to <code>HWND</code> windows.  You supply a virtual function that is called as the WinProc of the window.</P>
 
 <H3>The <code>handle_message</code> Function</H3>
-<P>When Windows sends a message to the <code>HWND</code> window, it triggers the 
+<P>When Windows sends a message to the <code>HWND</code> window, it triggers the
 <A HREF="message_tap.html#handle_message" class="code" TARGET="info">handle_message</A>
 virtual function. Write this function in your concrete class to do whatever you want the window to do
 in response to various messages.  This example uses the <A HREF="MSG.html#toptop" class="code" TARGET="info">MSG</A>
@@ -148,12 +157,12 @@ testhook_1* <B>p</B>= new testhook_1;
 <P>In the InitInstance function of the sample program, the <code>HWND</code> is created using a call to the Win32 primitive
 <code>CreateWindow</code>.  The instance is constructed using <code>new</code>, as <A HREF="#housekeeping">it must</A>.</P>
 
-<P>The <code>WinclassName</code> used in the call to <code>CreateWindow</code> is 
+<P>The <code>WinclassName</code> used in the call to <code>CreateWindow</code> is
 <A HREF="#WNDCLASS">discussed later</A>.</P>
 
 <P>The <code>new testhook_1</code> is assigned to a simple pointer, not a smart pointer.  That is fine since this code
 is not going to remember the value after InitInstance returns.  The window itself keeps a reference to this object, and
-the object will be destructed when the window is closed.  
+the object will be destructed when the window is closed.
 <IMG src="../images/caution.png" style="height:2em" ALIGN="right" ALT="caution" TITLE="This icon indicates special instructions or pitfalls.">
 If I had <I>kept</I> a pointer (that is, not a smart pointer), it would point
 to an object that the smart pointer system might free, without itself participating in the lifetime control.  In general, don’t

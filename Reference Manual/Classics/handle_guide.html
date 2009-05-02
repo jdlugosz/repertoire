@@ -1,5 +1,5 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"  "http://www.w3.org/TR/html4/loose.dtd">
-<HTML>
+<HTML lang="en-US">
 <HEAD>
 <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=windows-1252">
 <TITLE>handle User’s Guide</TITLE>
@@ -8,11 +8,12 @@
 <SCRIPT type="text/javascript">
    checkframe ("Classics/handle_index.html");
 </SCRIPT>
-<META name="date" content="2006-06-29">
+<META name="date" content="2006-10-27">
 </HEAD>
 
 <BODY>
-<H1>handle Users Guide</H1>
+<IFRAME id="page_banner" src="../page_banner.html" scrolling="no">banner</IFRAME>
+<H1 id="toptop">handle Users Guide</H1>
 
 <P>The handle is the pre-eminent &ldquo;smart pointer&rdquo; for reference counting in C++.</P>
 <UL>
@@ -31,6 +32,7 @@
 	<LI><A HREF="Smart%20Pointers%20Overview.html#toptop">Original Whitepaper</A>
 	<LI><A HREF="handle.html#toptop"><code>handle</code> Member Reference</A>
 	<LI><A HREF="baro.html#toptop"><code>baro</code> Member Reference</A>
+	<LI><A href="handle/cow_usage.html#toptop">Cow Usage</A>
 </UL>
 
 <H2>Overview</H2>
@@ -47,10 +49,20 @@ See <A HREF="Smart Pointers Overview.html">intro</A>
 	</UL>
 	<LI><A HREF="#housekeeping">Threading and Housekeeping Issues</A>
 	<LI><A HREF="#handle_cast">Casting &mdash; <code>handle_cast</code></A>
-	<LI><A HREF="#baro"><code>baro</code> &mdash Non-Owning References</A>
+	<LI><A HREF="#baro"><code>baro</code> &mdash; Non-Owning References</A>
 </UL>
 
 <H2 id="flavors">Five Flavors of Smart Pointer</H2>
+
+<DL>
+	<DT><code>const_handle</code>
+	<DT><code>handle</code>
+	<DT><code>cow</code>
+		<DD>See <A href="handle/cow_usage.html#toptop">Cow Usage</A>
+	<DT><code>const_baro</code>
+	<DT><code>baro</code>
+</DL>
+
 <H2 id="constraints">Requirements for <code>T</code></H2>
 <H3 id="can_handle">The <code>can_handle</code> class</H3>
 <H3 id="Get_lifetime_object"><code>Get_lifetime_object</code></H3>
@@ -149,7 +161,7 @@ the library deals with this transparantly.  Two threads that call <code>cow1->fo
 with a pending lazy copy, will work itself out.</P>
 
 <H2 id="handle_cast">Casting &mdash; <code>handle_cast</code></H2>
-<H2 id="baro"><code>baro</code> &mdash Non-Owning References</H2>
+<H2 id="baro"><code>baro</code> &mdash; Non-Owning References</H2>
 
 <H1>Footnotes</H1>
 <P id="footnote_must" class="footnote">A handle must point to a dynamically-allocated object, since the handle
@@ -163,5 +175,6 @@ essentially a singleton, is indeed static.  It is never deleted because the refe
 the delayed-copying of the same handle (not the same object, but the same handle variable) at the same time.  See
 notes at <A HREF="handle.html#make_unique" class="code" target="info">make_unique</A>.</P>
 <HR>
+<IFRAME id="page_footer" src="../page_footer.html">Copyright etc.</IFRAME>
 </BODY>
 </HTML>

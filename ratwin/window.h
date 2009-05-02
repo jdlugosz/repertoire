@@ -1,6 +1,6 @@
-// The Repertoire Project copyright 2006 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
+// The Repertoire Project copyright 2007 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: ratwin\window.h
-// Revision: public build 9, shipped on 18-Oct-2006
+// Revision: post-public build 9
 
 #pragma once
 #if defined RATWIN_NoGlobals
@@ -9,6 +9,7 @@
 
 #include "ratwin\window=struct.h"
 #include "ratwin\ChildidOrHMENU.h"
+#include "ratwin\LongPtr.h"
 #include "ratwin\message=struct.h"
 
 // DLL imports "cloaked" for overloading
@@ -47,14 +48,17 @@ __declspec(dllimport) int __stdcall UpdateWindow (Dlugosz::ratwin::arg::arg32);
 __declspec(dllimport) long __stdcall SendMessageA (ratwin::message::sMSG);
 __declspec(dllimport) void __stdcall PostQuitMessage (Dlugosz::ratwin::arg::arg32);
 __declspec(dllimport) long __stdcall DefWindowProcA (ratwin::message::sMSG);
+__declspec(dllimport) long __stdcall DefWindowProcW (ratwin::message::sMSG);
 __declspec(dllimport) unsigned short __stdcall RegisterClassA (Dlugosz::ratwin::arg::arg32);
 __declspec(dllimport) unsigned short __stdcall RegisterClassW (Dlugosz::ratwin::arg::arg32);
 __declspec(dllimport) void* __stdcall GetWindowLongA (Dlugosz::ratwin::arg::arg32,int);
-__declspec(dllimport) void* __stdcall SetWindowLongA (Dlugosz::ratwin::arg::arg32,int,void*);
+__declspec(dllimport) void* __stdcall SetWindowLongA (Dlugosz::ratwin::arg::arg32, int,Dlugosz::ratwin::arg::arg32);
+__declspec(dllimport) void* __stdcall SetWindowLongW (Dlugosz::ratwin::arg::arg32, int,Dlugosz::ratwin::arg::arg32);
 __declspec(dllimport) int __stdcall SetPropA (Dlugosz::ratwin::arg::arg32, const char*, void*);
 __declspec(dllimport) void* __stdcall GetPropA (Dlugosz::ratwin::arg::arg32, const char*);
 __declspec(dllimport) int __stdcall MoveWindow (Dlugosz::ratwin::arg::arg32, int X, int Y, int nWidth, int nHeight, int bRepaint);
 __declspec(dllimport) unsigned long __stdcall CallWindowProcA (Dlugosz::ratwin::arg::arg32, ratwin::message::sMSG);
+__declspec(dllimport) unsigned long __stdcall CallWindowProcW (Dlugosz::ratwin::arg::arg32, ratwin::message::sMSG);
 __declspec(dllimport) int __stdcall SetWindowTextA (Dlugosz::ratwin::arg::arg32, const char*);
 __declspec(dllimport) int __stdcall SetWindowTextW (Dlugosz::ratwin::arg::arg32, const wchar_t*);
 __declspec(dllimport) int __stdcall GetWindowTextA (Dlugosz::ratwin::arg::arg32, char*, int);
@@ -97,14 +101,14 @@ types::HWND CreateWindowEx (
     ChildidOrHMENU hMenu,
     types::HINSTANCE hInstance,
     void* lpParam)
-{ 
+{
    using types::HWND;
 //using types::HMENU;
 //using types::HINSTANCE;
 return reinterpret_cast<HWND>(::CreateWindowExA(
    dwExStyle, lpClassName, lpWindowName, dwStyle,
-   X, Y, nWidth, nHeight, 
-   reinterpret_cast<arg::arg32>(hWndParent), 
+   X, Y, nWidth, nHeight,
+   reinterpret_cast<arg::arg32>(hWndParent),
    hMenu,
    reinterpret_cast<arg::arg32>(hInstance), lpParam)); }
 
@@ -124,7 +128,7 @@ types::HWND CreateWindowEx (
     void* lpParam)
 { return reinterpret_cast<types::HWND>(::CreateWindowExW(
    dwExStyle, lpClassName, lpWindowName, dwStyle,
-   X, Y, nWidth, nHeight, 
+   X, Y, nWidth, nHeight,
    reinterpret_cast<arg::arg32>(hWndParent),
    hMenu,
    reinterpret_cast<arg::arg32>(hInstance), lpParam)); }
@@ -145,7 +149,7 @@ types::HWND CreateWindowEx (
     void* lpParam)
  { return CreateWindowEx (dwExStyle, reinterpret_cast<const char*>(window_class),
           lpWindowName, dwStyle, X, Y, nWidth, nHeight, hWndParent, hMenu, hInstance, lpParam); }
-    
+
 inline
 types::HWND CreateWindow (
     const char* lpClassName,
@@ -161,8 +165,8 @@ types::HWND CreateWindow (
     void* lpParam)
 { return reinterpret_cast<types::HWND>(::CreateWindowExA(
    0, lpClassName, lpWindowName, dwStyle,
-   X, Y, nWidth, nHeight, 
-   reinterpret_cast<arg::arg32>(hWndParent), 
+   X, Y, nWidth, nHeight,
+   reinterpret_cast<arg::arg32>(hWndParent),
    hMenu,
    reinterpret_cast<arg::arg32>(hInstance), lpParam)); }
 
@@ -181,8 +185,8 @@ types::HWND CreateWindow (
     void* lpParam)
 { return reinterpret_cast<types::HWND>(::CreateWindowExW(
    0, lpClassName, lpWindowName, dwStyle,
-   X, Y, nWidth, nHeight, 
-   reinterpret_cast<arg::arg32>(hWndParent), 
+   X, Y, nWidth, nHeight,
+   reinterpret_cast<arg::arg32>(hWndParent),
    hMenu,
    reinterpret_cast<arg::arg32>(hInstance), lpParam)); }
 
@@ -215,12 +219,17 @@ long SendMessage (types::HWND hWnd, unsigned Msg, unsigned wParam, const void* l
 
 inline void PostQuitMessage (int ExitCode)
  { ::PostQuitMessage (reinterpret_cast<arg::arg32>(ExitCode)); }
- 
-inline long DefWindowProc (types::HWND hWnd, unsigned Msg, unsigned wParam, ulong lParam)
- { return ::DefWindowProcA (*reinterpret_cast<const message::sMSG*>(&hWnd)); }
 
-inline long DefWindowProc (const message::sMSG& msg)
+template <typename CharT>
+long DefWindowProc (const message::sMSG& msg);
+
+template<>
+inline long DefWindowProc<char> (const message::sMSG& msg)
  { return ::DefWindowProcA (msg); }
+
+template<>
+inline long DefWindowProc<wchar_t> (const message::sMSG& msg)
+ { return ::DefWindowProcW (msg); }
 
 inline types::ATOM RegisterClass (const WNDCLASS<char>& lpWndClass)
  { return ::RegisterClassA (reinterpret_cast<arg::arg32>(const_cast<WNDCLASS<char>*>(&lpWndClass))); }
@@ -231,11 +240,22 @@ inline types::ATOM RegisterClass (const WNDCLASS<wchar_t>& lpWndClass)
 inline void* GetWindowLong (types::HWND hWnd, int index)
  { return ::GetWindowLongA (reinterpret_cast<arg::arg32>(hWnd), index); }
 
-inline void* SetWindowLong (types::HWND hWnd, int index, void* newval)
+
+template <typename CharT, typename T>
+T SetWindowLong (types::HWND hWnd, int index, T newval)
+ {
+ return reinterpret_cast<T>((arg::arg32)SetWindowLong<CharT,LongPtr>(hWnd, index, newval));
+ }
+
+template <>
+inline
+LongPtr SetWindowLong<char, LongPtr> (types::HWND hWnd, int index, LongPtr newval)
  { return ::SetWindowLongA (reinterpret_cast<arg::arg32>(hWnd), index, newval); }
 
-inline void* SetWindowLong (types::HWND hWnd, int index, ulong newval)
- { return ::SetWindowLongA (reinterpret_cast<arg::arg32>(hWnd), index, (void*)newval); }
+template <>
+inline
+LongPtr SetWindowLong<wchar_t, LongPtr> (types::HWND hWnd, int index, LongPtr newval)
+ { return ::SetWindowLongW (reinterpret_cast<arg::arg32>(hWnd), index, newval); }
 
 inline bool SetProp (types::HWND hWnd, const char* lpString, void* p)
  { return ::SetPropA (reinterpret_cast<arg::arg32>(hWnd), lpString, p); }
@@ -248,23 +268,18 @@ bool MoveWindow (types::HWND hWnd, int X, int Y, int nWidth, int nHeight, bool b
  { return ::MoveWindow (reinterpret_cast<arg::arg32>(hWnd), X, Y, nWidth, nHeight, bRepaint); }
 
 
-// 4 forms of CallWindowProc, and that's just for -A.  Need to consolidate this some day.
+template <typename CharT>
+ulong CallWindowProc (WNDPROC_sig proc, message::sMSG& msg);
 
+template<>
 inline
-ulong CallWindowProc (WNDPROC_2 proc, types::HWND w, unsigned msg, unsigned p1, ulong p2)
-  { return ::CallWindowProcA (reinterpret_cast<arg::arg32>(proc), *reinterpret_cast<message::sMSG*>(&w)); }
+ulong CallWindowProc<char> (WNDPROC_sig proc, message::sMSG& msg)
+  { return ::CallWindowProcA (proc.x, msg); }
 
+template<>
 inline
-ulong CallWindowProc (WNDPROC_2 proc, message::sMSG& msg)
-  { return ::CallWindowProcA (reinterpret_cast<arg::arg32>(proc), msg); }
-
-inline
-ulong CallWindowProc (WNDPROC proc, types::HWND w, unsigned msg, unsigned p1, ulong p2)
-  { return ::CallWindowProcA (reinterpret_cast<arg::arg32>(proc), *reinterpret_cast<message::sMSG*>(&w)); }
-
-inline
-ulong CallWindowProc (WNDPROC proc, message::sMSG& msg)
-  { return ::CallWindowProcA (reinterpret_cast<arg::arg32>(proc), msg); }
+ulong CallWindowProc<wchar_t> (WNDPROC_sig proc, message::sMSG& msg)
+  { return ::CallWindowProcW (proc.x, msg); }
 
 inline
 bool SetWindowText (types::HWND wnd, const char* text)
@@ -370,7 +385,7 @@ types::HWND GetAncestor (types::HWND w, GA_mode mode)
  { return reinterpret_cast<types::HWND>( ::GetAncestor (reinterpret_cast<arg::arg32>(w), mode) ); }
 
 } //end of window
-   
+
 }
 ENDWRAP
 
