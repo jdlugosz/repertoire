@@ -28,16 +28,23 @@ Copyright 2004 by <A HREF="mailto:john&#64;dlugosz.com">John M. Dlugosz</A>.
 
 <STYLE>
 TT {font: 12pt Arial;  color: green; margin-left: 0.5in }
+.ib /* info block */ {
+   white-space: pre;
+   color: green;
+   background-color: white;
+   font-family: Arial, sans-serif;
+   font-size: 1em;
+   margin-left: 0.5in;
+   }
 </STYLE> 
 
 <A NAME="A">
 
 <HR SIZE=10 COLOR="black">
 <A NAME="abstract_command_object"><H2>abstract_command_object</H2></A>
-<TT>library: classics<BR>
-header: command_object.h<BR>
-usage: main API</TT>
-</P>
+<P class="ib">library: classics
+header: command_object.h
+usage: main API</P>
 <P>
 This is a common interface used for command objects.  It has a virtual <code>operator()</code> function,
 which is to be invoked by the consumer of the command.
@@ -592,6 +599,14 @@ or as a static library.  The single Classics.DLL handles all cases.</P>
 in the <code>ustring</code> documentation.
 </P>
 
+<HR SIZE=10 COLOR="black">
+<H2 id="MSG">MSG</H2>
+<P><TT>library: RatWin<BR>
+header: message=struct.h or message.h<BR>
+usage: public</TT></P>
+
+<P>This is the same structure as defined in <code>WINDOWS.H</code> with that name.</P>
+
 
 
 <A NAME="N">
@@ -706,17 +721,30 @@ See the <A HREF="Classics/registry_guide.html#toptop">documentation</A> for deta
 <A NAME="S">
 
 <HR SIZE=10 COLOR="black">
-<A NAME="s_data_t"><H2>s_data_t</H2></A>
+<H2 id="s_data_t">s_data_t</H2>
 <TT>library: classics<BR>
 header: vararray.h<BR>
 usage: internal</TT>
 </P>
 
-<P>This is a concrete form of the data_t class (see above) that's used with
-the vararray_s.  Unlike g_data_t, this class is not a template and a single
-implementation is shared among all species of vararray_s.
+<P>This is a concrete form of the <A HREF="#data_t" class="code">data_t</A> class (see above) that's used with
+the <A HREF="#vararray_s" class="code">vararray_s</A>.  Unlike <A HREF="#g_data_t" class="code">g_data_t</A>, this class is not a template and a single
+implementation is shared among all species of <A HREF="#vararray_s" class="code">vararray_s</A>.
 </P>
 
+
+<HR SIZE=10 COLOR="black">
+<H2 id="sMSG">sMSG</H2>
+<P class="ib">library: RatWin
+header: message=struct.h or message.h
+usage: public</P>
+
+<P>This is a <I>simple message</I> structure used to hold the items normally passed to WinProc (and related)
+callback functions: <code>hwnd</code>, <code>message</code>, <code>wParam</code>, and <code>lParam</code>.</P>
+<P>This isn’t called <A HREF="#MSG" class="code">MSG</A> because <code>WINDOWS.H</code> already
+defines that name as a larger structure, so RatWin uses <code>MSG</code> for the same purpose.</P>
+<P>The <code>sMSG</code> struct and the specific message-cracker structs are described in the
+RatWin <A HREF="RatWin/message_crack_index.html" TARGET="index">Message Cracker</A> documentation.</P>
 
 <HR SIZE=10 COLOR="black">
 <H2>snoop_t</H2>

@@ -39,6 +39,10 @@ A:hover[TARGET=index]{
 	}
 A:hover { text-decoration: underline }
 
+H2:hover A { color: blue }
+
+H2 A { color: black }
+
 .banner {
    background-color: #ffffdd;
    font-weight:bold;

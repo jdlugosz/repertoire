@@ -15,6 +15,8 @@ struct WM_NOTIFY_msg : public ratwin::message::MSG_base {
    inline int child_ID() const { return ChildID; }
    inline ratwin::types::HWND sending_window() const { return info->sender; }
    inline unsigned notification_code() const { return info->code; }
+   // this goes in every message struct--just change the constant used to match.
+   static const ratwin::WM_constants::messages message_constant= ratwin::WM_constants::WM_NOTIFY;
    };
 
 }}

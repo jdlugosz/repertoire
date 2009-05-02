@@ -42,7 +42,8 @@ so this is there just to be safe.</P>
 
 <HR SIZE=10 class="sep1">
 
-<H2 id="call_old_wndproc">long <SPAN class="signame">call_old_wndproc</span> (sMSG&amp; msg)</H2>
+<H2 id="call_old_wndproc">long <SPAN class="signame">call_old_wndproc</span> 
+	(<A HREF="../class_summary.html#sMSG">sMSG</A>&amp; msg)</H2>
 <P class="mematt">public</P>
 <P>This calls the WndProc that the window had before it was subclassed by 
 a call to <A HREF="#hook" class="code">hook</A>, or calls <code>DefWndProc</code> if there wasn’t
@@ -92,10 +93,10 @@ use of the same instance.</P>
 
 <HR SIZE=10 class="sep1">
 
-<H2 id="handle_message">long <SPAN class="signame">handle_message</span> (sMSG&amp; msg)</H2>
+<H2 id="handle_message">long <SPAN class="signame">handle_message</span> (<A HREF="../class_summary.html#sMSG">sMSG</A>&amp; msg)</H2>
 <P class="mematt">public, virtual</P>
 <P>This function is called by the WinProc of the window to which it is attached.  
-The <code>sMSG</code> structure (short MSG, since it is a subset (base class) of the 
+The <A HREF="../class_summary.html#sMSG" class="code">sMSG</A> structure (short MSG, since it is a subset (base class) of the 
 <code>MSG</code> structure) is used to pass the <code>hwnd</code>, <code>message</code>, 
 <code>wParam</code>, and <code>lParam</code>.  Passing a structure rather than four parameters
 is better design, and passing by reference is more efficient than re-pushing all the parameters with all the 
@@ -175,7 +176,7 @@ For either, return 1 if the translate call returned <code>true</code>, or return
 
 <HR SIZE=10 class="sep1">
 
-<H2 id="Proc">typedef long (__stdcall* <SPAN class="signame">Proc</span>)(sMSG)</H2>
+<H2 id="Proc">typedef long (__stdcall* <SPAN class="signame">Proc</span>)(<A HREF="../class_summary.html#sMSG">sMSG</A>)</H2>
 <P class="mematt">public, typename</P>
 <P>This is typedef'ed here because the compiler could not handle the written-out form as a return
 value for a function.  I don’t want to reference the <code>ratwin::window::WNDPROC_2</code> type because

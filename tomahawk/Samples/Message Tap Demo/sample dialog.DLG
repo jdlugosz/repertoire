@@ -1,0 +1,26 @@
+
+SampleDialog DIALOG 50, 30, 180, 180
+STYLE DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION
+CAPTION "Dialog Title"
+FONT 8, "Helv"
+BEGIN
+    LTEXT           "Text", 101, 12, 10, 160, 12
+    EDITTEXT        102, 10, 22, 161, 12, ES_AUTOHSCROLL
+    COMBOBOX        103, 13, 39, 100, 35, CBS_DROPDOWN | CBS_SORT | 
+                    WS_VSCROLL | WS_TABSTOP
+    GROUPBOX        "Chekboxes", 104, 10, 60, 65, 66
+    AUTORADIOBUTTON "Radio 1", 105, 15, 77, 39, 10
+    AUTORADIOBUTTON "Radio 2", 106, 15, 87, 39, 10
+    AUTORADIOBUTTON "Radio 3", 107, 15, 97, 39, 10
+    AUTORADIOBUTTON "Radio 4", 108, 15, 107, 39, 10
+    CONTROL         "", 109, "msctls_updown32", 0x0 | WS_CLIPSIBLINGS, 151, 
+                    39, 15, 12
+    EDITTEXT        110, 124, 39, 28, 12, ES_AUTOHSCROLL
+    GROUPBOX        "Group", 111, 81, 60, 90, 66
+    AUTO3STATE      "Check 1 (tri-state)", 112, 86, 74, 83, 10
+    AUTOCHECKBOX    "Check 2 (push-like)", 113, 86, 84, 83, 10, BS_PUSHLIKE
+    AUTOCHECKBOX    "Check 3 (notify)", 114, 86, 94, 83, 10, BS_NOTIFY
+    AUTOCHECKBOX    "Check 4", 115, 86, 104, 83, 10
+    PUSHBUTTON      "Push", 116, 8, 158, 40, 14
+    PUSHBUTTON      "OK", IDOK, 133, 158, 40, 14
+END

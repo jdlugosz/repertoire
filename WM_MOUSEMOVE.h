@@ -4,6 +4,7 @@
 
 #pragma once
 #include "ratwin\message=struct.h"
+#include "ratwin\WM_constants.h"
 
 namespace tomahawk {
 namespace MSG {
@@ -23,6 +24,8 @@ struct WM_MOUSEMOVE_msg : public ratwin::message::MSG_base {
    inline KeyIndicators_t key_indicators() const { return static_cast<KeyIndicators_t>(KeyIndicators); }
    inline ratwin::types::POINT mouse_position() const
       { return ratwin::types::POINT (XPos,YPos); }
+   // this goes in every message struct--just change the constant used to match.
+   static const ratwin::WM_constants::messages message_constant= ratwin::WM_constants::WM_MOUSEMOVE;
    };
 
 

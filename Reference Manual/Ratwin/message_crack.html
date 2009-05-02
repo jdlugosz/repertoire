@@ -1,0 +1,181 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"  "http://www.w3.org/TR/html4/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=windows-1252">
+<TITLE>Message Cracker System documentation</TITLE>
+<LINK REL=STYLESHEET HREF="../info.css" TYPE="text/css">
+</HEAD>
+
+<BODY>
+<IFRAME id="page_banner" src="../page_banner.html" scrolling="no"></IFRAME>
+<A NAME="toptop"></A>
+
+<H1>Message Cracker System Complete Documentation</H1>
+
+<P>This describes the RatWin/Tomahawk system of extracting meaningful parameter information
+from the message information passed to a WinProc.</P>
+
+<H2>Contents</H2>
+<UL>
+	<LI><A HREF="#overview">Overview</A>
+	<LI><A HREF="#sMSG">sMSG</A>
+	<LI><A HREF="#WM_xxx">WM_ ...</A>
+	<LI><A HREF="#MSG_cast">MSG_cast</A>
+</UL>
+
+<H2 id="overview">Overview</H2>
+<P>The Win32 GUI API, like the 16-bit Windows before it, calls the WinProc with 4 parameters.  It uses the
+same four parameters for any type of message, and the relevant information is packed, sometimes quite
+creatively, into those values.</P>
+
+<P>Many years ago there was a header file in the Windows SDK called <code>WINDOWSX.H</code> that
+had macros called &ldquo;message crackers&rdquo;.  Before Wizard-driven frameworks became popular,
+this was very popular among writers who would teach Windows programming.</P>
+
+<P>In the Repertoire library, the central idea is to make code that is truely reusable on the binary level,
+not wizards that generate stock code.  The mechanism in Tomahawk for building message handlers
+uses a virtual function to handle whole groups of messages, as opposed to one virtual function for
+every possible message.  The plumbing of the message router is exposed, at least a little bit, to the user.
+So, breaking the raw message parameters up into something useful and appropreate to the message
+can’t be hidden away somewhere.</P>
+
+<P>To this end, I wanted something like the old Message Crackers.  Only, do so without macros, and with
+as much type-safety as practical.</P>
+
+<P>The resulting system is centered around the Message Cast mechanism.</P>
+
+
+<H2 id="sMSG">The <code>sMSG</code> structure</H2>
+
+<P>The <code>sMSG</code> structure, defined in <code>Ratwin\message=struct.h</code>,
+contains the data that is passed to the WinProc functions.  The fields are named <code>hwnd</code>,
+<code>message</code>, <code>wParam</code>, and <code>lParam</code>.</P>
+
+<P>This is designed to have the same layout on the stack, when passed by value, as the four
+invidual parameters normally have in a WinProc.  Specifically, you can define a WinProc to receive
+a <code>sMSG</code> and Windows indeed passes you one!</P>
+
+<H3>Why pass a structure?</H3>
+
+<P>There are several motives behind passing a single structure rather than 4 individual parameters.
+First, it ties in with the concept behind the thunk class which only handles one parameter because multiple
+parameters could always be combined into a single structure. [[XREF the passage in the thunk docs]]</P>
+
+<P>Second, it makes sence to combine the parameters that are always passed as a group.  It makes
+engineering sence that these ought to be grouped together into one named entity, and it is more efficient
+to pass the whole structure (by reference) to deeper functions rather than re-pushing the same parameters
+over and over.  The code handling messages will often contain only a little code and then call another function
+with the same message data, and call the base class version, and call the default, etc.  The message is
+<I>routed</I> to modular code, so it gets passed a lot and treated as a lump.</P>
+
+<P>Finally, putting the items together makes the idea of the MSG_cast very clean and elegant.</P>
+
+<H3>Why is it so plain?</H3>
+
+<P>I’ve seen a structure that uses unions to allow easy addressing of the individual words and bytes
+of the lParam and wParam, and provide meaningful names for the commonly-used fields, all together
+in one structure and referring to the same bytes.  This kind of system was part of the inspiration,
+but in C++ we can do much better than we could in C, and expect a higher degree of type safety.</P>
+
+<P>So, the <code>sMSG</code> structure doesn’t have any of that baggage in it.  It’s just the 4 parameters
+with no special way to &ldquo;crack&rdquo; them or refer to them with more meaningful names.
+Instead, each set of cracked arguments is described in a <I>different</I> class, with each class
+named after the message it services.</P>
+
+<H2 id="WM_xxx">WM_xxx structures</H2>
+
+<P>There are structures named after the messages they service, one per file, in the <code>Tomahawk\MSG</code>
+directory.  For example, <code>WM_command_msg</code> is a struct in <code>Tomahawk\MSG\WM_COMMAND.h</code>,
+and <code>WM_MOUSEMOVE_msg</code> is in <code>Tomahawk\MSG\WM_MOUSEMOVE.h</code>.</P>
+
+<P>Each struct defines appropriate data members instead of <code>wParam</code> and <code>lParam</code>.
+For example, <code>WM_MOUSEMOVE_msg</code> contains an <code>unsigned KeyIndicators</code> and
+two <code>short</code>s for <code>XPos</code> and <code>YPos</code>.  You don’t have to know
+implicitly that the key indicators are in <code>wParam</code>, since it is called <code>KeyIndicators</code> instead.
+You don’t have to deal with unpacking the high and low bits from <code>lParam</code> since the struct is
+declared in a way to access those bits directly.  Generally, the data member names are those used in some versions of
+the Windows SDK documentation of the message.</P>
+
+<P>The data members in the typed message structure are better than knowing how to unpack and extract
+the values from the generic <code>sMSG</code>.  We could stop there.  But, Tomahawk goes a step further
+and defines inline accessor functions for all the information.</P>
+
+<P>In the <code>WM_MOUSEMOVE_msg</code> struct, the const member function <code>key_indicators()</code>
+might seem to be no different than the data member <code>KeyIndicators</code>.  You can in fact use either, since
+all the data members are public.  However, notice that the function returns an enumeration for the flags, while the
+data member is a simple <code>unsigned</code>.  The data member could not be declared as the enumeration
+type because there is no way to specify the actual bit-size and control the layout.  So the data members are
+defined using basic integer types only, while the member functions can be defined with stronger typing.  The functions
+are more flexible, and there could be multiple ways to refer to the same data, and no need to match the
+actual concrete data layout.  In short, the functions provide the kind of abstraction you would normally expect from
+software engineering, while the data members match the pre-defined bit layout.</P>
+
+<P>Also, the member functions are given consistant and unambiguous names across all message types.  <code>mouse_position</code>
+is clearer than just <code>pos</code>.</P>
+
+<H2 id="MSG_cast">Message Casting</H2>
+
+<P>The specific message structure contains only those things for that message, and exposes them in a normal
+enough manner.  The question is, how do you get a specific message structure, when WinProc is passed a
+generic <code>sMSG</code>?</P>
+
+<P>All the message structures are exactly the same size, since they all expose the same sized record in
+different ways.  So, it should be possible to cast one to another.  Given a pointer to a struct, you can
+cast it into a pointer to a different struct.  Given a value (as opposed to a pointer) you can cast it to a reference
+to some other struct.  Using old-style C casts, the compiler will take your word for it and never complain.</P>
+
+<P>Here we have a slightly better way.  In C++ the new-style casts are better because each one has a different
+purpose, and the compiler can catch some kinds of mistakes.  In Tomahawk there is a <code>MSG_cast</code>
+that matches the syntax of the C++ casting operators.  It is more limited than a C-style cast in that the compiler
+ensures that <I>only different kinds of message structures are cast to other message structures</I>.</P>
+
+<P>That is, you could code <code>process_Size (MSG_cast&ldquo;WM_SIZE_msg>(msg));</code> and
+the compiler makes two checks:  it checks that <code>process_Size</code> is expecting a <code>WM_SIZE</code> message, and
+it also checks that <code>msg</code> is some message structure.  You can’t pass just anything to a message
+cast&mdash;it only works between message structures, and this is a compile-time check.</P>
+
+<P>What it doesn’t do is make sure that the <code>msg</code> is in fact a <code>WM_SIZE</code>
+message.  Since it is typically used like this:</P>
+
+<PRE class="code">
+ switch (msg.message) {
+    case WM_MOUSEMOVE:
+       process_MouseMove (MSG_cast&ldquo;WM_MOUSEMOVE_msg>(msg));
+       break;
+    case WM_SIZE:
+       process_Size (MSG_cast&ldquo;WM_SIZE_msg>(msg));
+       break;
+    }
+</PRE>
+
+<P>misusing it is generally not a problem.  However, there’s nothing to stop you from writing</P>
+<PRE class="code">
+void C::process_Size (const WM_SIZE_msg&amp; msg)
+ {
+ assert (msg.message == WM_SIZE);
+ // ... get on with the real work.
+ }
+</PRE>
+
+<P>just to make sure.  Given the tight naming convention between the message name and the struct name,
+making the structure define its own id would not be generally helpful for coding.  But, what about templates?
+To make it possible to make generic code like:</P>
+
+<PRE class="code">
+template &lt;typename T>
+void foo (const T&amp; msg)
+ {
+ assert (msg.message == T::message_constant);
+ // ...
+ }
+</PRE>
+
+<P>The example program <code>message_tap_demo.cxx</code> shows how to use the message
+casts for message cracking.  The main handler takes its <code>sMSG</code> and casts it to the proper type, calling the handler function
+for that message type.  The handlers declare their parameter of the specific type, and pass by
+reference.</P>
+
+<IFRAME id="page_footer" src="../page_footer.html"></IFRAME>
+</BODY>
+
+</HTML>

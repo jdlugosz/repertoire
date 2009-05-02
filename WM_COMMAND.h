@@ -4,6 +4,7 @@
 
 #pragma once
 #include "ratwin\message=struct.h"
+#include "ratwin\WM_constants.h"
 
 namespace tomahawk {
 namespace MSG {
@@ -22,6 +23,8 @@ struct WM_COMMAND_msg : public ratwin::message::MSG_base {
    inline command_ID() const { return CommandID; }
    inline ratwin::types::HWND sending_window() const { return ControlWindow; }
    inline unsigned short notification_code() const { return Other; }
+   // this goes in every message struct--just change the constant used to match.
+   static const ratwin::WM_constants::messages message_constant= ratwin::WM_constants::WM_COMMAND;
    };
 
 
