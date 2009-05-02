@@ -1,6 +1,6 @@
 // The Repertoire Project copyright 2006 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: classics\portability.h
-// Revision: public build 9, shipped on 18-Oct-2006
+// Revision: post-public build 9
 
 #pragma once
 #if !defined PORTABILITY_INCLUDED
@@ -26,7 +26,7 @@
 # define ENDWRAP  /* nothing */
 #endif
 
-#if defined _MSC_VER 
+#if defined _MSC_VER
 #if _MSC_VER >= 1200  //v6.0 or higher
  # define ccfg_PLACEMENT_DELETE
 #endif
@@ -54,6 +54,7 @@
       // overloading should work, etc.
    #define ccfg_SUPPORT_WCHAR_AS_INT
       // help client files compiled =without= the /Zc:wchar_t flag by providing ushort forms of signatures as well as wchar_t.
+   #pragma warning (disable : 4345)
 #endif
 
 #if ! defined( _WCHAR_T_DEFINED) && ! defined(ccfg_HAS_WCHAR_T)

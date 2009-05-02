@@ -73,7 +73,7 @@ void message_tap::hook (ratwin::types::HWND window)
  prevent_duplicate_hook();
  using namespace ratwin::window;
  WindowHandle= window;
- WindowOwnsMe= this;
+ forge_reference();
  OldWndProc= SetWindowLong<wchar_t> (window, GWL_WNDPROC, EntryPoint.callptr());
  on_attach();
  }
@@ -109,7 +109,7 @@ bool message_tap::unhook (bool force)
  // reset the data members
  OldWndProc= 0;
  WindowHandle= 0;
- WindowOwnsMe= 0;  // can cause deletion!!! Must do this last.  No member access allowed past this point.
+ release_forged_reference();  // can cause deletion!!! Must do this last.  No member access allowed past this point.
  return graceful;
  }
 

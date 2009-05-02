@@ -1,6 +1,6 @@
 // The Repertoire Project copyright 2006 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: ratwin\window.cpp
-// Revision: public build 9, shipped on 18-Oct-2006
+// Revision: post-public build 9
 
 #define RATWIN_EXPORT __declspec(dllexport)
 
@@ -49,12 +49,16 @@ template class window_class<char>;
 template class window_class<wchar_t>;
 
 
-types::HWND CreateWindow (const char* lpClassName, const char* lpWindowName, ulong dwStyle)
+template<typename CharT>
+types::HWND CreateWindow (const CharT* lpClassName, const CharT* lpWindowName, ulong dwStyle)
  {
  return CreateWindow (lpClassName, lpWindowName, dwStyle,
     CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
     0, ChildidOrHMENU(), util::get_Instance(), 0);
  }
+
+template RATWIN_EXPORT types::HWND CreateWindow<char> (const char* lpClassName, const char* lpWindowName, ulong dwStyle);
+template RATWIN_EXPORT types::HWND CreateWindow<wchar_t> (const wchar_t* lpClassName, const wchar_t* lpWindowName, ulong dwStyle);
 
 
 types::HWND CreateWindowEx (ulong moreflags, const char* lpClassName, const char* lpWindowName, ulong dwStyle)

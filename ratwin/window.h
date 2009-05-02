@@ -190,8 +190,9 @@ types::HWND CreateWindow (
    hMenu,
    reinterpret_cast<arg::arg32>(hInstance), lpParam)); }
 
+template<typename CharT>
 RATWIN_EXPORT
-types::HWND CreateWindow (const char* lpClassName, const char* lpWindowName, ulong dwStyle);
+types::HWND CreateWindow (const CharT* lpClassName, const CharT* lpWindowName, ulong dwStyle);
 
 RATWIN_EXPORT
 types::HWND CreateWindowEx (ulong, const char*, const char*, ulong dwStyle);

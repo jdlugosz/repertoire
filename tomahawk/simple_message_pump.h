@@ -3,6 +3,9 @@
 // Revision: public build 9, shipped on 18-Oct-2006
 
 #pragma once
+#if !defined TOMAHAWK_EXPORT
+#define TOMAHAWK_EXPORT __declspec(dllimport)
+#endif
 #include "ratwin\message=struct.h"
 #include "classics\exception.h"
 
