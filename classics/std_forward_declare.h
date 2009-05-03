@@ -24,6 +24,7 @@ class allocator;
 
 template < typename CharType, typename Traits= char_traits<CharType>, typename Allocator=allocator<CharType> >
 class basic_string;
+#pragma warning (disable: 4348) // When I later include it for real, I get that warning.
 
 typedef basic_string< char, char_traits<char>, allocator<char> > string;
 typedef basic_string< wchar_t, char_traits<wchar_t>, allocator<wchar_t> > wstring;

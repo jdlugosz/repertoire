@@ -10,13 +10,13 @@
 #include "ratwin\window=struct.h"
 #include "classics\pointers.h"
 #include "classics\exception.h"
-#include "classics\no_auto_copy.h"
+#include "classics\nocopy.h"
 #include "ratwin\message=struct.h"
 
 STARTWRAP
 namespace tomahawk {
 
-class HWND_vpapa : public virtual classics::can_handle, private classics::no_auto_copy {
+class HWND_vpapa : public virtual classics::can_handle, private classics::nocopy {
    classics::handle <HWND_vpapa> WindowOwnsMe;  // on behalf of the (valid) WindowHandle
 protected:
    ratwin::types::HWND WindowHandle;

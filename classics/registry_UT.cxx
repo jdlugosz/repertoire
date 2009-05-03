@@ -29,7 +29,8 @@ void verify_key_creation (registry_key& Key, const ustring& subkey_name)
  const int subkey_count= Key.subkey_count();
  wstring target_name= subkey_name;
  wstring name;
- for (int loop= subkey_count-1;  loop >= 0;  loop--) {
+ int loop;
+ for (loop= subkey_count-1;  loop >= 0;  loop--) {
     name= Key.subkey(loop);
     if (name[0] == target_name[0])  break;  //stop when first character matches
     }

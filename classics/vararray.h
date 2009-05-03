@@ -168,7 +168,8 @@ template <typename T>
 template <typename T>
 int vararray<T>::sorted_insert (const T& value, int (*compare)(const T&, const T&))
  {
- for (int loop= elcount()-1;  loop >= 0;  loop--)
+ int loop;
+ for (loop= elcount()-1;  loop >= 0;  loop--)
     if (compare (get_at(loop), value) <= 0)  break;
  replace (loop+1, 0, &value, 1);
  return loop+1;
@@ -179,7 +180,8 @@ int vararray<T>::sorted_insert (const T& value, int starting, int (*compare)(con
  {
  if (starting >= elcount())  starting= elcount()-1;
  else if (starting < 0)  starting= 0;
- for (int loop= starting;  loop >= 0;  loop--)
+ int loop;
+ for (loop= starting;  loop >= 0;  loop--)
     if (compare (get_at(loop), value) <= 0)  break;
  replace (loop+1, 0, &value, 1);
  return loop+1;

@@ -1,6 +1,8 @@
 // The Repertoire Project copyright 2006 by John M. Dlugosz : see <http://www.dlugosz.com/Repertoire/>
 // File: classics\registry_permissions.cxx
 // Revision: public build 9, shipped on 18-Oct-2006
+
+#define _CRT_SECURE_NO_DEPRECATE
 #include <iostream>
 #include <iomanip>
 #include <cstring>
@@ -20,7 +22,7 @@ using classics::ulong;
 
 classics::registry_key_init cleave_hive_name (const wchar_t*&s)
  {
- wchar_t* p= wcschr (s, L'\\');
+ wchar_t* p= const_cast<wchar_t*>(wcschr (s, L'\\'));
  if (!p) {
     cout << "Input error:  no backslash in parameter." << endl;
     exit (2);

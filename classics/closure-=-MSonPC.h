@@ -11,8 +11,10 @@
 #define CLASSICS_EXPORT __declspec(dllimport)
 #endif
 
-#if (_M_IX86 < 500) || (_MSC_VER != 1310)
-  #error This file has only been tested on MSVC 7.1 (.NET 2003 release), and requires Pentium or higher X86 processor.
+#if (_M_IX86 < 500) || ((_MSC_VER != 1310) && (_MSC_VER != 1400))
+#error This file has only been tested on: \
+ MSVC 7.1 (.NET 2003 release), MSVC 8.0 (2005) \
+ and requires Pentium or higher X86 processor.
   // This tests for EQUAL on the compiler version, to make sure the unit test is run for the
   // specific version.  That's just in case code generated is incompatible.  Change the _MSC_VER
   // to allow the new version too, and verify that it works correctly, and send your results to

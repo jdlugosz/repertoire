@@ -555,7 +555,7 @@ void replace_tester<Vector>::setup_population()
     //show (v);
     memorize (loop);
     }
- for (/*int*/ loop= 0;  loop < 5;  loop++) {
+ for (int loop= 0;  loop < 5;  loop++) {
     test_array[loop]= test_array[5];
     memorize (loop);
     }

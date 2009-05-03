@@ -4,6 +4,7 @@
 
 // This tests the exception class
 
+#define _CRT_SECURE_NO_DEPRECATE
 #include "classics\exception.h"
 #include "classics\string_ios.h"
 #include <iostream>
@@ -29,7 +30,7 @@ void test1()
     X.show();
     }
  }
- 
+
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
 void bar2()
@@ -54,7 +55,7 @@ void foo2()
     throw;
     }
  }
-    
+
 // =============================================
 
 void test2()
@@ -66,7 +67,7 @@ void test2()
     X.show();
     }
  }
-    
+
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
 void (*old_setup_hook) (classics::exception* self, const ustring& module, const ustring& name, const ustring& fname, int line);
@@ -91,7 +92,7 @@ void test3()
  classics::exception::setup_hook= my_setup;
  test1();
  }
- 
+
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
 int main()
@@ -102,4 +103,4 @@ int main()
  cout << "* note: results not automatically validated." << endl;
  return 0;
  }
- 
+

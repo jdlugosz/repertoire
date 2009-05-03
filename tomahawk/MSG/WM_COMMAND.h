@@ -20,7 +20,7 @@ struct WM_COMMAND_msg : public ratwin::message::MSG_base {
    // 'other' param is normally 1 for accelerator key, 0 for button.  But ComboBox notifications use
    // this field as a notification code.
    ratwin::types::HWND ControlWindow;  // the window sending the message (if applicable).
-   inline command_ID() const { return CommandID; }
+   inline unsigned short command_ID() const { return CommandID; }
    inline ratwin::types::HWND sending_window() const { return ControlWindow; }
    inline unsigned short notification_code() const { return Other; }
    // this goes in every message struct--just change the constant used to match.

@@ -64,7 +64,7 @@ void testhook_1::on_attach()
  int errorcode= ratwin::util::GetLastError();  // see it in the debugger.
  // >> create modeless dialog box here.
  }
- 
+
 void testhook_1::process_Size (const WM_SIZE_msg& msg)
  {
  // make my child match the new size
@@ -94,6 +94,7 @@ long testhook_1::handle_message (sMSG& msg)
        break;
     }
  return message_tap::handle_message (msg);  // pass it on to my base class.
+ // >> why didn't this line cause a linker error, when the exact same thing in message_tap_demo.cxx does?
  }
 
 // =====================================================================
@@ -133,7 +134,7 @@ int message_pump()
  while ( GetMessage(msg) ) {
     // >> this doesn't translate key events to handle Accelerator Tables or modeless dialog boxes.
     TranslateMessage(msg);
-    DispatchMessage(msg); 
+    DispatchMessage(msg);
     }
  return (msg.wParam);
  }

@@ -231,7 +231,7 @@ int literal_string_support<char>::length (const void* st) const
  }
 
 template<>
-literal_string_support<wchar_t>::length (const void* st) const
+int literal_string_support<wchar_t>::length (const void* st) const
  {
  const wchar_t* s= static_cast<const wchar_t*>(st);
  return wcslen(s);
@@ -525,22 +525,19 @@ void* ustring::convert (const awareness_t* dest, const awareness_t* src, const v
  {
  if (src == dest)  return src->clone(p);  //special case
  const int Case= CASE(src->type, dest->type);
- using awareness_t::ANSI;
- using awareness_t::OEM;
- using awareness_t::Unicode;
  switch (Case) {
-    case CASE(ANSI,ANSI):
-    case CASE(OEM,OEM):
-    case CASE(Unicode,Unicode):
+    case CASE(awareness_t::ANSI,awareness_t::ANSI):
+    case CASE(awareness_t::OEM,awareness_t::OEM):
+    case CASE(awareness_t::Unicode,awareness_t::Unicode):
        return convert_justcopy (dest, src, p, result);
-    case CASE(ANSI,Unicode):
+    case CASE(awareness_t::ANSI,awareness_t::Unicode):
        return convert_ANSItoUnicode (dest, src, p, result);
-    case CASE(Unicode,ANSI):
+    case CASE(awareness_t::Unicode,awareness_t::ANSI):
        return convert_UnicodetoANSI (dest, src, p, result);
-    case CASE(ANSI,OEM):
-    case CASE(OEM,ANSI):
-    case CASE(OEM,Unicode):
-    case CASE(Unicode,OEM):
+    case CASE(awareness_t::ANSI,awareness_t::OEM):
+    case CASE(awareness_t::OEM,awareness_t::ANSI):
+    case CASE(awareness_t::OEM,awareness_t::Unicode):
+    case CASE(awareness_t::Unicode,awareness_t::OEM):
        // OEM character set not handled yet.
     default: {
        exception X ("Classics", "Can't convert a universal string", FNAME, __LINE__);

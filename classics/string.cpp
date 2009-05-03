@@ -23,7 +23,7 @@ inline int compare_ (const char* a, const char* b, int len, bool case_sensitive)
 #ifdef _DEBUG
  if (len==0)  return 0;  // strncmp in debug RTL doesn't like zero-length.
 #endif
- return (case_sensitive ? strncmp : strnicmp) (a,b,len);
+ return (case_sensitive ? strncmp : _strnicmp) (a,b,len);
  }
  
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
@@ -33,7 +33,7 @@ inline int compare_ (const wchar_t* a, const wchar_t* b, int len, bool case_sens
 #ifdef _DEBUG
  if (len==0)  return 0;  // strncmp in debug RTL doesn't like zero-length.
 #endif
- return (case_sensitive ? wcsncmp : wcsnicmp) (a,b,len);
+ return (case_sensitive ? wcsncmp : _wcsnicmp) (a,b,len);
  }
 
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
@@ -54,7 +54,7 @@ template class generic_string<wchar_t>;
     #ifdef _DEBUG
     if (len==0)  return 0;  // strncmp in debug RTL doesn't like zero-length.
     #endif
-    return (case_sensitive ? wcsncmp : wcsnicmp) (reinterpret_cast<const wchar_t*>(a),reinterpret_cast<const wchar_t*>(b),len);
+    return (case_sensitive ? wcsncmp : _wcsnicmp) (reinterpret_cast<const wchar_t*>(a),reinterpret_cast<const wchar_t*>(b),len);
     }
 
    template class generic_string<unsigned short>;  // be friendly to programs who compiled without /Zc:wchar_t

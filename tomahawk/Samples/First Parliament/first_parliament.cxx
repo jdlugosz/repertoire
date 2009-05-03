@@ -2,6 +2,7 @@
 // File:
 // Revision: post-public build 9
 
+#define _CRT_SECURE_NO_DEPRECATE
 #include "tomahawk\simple_message_pump.h"
 #include "tomahawk\message_parliament.h"
 #include "tomahawk\minister.h"

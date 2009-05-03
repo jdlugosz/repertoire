@@ -5,6 +5,7 @@
 // The purpose of this test is to find out whether reading a machine
 // word is atomic on a multi-CPU machine.
 
+#define _CRT_SECURE_NO_DEPRECATE
 #include "classics\new.h"
 #include "classics\thread.h"
 #include "ratwin\tasking\CriticalSection.h"
@@ -32,7 +33,7 @@ public:
    };
 
 CRITICAL_SECTION lock::cs;
-   
+
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
 class writer {
@@ -58,7 +59,7 @@ void writer::start()
        }
     }
  }
- 
+
 /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */
 
 class reader {
@@ -75,7 +76,7 @@ bool OK (unsigned val)
  const char* const p= reinterpret_cast<char*>(&val);
  return p[0] == p[1] && p[1] == p[2] && p[2] == p[3];
  }
- 
+
 // ===========================================
 
 void reader::start()

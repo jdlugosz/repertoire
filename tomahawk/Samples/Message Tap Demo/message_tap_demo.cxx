@@ -2,6 +2,8 @@
 // File: tomahawk\Samples\Message Tap Demo\message_tap_demo.cxx
 // Revision: post-public build 9
 
+#define _CRT_SECURE_NO_DEPRECATE
+
 #include "tomahawk\message_tap.h"
 #include "tomahawk\Dialog_message_tap.h"
 #include "ratwin\message.h"
@@ -242,7 +244,7 @@ long testhook_1::handle_message (sMSG& msg)
        process_Size (MSG_cast<WM_SIZE_msg>(msg));
        break;
     }
- return message_tap::handle_message (msg);  // pass it on to my base class.
+ return call_old_wndproc(msg);
  }
 
 

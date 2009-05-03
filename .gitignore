@@ -1,10 +1,13 @@
 vssver2.scc
 compile.vc*/mssccprj.scc
 compile.vc*/*/mssccprj.scc
-compile.vc71/*.ncb
-compile.vc71/*.suo
+compile.vc*/*.ncb
+compile.vc*/*.suo
 compile.vc*/debug/
 compile.vc*/release/
+compile.vc*/Release/
 compile.vc*/*/Debug/
 compile.vc*/*/release/
+compile.vc*/*/Release/
 compile.vc*/*/CLR Release/
+compile.vc*/*/*.vcproj.*.user

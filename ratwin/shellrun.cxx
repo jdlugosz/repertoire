@@ -30,7 +30,7 @@ void get_module_path (char* buffer, int size)
  {
  ratwin::tasking::GetModuleFileName (0, buffer, size);
  // clip at the last backslash to get the path only
- unsigned char* p= _mbsrchr ((const unsigned char*)buffer, '\\');
+ unsigned char* p= const_cast<unsigned char*>(_mbsrchr ((const unsigned char*)buffer, '\\'));
  if (p)  *p= '\0';
  }
 

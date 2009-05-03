@@ -39,13 +39,13 @@
 				Name="VCLinkerTool"
 				AdditionalOptions="/MACHINE:I386"
 				AdditionalDependencies="comctl32.lib"
-				OutputFile="..\Debug/Dlugosz Repertoire Tomahawk.vc71.debug{pb9}.dll"
+				OutputFile="..\Debug/Dlugosz Repertoire Tomahawk.vc71.debug{pb9+}.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"
 				GenerateDebugInformation="TRUE"
-				ProgramDatabaseFile=".\..\Debug/Dlugosz Repertoire Tomahawk.vc71.debug{pb9}.pdb"
+				ProgramDatabaseFile=".\..\Debug/Dlugosz Repertoire Tomahawk.vc71.debug{pb9+}.pdb"
 				SubSystem="2"
-				ImportLibrary=".\..\Debug/Dlugosz Repertoire Tomahawk.vc71.debug{pb9}.lib"/>
+				ImportLibrary=".\..\Debug/Dlugosz Repertoire Tomahawk.vc71.debug{pb9+}.lib"/>
 			<Tool
 				Name="VCMIDLTool"
 				PreprocessorDefinitions="_DEBUG"
@@ -107,13 +107,13 @@
 				Name="VCLinkerTool"
 				AdditionalOptions="/MACHINE:I386"
 				AdditionalDependencies="comctl32.lib"
-				OutputFile="..\Release/Dlugosz Repertoire Tomahawk.vc71{pb9}.dll"
+				OutputFile="..\Release/Dlugosz Repertoire Tomahawk.vc71{pb9+}.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"
 				GenerateDebugInformation="TRUE"
-				ProgramDatabaseFile=".\..\Release/Dlugosz Repertoire Tomahawk.vc71{pb9}.pdb"
+				ProgramDatabaseFile=".\..\Release/Dlugosz Repertoire Tomahawk.vc71{pb9+}.pdb"
 				SubSystem="2"
-				ImportLibrary=".\..\Release/Dlugosz Repertoire Tomahawk.vc71{pb9}.lib"/>
+				ImportLibrary=".\..\Release/Dlugosz Repertoire Tomahawk.vc71{pb9+}.lib"/>
 			<Tool
 				Name="VCMIDLTool"
 				PreprocessorDefinitions="NDEBUG"
@@ -174,12 +174,12 @@
 				Name="VCLinkerTool"
 				AdditionalOptions="/MACHINE:I386"
 				AdditionalDependencies="comctl32.lib"
-				OutputFile="..\Release/Dlugosz Repertoire Tomahawk.vc71{pb9}.dll"
+				OutputFile="..\Release/Dlugosz Repertoire Tomahawk.vc71{pb9+}.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"
-				ProgramDatabaseFile=".\..\Release/Dlugosz Repertoire Tomahawk.vc71{pb9}.pdb"
+				ProgramDatabaseFile=".\..\Release/Dlugosz Repertoire Tomahawk.vc71{pb9+}.pdb"
 				SubSystem="2"
-				ImportLibrary=".\..\Release/Dlugosz Repertoire Tomahawk.vc71{pb9}.lib"/>
+				ImportLibrary=".\..\Release/Dlugosz Repertoire Tomahawk.vc71{pb9+}.lib"/>
 			<Tool
 				Name="VCMIDLTool"
 				PreprocessorDefinitions="NDEBUG"

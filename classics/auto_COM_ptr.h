@@ -20,7 +20,7 @@ public:
       auto_COM_ptr (const auto_COM_ptr<U>& other)
          : p(other.get()) { if(p)  p->AddRef(); }
    // repeat myself because...
-   template<> auto_COM_ptr (const auto_COM_ptr& other)
+   auto_COM_ptr (const auto_COM_ptr& other)
       : p(other.get()) { if(p)  p->AddRef(); }
    void operator= (const auto_COM_ptr& other)
       { if (p!=other.p)  { reset(other.p); if(p) p->AddRef(); } }
@@ -36,7 +36,7 @@ public:
       // designed for [out] parameters, unsiutable for [in,out] parameters
    operator bool() const  { return p != 0; }
       // operator bool needed to prevent accidential calling of operator T** which is destructive.
-   operator ! () const  { return p == 0; }
+   bool operator ! () const  { return p == 0; }
       // if I have operator bool, ought to have this one too.
    };
 

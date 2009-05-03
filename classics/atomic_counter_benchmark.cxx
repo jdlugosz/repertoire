@@ -2,6 +2,7 @@
 // File: classics\atomic_counter_benchmark.cxx
 // Revision: public build 9, shipped on 18-Oct-2006
 
+#define _CRT_SECURE_NO_DEPRECATE
 #include "classics\atomic_counter.h"
 #include "classics\profile_timer.h"
 #include "classics\critical_section.h"
@@ -11,7 +12,7 @@ using classics::critical_section;
 using std::cout;
 using std::endl;
 
-#pragma warning( disable : 4101)  // don't complain about padding variables  
+#pragma warning( disable : 4101)  // don't complain about padding variables
 
 static volatile int* global;
 static volatile int* global2;
@@ -64,7 +65,7 @@ void regular()
  double result= (timer.get_user()/1E3) / 3E8;
  cout << "regular memory variable: " << result*1E9 << " nanoseconds" << endl;
  }
- 
+
 // ========================================
 
 void regular_3X()
@@ -80,7 +81,7 @@ void regular_3X()
  char padding2[60];
  volatile int value3;
  global3= &value3;  // name in scope, but now known to "others".
- 
+
  timer.start();
  for (int loop= 0;  loop < 10000000;  loop++) {
     value1++;  // 1
@@ -167,7 +168,7 @@ void hand_coded()
  double result= (timer.get_user()/1E3) / 3E8;
  cout << "hand-coded INC memory variable: " << result*1E9 << " nanoseconds" << endl;
  }
- 
+
 // ========================================
 
 void hand_coded_3X()
@@ -222,7 +223,7 @@ void hand_coded_3X()
  double result= (timer.get_user()/1E3) / 1E8;
  cout << "3 hand-coded INC memory variables: " << result*1E9 << " nanoseconds (" << result*1E9/3 << " each)" << endl;
  }
- 
+
 // ========================================
 
 void atomic_post_increment()
@@ -246,7 +247,7 @@ void atomic_post_increment()
  double result= (timer.get_user()/1E3) / 1E7;
  cout << "atomic counter post-increment: " << result*1E9 << " nanoseconds" << endl;
  }
- 
+
 // ========================================
 
 void atomic_X3()
@@ -294,9 +295,9 @@ void atomic_X3()
  double result= (timer.get_user()/1E3) / 1E7;
  cout << "3 atomic counters (post-increment) interleaved: " << result*1E9 << " nanoseconds (" << result*1E9/3 << " each)" << endl;
  }
- 
+
  // ========================================
- 
+
  void atomic_pre_increment()
   {
   timer.reset();
@@ -318,9 +319,9 @@ void atomic_X3()
   double result= (timer.get_user()/1E3) / 1E7;
   cout << "atomic counter pre-increment: " << result*1E9 << " nanoseconds" << endl;
   }
-  
+
   // ========================================
-  
+
   void atomic_inc()
    {
    timer.reset();
@@ -342,7 +343,7 @@ void atomic_X3()
    double result= (timer.get_user()/1E3) / 1E7;
    cout << "atomic counter inc: " << result*1E9 << " nanoseconds" << endl;
  }
- 
+
 // ========================================
 
 critical_section cs;
@@ -377,7 +378,7 @@ void critical()
  double result= (timer.get_user()/1E3) / 1E7;
  cout << "critical section: " << result*1E9 << " nanoseconds" << endl;
  }
- 
+
 // ========================================
 
 int main()
@@ -394,4 +395,4 @@ int main()
  critical();
  return 0;
  }
- 
+

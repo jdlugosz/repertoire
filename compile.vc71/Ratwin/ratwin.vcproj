@@ -43,12 +43,12 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/MACHINE:I386"
-				OutputFile="..\Release/Dlugosz Repertoire Ratwin.vc71{pb9}.dll"
+				OutputFile="..\Release/Dlugosz Repertoire Ratwin.vc71{pb9+}.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"
-				ProgramDatabaseFile=".\..\Release/Dlugosz Repertoire Ratwin.vc71{pb9}.pdb"
+				ProgramDatabaseFile=".\..\Release/Dlugosz Repertoire Ratwin.vc71{pb9+}.pdb"
 				SubSystem="2"
-				ImportLibrary=".\..\Release/Dlugosz Repertoire Ratwin.vc71{pb9}.lib"/>
+				ImportLibrary=".\..\Release/Dlugosz Repertoire Ratwin.vc71{pb9+}.lib"/>
 			<Tool
 				Name="VCMIDLTool"
 				PreprocessorDefinitions="NDEBUG"
@@ -105,13 +105,13 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/MACHINE:I386"
-				OutputFile="..\Debug/Dlugosz Repertoire Ratwin.vc71.debug{pb9}.dll"
+				OutputFile="..\Debug/Dlugosz Repertoire Ratwin.vc71.debug{pb9+}.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"
 				GenerateDebugInformation="TRUE"
-				ProgramDatabaseFile=".\..\Debug/Dlugosz Repertoire Ratwin.vc71.debug{pb9}.pdb"
+				ProgramDatabaseFile=".\..\Debug/Dlugosz Repertoire Ratwin.vc71.debug{pb9+}.pdb"
 				SubSystem="2"
-				ImportLibrary=".\..\Debug/Dlugosz Repertoire Ratwin.vc71.debug{pb9}.lib"/>
+				ImportLibrary=".\..\Debug/Dlugosz Repertoire Ratwin.vc71.debug{pb9+}.lib"/>
 			<Tool
 				Name="VCMIDLTool"
 				PreprocessorDefinitions="_DEBUG"
@@ -171,12 +171,12 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/MACHINE:I386"
-				OutputFile="..\Release/Dlugosz Repertoire Ratwin.vc71{pb9}.dll"
+				OutputFile="..\Release/Dlugosz Repertoire Ratwin.vc71{pb9+}.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"
-				ProgramDatabaseFile=".\..\Release/Dlugosz Repertoire Ratwin.vc71{pb9}.pdb"
+				ProgramDatabaseFile=".\..\Release/Dlugosz Repertoire Ratwin.vc71{pb9+}.pdb"
 				SubSystem="2"
-				ImportLibrary=".\..\Release/Dlugosz Repertoire Ratwin.vc71{pb9}.lib"/>
+				ImportLibrary=".\..\Release/Dlugosz Repertoire Ratwin.vc71{pb9+}.lib"/>
 			<Tool
 				Name="VCMIDLTool"
 				PreprocessorDefinitions="NDEBUG"

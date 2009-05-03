@@ -1,5 +1,5 @@
 #define VERSION_ID 3,9,0,2
-#define VERSION_NAME "Public Build 9"
+#define VERSION_NAME "Public Build 9, plus modifications"
 #define NAME "Classics"
 // #define IsPrerelease  // comment-out for official release build
 

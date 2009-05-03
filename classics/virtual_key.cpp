@@ -5,6 +5,7 @@
 #define CLASSICS_EXPORT __declspec(dllexport)
 #include "classics\virtual_key.h"
 #include "classics\string_ios.h"
+#include <string.h>
 
 STARTWRAP
 namespace classics {
@@ -96,15 +97,15 @@ static int parse_prefixes (const char*& p)
  {
  int result= 0;
  for (;;) {
-    if (!strnicmp(p,"shift+",6)) {
+    if (!_strnicmp(p,"shift+",6)) {
        result |= ShiftKey;
        p += 6;
        }
-    else if (!strnicmp (p,"ctrl+",5)) {
+    else if (!_strnicmp (p,"ctrl+",5)) {
        result |= ControlKey;
        p += 5;
        }
-    else if (!strnicmp (p,"alt+",4)) {
+    else if (!_strnicmp (p,"alt+",4)) {
        result |= AltKey;
        p += 4;
        }
@@ -135,7 +136,7 @@ VK parse<VK> (const ustring& us)
        // brute but simple, for now
        const char* name= key_names[loop];
        if (!name)  continue;
-       if (!strcmpi (name, p))  return VK(result+loop);
+       if (!_stricmp (name, p))  return VK(result+loop);
        }
     }
  error:
